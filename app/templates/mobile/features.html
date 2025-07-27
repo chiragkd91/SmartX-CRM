@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Features - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Mobile Features</h1>
+        
+        {% if features %}
+        <div class="features-grid">
+            {% for feature in features %}
+            <div class="feature-card">
+                <h3>{{ feature.name }}</h3>
+                <p>{{ feature.description }}</p>
+                <div class="feature-status">
+                    <span class="status-badge {{ 'enabled' if feature.enabled else 'disabled' }}">
+                        {{ 'Enabled' if feature.enabled else 'Disabled' }}
+                    </span>
+                </div>
+                <div class="feature-actions">
+                    {% if feature.enabled %}
+                    <form method="POST" action="{{ url_for('mobile.disable_feature', feature_name=feature.name) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-warning">Disable</button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('mobile.enable_feature', feature_name=feature.name) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-success">Enable</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No mobile features available.</p>
+        {% endif %}
+
+        <div class="actions">
+            <a href="{{ url_for('mobile.mobile_dashboard') }}" class="btn btn-primary">Mobile Dashboard</a>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunity Settings - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .stage-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .stage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .stage-probability {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Opportunity Settings</h1>
+                <p>Configure opportunity management and sales pipeline settings</p>
+            </div>
+            <div>
+                <a href="/crm/settings" class="btn btn-primary">Back to Settings</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h2>Sales Pipeline Stages</h2>
+            <form method="POST" action="/crm/settings/opportunities/stages">
+                <div class="form-group">
+                    <label for="new_stage">Add New Stage</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="new_stage" name="stage_name" placeholder="Stage Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="stage_probability" name="stage_probability" placeholder="Probability %" min="0" max="100">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Stage</button>
+                </div>
+            </form>
+
+            <div class="stage-list">
+                <h4>Current Pipeline Stages</h4>
+                <div class="stage-item">
+                    <div>
+                        <strong>Prospecting</strong>
+                        <div class="stage-probability">10%</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStage('prospecting')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStage('prospecting')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Qualification</strong>
+                        <div class="stage-probability">25%</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStage('qualification')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStage('qualification')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Proposal</strong>
+                        <div class="stage-probability">50%</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStage('proposal')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStage('proposal')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Negotiation</strong>
+                        <div class="stage-probability">75%</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStage('negotiation')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStage('negotiation')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Closed Won</strong>
+                        <div class="stage-probability">100%</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStage('closed-won')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStage('closed-won')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Closed Lost</strong>
+                        <div class="stage-probability">0%</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStage('closed-lost')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStage('closed-lost')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Opportunity Types</h2>
+            <form method="POST" action="/crm/settings/opportunities/types">
+                <div class="form-group">
+                    <label for="new_type">Add New Type</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="new_type" name="type_name" placeholder="Type Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="type_description" name="type_description" placeholder="Description">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Type</button>
+                </div>
+            </form>
+
+            <div class="stage-list">
+                <h4>Current Opportunity Types</h4>
+                <div class="stage-item">
+                    <div>
+                        <strong>New Business</strong>
+                        <div>New customer acquisition</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editType('new-business')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteType('new-business')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Existing Business</strong>
+                        <div>Expansion with existing customer</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editType('existing-business')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteType('existing-business')">Delete</button>
+                    </div>
+                </div>
+                <div class="stage-item">
+                    <div>
+                        <strong>Renewal</strong>
+                        <div>Contract renewal</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editType('renewal')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteType('renewal')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Sales Forecasting</h2>
+            <form method="POST" action="/crm/settings/opportunities/forecasting">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="forecast_period">Forecast Period</label>
+                        <select id="forecast_period" name="forecast_period">
+                            <option value="monthly" {% if settings.forecast_period == 'monthly' %}selected{% endif %}>Monthly</option>
+                            <option value="quarterly" {% if settings.forecast_period == 'quarterly' %}selected{% endif %}>Quarterly</option>
+                            <option value="yearly" {% if settings.forecast_period == 'yearly' %}selected{% endif %}>Yearly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="forecast_method">Forecast Method</label>
+                        <select id="forecast_method" name="forecast_method">
+                            <option value="probability" {% if settings.forecast_method == 'probability' %}selected{% endif %}>Probability Based</option>
+                            <option value="stage" {% if settings.forecast_method == 'stage' %}selected{% endif %}>Stage Based</option>
+                            <option value="weighted" {% if settings.forecast_method == 'weighted' %}selected{% endif %}>Weighted Average</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_forecast" {% if settings.auto_forecast %}checked{% endif %}>
+                        Enable automatic forecasting
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="forecast_confidence">Forecast Confidence Level (%)</label>
+                    <input type="number" id="forecast_confidence" name="forecast_confidence" value="{{ settings.forecast_confidence or '80' }}" min="50" max="100">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Forecasting Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Deal Management</h2>
+            <form method="POST" action="/crm/settings/opportunities/deals">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="min_deal_value">Minimum Deal Value</label>
+                        <input type="number" id="min_deal_value" name="min_deal_value" value="{{ settings.min_deal_value or '1000' }}" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_deal_value">Maximum Deal Value</label>
+                        <input type="number" id="max_deal_value" name="max_deal_value" value="{{ settings.max_deal_value or '1000000' }}" min="0" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="deal_approval_threshold">Approval Threshold</label>
+                        <input type="number" id="deal_approval_threshold" name="deal_approval_threshold" value="{{ settings.deal_approval_threshold or '50000' }}" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="deal_expiry_days">Deal Expiry (days)</label>
+                        <input type="number" id="deal_expiry_days" name="deal_expiry_days" value="{{ settings.deal_expiry_days or '90' }}" min="1" max="365">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_approval" {% if settings.require_approval %}checked{% endif %}>
+                        Require approval for large deals
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_close_expired" {% if settings.auto_close_expired %}checked{% endif %}>
+                        Automatically close expired deals
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Deal Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Win/Loss Analysis</h2>
+            <form method="POST" action="/crm/settings/opportunities/analysis">
+                <div class="form-group">
+                    <label for="loss_reasons">Loss Reasons</label>
+                    <textarea id="loss_reasons" name="loss_reasons" placeholder="Enter common loss reasons, one per line">{{ settings.loss_reasons or 'Price too high\nCompetitor won\nNo budget\nNo decision maker\nTiming issues' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="win_reasons">Win Reasons</label>
+                    <textarea id="win_reasons" name="win_reasons" placeholder="Enter common win reasons, one per line">{{ settings.win_reasons or 'Best solution\nCompetitive pricing\nStrong relationship\nQuick implementation\nGood references' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="track_win_loss" {% if settings.track_win_loss %}checked{% endif %}>
+                        Track win/loss reasons
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_reason" {% if settings.require_reason %}checked{% endif %}>
+                        Require reason when closing deals
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Analysis Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Pipeline Automation</h2>
+            <form method="POST" action="/crm/settings/opportunities/automation">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_stage_progression" {% if settings.auto_stage_progression %}checked{% endif %}>
+                        Enable automatic stage progression
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_task_creation" {% if settings.auto_task_creation %}checked{% endif %}>
+                        Create tasks based on stage
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_notifications" {% if settings.auto_notifications %}checked{% endif %}>
+                        Send notifications for stage changes
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="stage_timeout">Stage Timeout (days)</label>
+                    <input type="number" id="stage_timeout" name="stage_timeout" value="{{ settings.stage_timeout or '30' }}" min="1" max="365">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Automation Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editStage(stage) {
+            // Handle stage editing
+            alert(`Editing stage: ${stage}`);
+        }
+
+        function deleteStage(stage) {
+            if (confirm(`Are you sure you want to delete the stage: ${stage}?`)) {
+                alert(`Stage ${stage} deleted successfully`);
+            }
+        }
+
+        function editType(type) {
+            // Handle type editing
+            alert(`Editing type: ${type}`);
+        }
+
+        function deleteType(type) {
+            if (confirm(`Are you sure you want to delete the type: ${type}?`)) {
+                alert(`Type ${type} deleted successfully`);
+            }
+        }
+    </script>
+</body>
+</html> 

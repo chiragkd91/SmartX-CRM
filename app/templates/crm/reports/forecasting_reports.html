@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecasting Reports - CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1em;
+        }
+        .metric-change {
+            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .forecast-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .forecast-table th,
+        .forecast-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .forecast-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .forecast-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .forecast-on-track {
+            background: #d4edda;
+            color: #155724;
+        }
+        .forecast-at-risk {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .forecast-behind {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Forecasting Reports</h1>
+            <div>
+                <a href="/crm/reports" class="btn btn-primary">Reports Dashboard</a>
+                <a href="/crm/reports/forecasting_reports/export" class="btn btn-success">Export Report</a>
+                <a href="/crm/reports/forecasting_reports/print" class="btn btn-warning">Print Report</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">${{ "{:,.0f}".format(metrics.forecasted_revenue) }}</div>
+                <div class="metric-label">Forecasted Revenue</div>
+                <div class="metric-change {% if metrics.forecast_accuracy >= 0 %}positive{% else %}negative{% endif %}">
+                    {{ "%.1f"|format(metrics.forecast_accuracy) }}% accuracy
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_pipeline }}</div>
+                <div class="metric-label">Total Pipeline</div>
+                <div class="metric-change {% if metrics.pipeline_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.pipeline_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.pipeline_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.win_probability) }}%</div>
+                <div class="metric-label">Average Win Probability</div>
+                <div class="metric-change {% if metrics.probability_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.probability_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.probability_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.forecast_periods }}</div>
+                <div class="metric-label">Forecast Periods</div>
+                <div class="metric-change {% if metrics.periods_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.periods_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.periods_growth) }}% vs last period
+                </div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/crm/reports/forecasting_reports">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="forecast_period">Forecast Period:</label>
+                        <select id="forecast_period" name="forecast_period">
+                            <option value="">All Periods</option>
+                            <option value="1m" {% if request.args.get('forecast_period') == '1m' %}selected{% endif %}>1 Month</option>
+                            <option value="3m" {% if request.args.get('forecast_period') == '3m' %}selected{% endif %}>3 Months</option>
+                            <option value="6m" {% if request.args.get('forecast_period') == '6m' %}selected{% endif %}>6 Months</option>
+                            <option value="1y" {% if request.args.get('forecast_period') == '1y' %}selected{% endif %}>1 Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="forecast_model">Forecast Model:</label>
+                        <select id="forecast_model" name="forecast_model">
+                            <option value="">All Models</option>
+                            <option value="linear" {% if request.args.get('forecast_model') == 'linear' %}selected{% endif %}>Linear Regression</option>
+                            <option value="exponential" {% if request.args.get('forecast_model') == 'exponential' %}selected{% endif %}>Exponential Smoothing</option>
+                            <option value="arima" {% if request.args.get('forecast_model') == 'arima' %}selected{% endif %}>ARIMA</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="confidence_level">Confidence Level:</label>
+                        <select id="confidence_level" name="confidence_level">
+                            <option value="">All Levels</option>
+                            <option value="high" {% if request.args.get('confidence_level') == 'high' %}selected{% endif %}>High (90%+)</option>
+                            <option value="medium" {% if request.args.get('confidence_level') == 'medium' %}selected{% endif %}>Medium (70-89%)</option>
+                            <option value="low" {% if request.args.get('confidence_level') == 'low' %}selected{% endif %}>Low (<70%)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/reports/forecasting_reports" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Revenue Forecast Trend</h3>
+                <canvas id="revenueForecastChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Forecast Accuracy by Model</h3>
+                <canvas id="forecastAccuracyChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="card-title">Multi-Period Forecast Comparison</h3>
+            <canvas id="forecastComparisonChart" width="800" height="400"></canvas>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Forecast Performance Summary</h3>
+                <table class="forecast-table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Forecasted</th>
+                            <th>Actual</th>
+                            <th>Accuracy</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for forecast in forecast_summary %}
+                        <tr>
+                            <td>{{ forecast.period }}</td>
+                            <td>${{ "{:,.0f}".format(forecast.forecasted) }}</td>
+                            <td>${{ "{:,.0f}".format(forecast.actual) }}</td>
+                            <td>{{ "%.1f"|format(forecast.accuracy) }}%</td>
+                            <td>
+                                {% if forecast.status == 'on_track' %}
+                                    <span class="forecast-badge forecast-on-track">On Track</span>
+                                {% elif forecast.status == 'at_risk' %}
+                                    <span class="forecast-badge forecast-at-risk">At Risk</span>
+                                {% else %}
+                                    <span class="forecast-badge forecast-behind">Behind</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Pipeline Forecast</h3>
+                <canvas id="pipelineForecastChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Detailed Forecast Analysis</h3>
+            <table class="forecast-table">
+                <thead>
+                    <tr>
+                        <th>Opportunity</th>
+                        <th>Customer</th>
+                        <th>Forecasted Amount</th>
+                        <th>Probability</th>
+                        <th>Close Date</th>
+                        <th>Model Used</th>
+                        <th>Confidence</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for forecast in detailed_forecasts %}
+                    <tr>
+                        <td>{{ forecast.opportunity_name }}</td>
+                        <td>{{ forecast.customer_name }}</td>
+                        <td>${{ "{:,.0f}".format(forecast.forecasted_amount) }}</td>
+                        <td>{{ "%.1f"|format(forecast.probability) }}%</td>
+                        <td>{{ forecast.close_date }}</td>
+                        <td>{{ forecast.model_used }}</td>
+                        <td>{{ "%.1f"|format(forecast.confidence) }}%</td>
+                        <td>
+                            <a href="/crm/opportunities/{{ forecast.opportunity_id }}" class="btn btn-primary btn-sm">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Revenue Forecast Chart
+        const revenueForecastCtx = document.getElementById('revenueForecastChart').getContext('2d');
+        new Chart(revenueForecastCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Historical Revenue',
+                    data: [150000, 160000, 155000, 170000, 165000, 180000, null, null, null, null, null, null],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                }, {
+                    label: 'Forecasted Revenue',
+                    data: [null, null, null, null, null, null, 185000, 190000, 195000, 200000, 205000, 210000],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Forecast Accuracy Chart
+        const forecastAccuracyCtx = document.getElementById('forecastAccuracyChart').getContext('2d');
+        new Chart(forecastAccuracyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Linear', 'Exponential', 'ARIMA', 'Neural Network'],
+                datasets: [{
+                    label: 'Accuracy (%)',
+                    data: [85, 92, 88, 95],
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Forecast Comparison Chart
+        const forecastComparisonCtx = document.getElementById('forecastComparisonChart').getContext('2d');
+        new Chart(forecastComparisonCtx, {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: '1-Month Forecast',
+                    data: [450000, 520000, 580000, 630000],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                }, {
+                    label: '3-Month Forecast',
+                    data: [460000, 530000, 590000, 640000],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                }, {
+                    label: '6-Month Forecast',
+                    data: [470000, 540000, 600000, 650000],
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pipeline Forecast Chart
+        const pipelineForecastCtx = document.getElementById('pipelineForecastChart').getContext('2d');
+        new Chart(pipelineForecastCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Qualified', 'Proposal', 'Negotiation', 'Closed Won'],
+                datasets: [{
+                    data: [40, 25, 20, 15],
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

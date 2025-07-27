@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Designer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .workflow-container {
+            display: flex;
+            gap: 20px;
+            height: 80vh;
+        }
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .canvas {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: auto;
+        }
+        .properties-panel {
+            width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .workflow-item {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: move;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .workflow-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .workflow-item.trigger {
+            border-left: 4px solid #dc3545;
+        }
+        .workflow-item.action {
+            border-left: 4px solid #28a745;
+        }
+        .workflow-item.condition {
+            border-left: 4px solid #ffc107;
+        }
+        .workflow-item.delay {
+            border-left: 4px solid #6f42c1;
+        }
+        .canvas-node {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            background: white;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            font-size: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .canvas-node.trigger {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .canvas-node.action {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .canvas-node.condition {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+        .canvas-node.delay {
+            border-color: #6f42c1;
+            background: #e2d9f3;
+        }
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: #007bff;
+            transform-origin: left center;
+        }
+        .workflow-list {
+            margin-top: 20px;
+        }
+        .workflow-card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .workflow-card h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .workflow-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Workflow Designer</h1>
+                <p>Create and manage automated workflows for your CRM</p>
+            </div>
+            <div>
+                <button class="btn btn-secondary" onclick="saveWorkflow()">Save Draft</button>
+                <button class="btn btn-success" onclick="activateWorkflow()">Activate</button>
+                <a href="/crm/workflows" class="btn btn-secondary">Back to Workflows</a>
+            </div>
+        </div>
+
+        <div class="workflow-container">
+            <!-- Left Sidebar - Workflow Components -->
+            <div class="sidebar">
+                <h3>Workflow Components</h3>
+                
+                <h4>Triggers</h4>
+                <div class="workflow-item trigger" draggable="true" data-type="trigger" data-component="lead_created">
+                    <strong>Lead Created</strong>
+                    <p>Trigger when a new lead is created</p>
+                </div>
+                <div class="workflow-item trigger" draggable="true" data-type="trigger" data-component="email_opened">
+                    <strong>Email Opened</strong>
+                    <p>Trigger when an email is opened</p>
+                </div>
+                <div class="workflow-item trigger" draggable="true" data-type="trigger" data-component="form_submitted">
+                    <strong>Form Submitted</strong>
+                    <p>Trigger when a form is submitted</p>
+                </div>
+                <div class="workflow-item trigger" draggable="true" data-type="trigger" data-component="deal_stage_changed">
+                    <strong>Deal Stage Changed</strong>
+                    <p>Trigger when deal stage changes</p>
+                </div>
+
+                <h4>Actions</h4>
+                <div class="workflow-item action" draggable="true" data-type="action" data-component="send_email">
+                    <strong>Send Email</strong>
+                    <p>Send automated email</p>
+                </div>
+                <div class="workflow-item action" draggable="true" data-type="action" data-component="create_task">
+                    <strong>Create Task</strong>
+                    <p>Create a new task</p>
+                </div>
+                <div class="workflow-item action" draggable="true" data-type="action" data-component="update_lead">
+                    <strong>Update Lead</strong>
+                    <p>Update lead information</p>
+                </div>
+                <div class="workflow-item action" draggable="true" data-type="action" data-component="assign_owner">
+                    <strong>Assign Owner</strong>
+                    <p>Assign to team member</p>
+                </div>
+
+                <h4>Conditions</h4>
+                <div class="workflow-item condition" draggable="true" data-type="condition" data-component="if_condition">
+                    <strong>If Condition</strong>
+                    <p>Check if condition is met</p>
+                </div>
+                <div class="workflow-item condition" draggable="true" data-type="condition" data-component="wait_condition">
+                    <strong>Wait Until</strong>
+                    <p>Wait for condition</p>
+                </div>
+
+                <h4>Delays</h4>
+                <div class="workflow-item delay" draggable="true" data-type="delay" data-component="delay">
+                    <strong>Delay</strong>
+                    <p>Add time delay</p>
+                </div>
+
+                <div class="workflow-list">
+                    <h3>Existing Workflows</h3>
+                    <div class="workflow-card">
+                        <h4>Lead Nurturing Campaign</h4>
+                        <span class="workflow-status status-active">Active</span>
+                        <p>Automated follow-up for new leads</p>
+                    </div>
+                    <div class="workflow-card">
+                        <h4>Deal Follow-up</h4>
+                        <span class="workflow-status status-draft">Draft</span>
+                        <p>Follow-up reminders for deals</p>
+                    </div>
+                    <div class="workflow-card">
+                        <h4>Customer Onboarding</h4>
+                        <span class="workflow-status status-active">Active</span>
+                        <p>Welcome series for new customers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Canvas -->
+            <div class="canvas" id="workflow-canvas">
+                <div style="padding: 20px; color: #666; text-align: center;">
+                    <h3>Workflow Canvas</h3>
+                    <p>Drag components from the sidebar to build your workflow</p>
+                    <p>Connect components by dragging from one node to another</p>
+                </div>
+            </div>
+
+            <!-- Right Properties Panel -->
+            <div class="properties-panel">
+                <h3>Properties</h3>
+                <div id="workflow-properties">
+                    <div class="form-group">
+                        <label>Workflow Name</label>
+                        <input type="text" id="workflow-name" placeholder="Enter workflow name">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="workflow-description" rows="3" placeholder="Enter workflow description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="workflow-status">
+                            <option value="draft">Draft</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="node-properties" class="hidden">
+                    <h4>Node Properties</h4>
+                    <div class="form-group">
+                        <label>Node Name</label>
+                        <input type="text" id="node-name" placeholder="Enter node name">
+                    </div>
+                    <div class="form-group">
+                        <label>Node Type</label>
+                        <input type="text" id="node-type" readonly>
+                    </div>
+                    <div id="trigger-properties" class="hidden">
+                        <div class="form-group">
+                            <label>Trigger Event</label>
+                            <select id="trigger-event">
+                                <option value="lead_created">Lead Created</option>
+                                <option value="email_opened">Email Opened</option>
+                                <option value="form_submitted">Form Submitted</option>
+                                <option value="deal_stage_changed">Deal Stage Changed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="action-properties" class="hidden">
+                        <div class="form-group">
+                            <label>Action Type</label>
+                            <select id="action-type">
+                                <option value="send_email">Send Email</option>
+                                <option value="create_task">Create Task</option>
+                                <option value="update_lead">Update Lead</option>
+                                <option value="assign_owner">Assign Owner</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="condition-properties" class="hidden">
+                        <div class="form-group">
+                            <label>Condition Type</label>
+                            <select id="condition-type">
+                                <option value="if">If</option>
+                                <option value="wait_until">Wait Until</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Condition Logic</label>
+                            <textarea id="condition-logic" rows="3" placeholder="Enter condition logic"></textarea>
+                        </div>
+                    </div>
+                    <div id="delay-properties" class="hidden">
+                        <div class="form-group">
+                            <label>Delay Duration</label>
+                            <input type="number" id="delay-duration" placeholder="Enter delay in minutes">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedNode = null;
+        let nodes = [];
+        let connections = [];
+        let nodeCounter = 0;
+
+        // Initialize drag and drop
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDragAndDrop();
+            initializeCanvas();
+        });
+
+        function initializeDragAndDrop() {
+            const workflowItems = document.querySelectorAll('.workflow-item');
+            const canvas = document.getElementById('workflow-canvas');
+
+            workflowItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+            });
+
+            canvas.addEventListener('dragover', handleDragOver);
+            canvas.addEventListener('drop', handleDrop);
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                type: e.target.dataset.type,
+                component: e.target.dataset.component,
+                name: e.target.querySelector('strong').textContent
+            }));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            createNode(data, x, y);
+        }
+
+        function createNode(data, x, y) {
+            const node = {
+                id: 'node-' + nodeCounter++,
+                type: data.type,
+                component: data.component,
+                name: data.name,
+                x: x,
+                y: y
+            };
+
+            nodes.push(node);
+            renderNode(node);
+        }
+
+        function renderNode(node) {
+            const canvas = document.getElementById('workflow-canvas');
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `canvas-node ${node.type}`;
+            nodeElement.id = node.id;
+            nodeElement.style.left = node.x + 'px';
+            nodeElement.style.top = node.y + 'px';
+            nodeElement.textContent = node.name;
+            
+            nodeElement.addEventListener('click', () => selectNode(node));
+            nodeElement.addEventListener('mousedown', startNodeDrag);
+            
+            canvas.appendChild(nodeElement);
+        }
+
+        function selectNode(node) {
+            selectedNode = node;
+            showNodeProperties(node);
+        }
+
+        function showNodeProperties(node) {
+            document.getElementById('workflow-properties').classList.add('hidden');
+            document.getElementById('node-properties').classList.remove('hidden');
+            
+            document.getElementById('node-name').value = node.name;
+            document.getElementById('node-type').value = node.type;
+            
+            // Hide all property sections
+            document.getElementById('trigger-properties').classList.add('hidden');
+            document.getElementById('action-properties').classList.add('hidden');
+            document.getElementById('condition-properties').classList.add('hidden');
+            document.getElementById('delay-properties').classList.add('hidden');
+            
+            // Show relevant property section
+            if (node.type === 'trigger') {
+                document.getElementById('trigger-properties').classList.remove('hidden');
+                document.getElementById('trigger-event').value = node.component;
+            } else if (node.type === 'action') {
+                document.getElementById('action-properties').classList.remove('hidden');
+                document.getElementById('action-type').value = node.component;
+            } else if (node.type === 'condition') {
+                document.getElementById('condition-properties').classList.remove('hidden');
+                document.getElementById('condition-type').value = node.component;
+            } else if (node.type === 'delay') {
+                document.getElementById('delay-properties').classList.remove('hidden');
+            }
+        }
+
+        function startNodeDrag(e) {
+            e.preventDefault();
+            const node = e.target;
+            let isDragging = false;
+            let startX, startY;
+
+            function onMouseMove(e) {
+                if (!isDragging) {
+                    isDragging = true;
+                    startX = e.clientX - parseInt(node.style.left);
+                    startY = e.clientY - parseInt(node.style.top);
+                }
+                
+                node.style.left = (e.clientX - startX) + 'px';
+                node.style.top = (e.clientY - startY) + 'px';
+            }
+
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+
+        function initializeCanvas() {
+            // Add canvas click handler to deselect nodes
+            document.getElementById('workflow-canvas').addEventListener('click', (e) => {
+                if (e.target.id === 'workflow-canvas') {
+                    selectedNode = null;
+                    document.getElementById('node-properties').classList.add('hidden');
+                    document.getElementById('workflow-properties').classList.remove('hidden');
+                }
+            });
+        }
+
+        function saveWorkflow() {
+            const workflowData = {
+                name: document.getElementById('workflow-name').value,
+                description: document.getElementById('workflow-description').value,
+                status: document.getElementById('workflow-status').value,
+                nodes: nodes,
+                connections: connections
+            };
+            
+            console.log('Saving workflow:', workflowData);
+            alert('Workflow saved as draft!');
+        }
+
+        function activateWorkflow() {
+            if (nodes.length === 0) {
+                alert('Please add at least one node to the workflow');
+                return;
+            }
+            
+            document.getElementById('workflow-status').value = 'active';
+            saveWorkflow();
+            alert('Workflow activated successfully!');
+        }
+    </script>
+</body>
+</html> 

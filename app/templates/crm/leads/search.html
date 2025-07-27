@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Lead Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .search-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .search-tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        .search-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .search-tab.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .search-tab:hover {
+            background: #f8f9fa;
+        }
+        .search-form {
+            display: none;
+        }
+        .search-form.active {
+            display: block;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        .search-criteria {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .criteria-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .criteria-row select, .criteria-row input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .criteria-operator {
+            min-width: 120px;
+        }
+        .criteria-value {
+            min-width: 200px;
+        }
+        .btn-remove-criteria {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .saved-searches {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .saved-search-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        .saved-search-info {
+            flex: 1;
+        }
+        .saved-search-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .saved-search-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .saved-search-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .results-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .results-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-new {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-contacted {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-qualified {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .status-lost {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .quick-search {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .quick-search-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .quick-search-btn {
+            background: white;
+            border: 1px solid #007bff;
+            color: #007bff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quick-search-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+        .search-summary {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pagination button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .pagination button:hover:not(.active) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced Lead Search</h1>
+            <div>
+                <button class="btn btn-success" onclick="saveSearch()">Save Search</button>
+                <button class="btn btn-warning" onclick="exportResults()">Export Results</button>
+                <a href="/crm/leads" class="btn btn-secondary">Back to Leads</a>
+            </div>
+        </div>
+
+        <!-- Quick Search -->
+        <div class="quick-search">
+            <h3>Quick Search</h3>
+            <div class="quick-search-buttons">
+                <button class="quick-search-btn" onclick="quickSearch('new')">New Leads</button>
+                <button class="quick-search-btn" onclick="quickSearch('qualified')">Qualified Leads</button>
+                <button class="quick-search-btn" onclick="quickSearch('website')">Website Leads</button>
+                <button class="quick-search-btn" onclick="quickSearch('email')">Email Campaign Leads</button>
+                <button class="quick-search-btn" onclick="quickSearch('recent')">Recent Activity</button>
+                <button class="quick-search-btn" onclick="quickSearch('high-value')">High Value Leads</button>
+            </div>
+        </div>
+
+        <!-- Saved Searches -->
+        <div class="saved-searches">
+            <h3>Saved Searches</h3>
+            <div class="saved-search-item">
+                <div class="saved-search-info">
+                    <div class="saved-search-name">High Value Prospects</div>
+                    <div class="saved-search-desc">Leads with company size > 100 employees and budget > $50k</div>
+                </div>
+                <div class="saved-search-actions">
+                    <button class="btn btn-primary" onclick="loadSavedSearch(1)">Load</button>
+                    <button class="btn btn-warning" onclick="editSavedSearch(1)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteSavedSearch(1)">Delete</button>
+                </div>
+            </div>
+            <div class="saved-search-item">
+                <div class="saved-search-info">
+                    <div class="saved-search-name">Website Visitors</div>
+                    <div class="saved-search-desc">Leads from website with > 3 page views</div>
+                </div>
+                <div class="saved-search-actions">
+                    <button class="btn btn-primary" onclick="loadSavedSearch(2)">Load</button>
+                    <button class="btn btn-warning" onclick="editSavedSearch(2)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteSavedSearch(2)">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Interface -->
+        <div class="search-container">
+            <div class="search-tabs">
+                <div class="search-tab active" onclick="switchTab('basic')">Basic Search</div>
+                <div class="search-tab" onclick="switchTab('advanced')">Advanced Search</div>
+                <div class="search-tab" onclick="switchTab('custom')">Custom Query</div>
+            </div>
+
+            <!-- Basic Search -->
+            <div id="basic-search" class="search-form active">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="basic-name">Name</label>
+                        <input type="text" id="basic-name" placeholder="Search by name...">
+                    </div>
+                    <div class="form-group">
+                        <label for="basic-company">Company</label>
+                        <input type="text" id="basic-company" placeholder="Search by company...">
+                    </div>
+                    <div class="form-group">
+                        <label for="basic-email">Email</label>
+                        <input type="email" id="basic-email" placeholder="Search by email...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="basic-status">Status</label>
+                        <select id="basic-status">
+                            <option value="">All Statuses</option>
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="qualified">Qualified</option>
+                            <option value="lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="basic-source">Lead Source</label>
+                        <select id="basic-source">
+                            <option value="">All Sources</option>
+                            <option value="website">Website</option>
+                            <option value="email">Email Campaign</option>
+                            <option value="social">Social Media</option>
+                            <option value="referral">Referral</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="basic-date">Created Date</label>
+                        <select id="basic-date">
+                            <option value="">All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Search -->
+            <div id="advanced-search" class="search-form">
+                <div class="search-criteria">
+                    <h4>Search Criteria</h4>
+                    <div id="criteria-container">
+                        <div class="criteria-row">
+                            <select class="criteria-field">
+                                <option value="">Select Field</option>
+                                <option value="first_name">First Name</option>
+                                <option value="last_name">Last Name</option>
+                                <option value="email">Email</option>
+                                <option value="company">Company</option>
+                                <option value="job_title">Job Title</option>
+                                <option value="phone">Phone</option>
+                                <option value="status">Status</option>
+                                <option value="lead_source">Lead Source</option>
+                                <option value="created_date">Created Date</option>
+                                <option value="last_activity">Last Activity</option>
+                                <option value="company_size">Company Size</option>
+                                <option value="industry">Industry</option>
+                                <option value="budget">Budget</option>
+                            </select>
+                            <select class="criteria-operator">
+                                <option value="equals">Equals</option>
+                                <option value="contains">Contains</option>
+                                <option value="starts_with">Starts With</option>
+                                <option value="ends_with">Ends With</option>
+                                <option value="greater_than">Greater Than</option>
+                                <option value="less_than">Less Than</option>
+                                <option value="between">Between</option>
+                                <option value="is_empty">Is Empty</option>
+                                <option value="is_not_empty">Is Not Empty</option>
+                            </select>
+                            <input type="text" class="criteria-value" placeholder="Enter value">
+                            <button type="button" class="btn-remove-criteria" onclick="removeCriteria(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addCriteria()">Add Criteria</button>
+                </div>
+            </div>
+
+            <!-- Custom Query -->
+            <div id="custom-search" class="search-form">
+                <div class="form-group">
+                    <label for="custom-query">Custom SQL Query</label>
+                    <textarea id="custom-query" rows="8" placeholder="Enter your custom SQL query here..."></textarea>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn btn-secondary" onclick="showQueryExamples()">Show Examples</button>
+                    <button class="btn btn-warning" onclick="validateQuery()">Validate Query</button>
+                </div>
+            </div>
+
+            <div class="search-actions">
+                <button class="btn btn-primary" onclick="performSearch()">Search</button>
+                <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+                <button class="btn btn-success" onclick="saveSearch()">Save Search</button>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="search-results" style="display: none;">
+            <div class="search-summary">
+                <strong>Search Results:</strong> Found 156 leads matching your criteria
+            </div>
+
+            <div class="results-container">
+                <div class="results-header">
+                    <h3>Search Results</h3>
+                    <div>
+                        <select id="sort-by">
+                            <option value="created_date">Sort by Created Date</option>
+                            <option value="name">Sort by Name</option>
+                            <option value="company">Sort by Company</option>
+                            <option value="status">Sort by Status</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Lead Name</th>
+                            <th>Company</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                        <tr>
+                            <td>John Smith</td>
+                            <td>TechCorp Inc</td>
+                            <td>john.smith@techcorp.com</td>
+                            <td>(555) 123-4567</td>
+                            <td><span class="status-badge status-new">New</span></td>
+                            <td>Website</td>
+                            <td>2024-01-15</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewLead(1)">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sarah Johnson</td>
+                            <td>Innovate Solutions</td>
+                            <td>sarah.j@innovate.com</td>
+                            <td>(555) 234-5678</td>
+                            <td><span class="status-badge status-contacted">Contacted</span></td>
+                            <td>Email Campaign</td>
+                            <td>2024-01-14</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewLead(2)">View</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button onclick="changePage(1)">First</button>
+                <button onclick="changePage(1)">Previous</button>
+                <button class="active">1</button>
+                <button onclick="changePage(2)">2</button>
+                <button onclick="changePage(3)">3</button>
+                <button onclick="changePage(2)">Next</button>
+                <button onclick="changePage(8)">Last</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Search Modal -->
+    <div id="saveSearchModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Save Search</h2>
+            
+            <form id="saveSearchForm">
+                <div class="form-group">
+                    <label for="search-name">Search Name</label>
+                    <input type="text" id="search-name" required placeholder="Enter a name for this search">
+                </div>
+                <div class="form-group">
+                    <label for="search-description">Description (Optional)</label>
+                    <textarea id="search-description" rows="3" placeholder="Describe what this search does..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="search-public"> Make this search public (available to all users)
+                    </label>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all search forms
+            document.querySelectorAll('.search-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.search-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected form and activate tab
+            document.getElementById(tabName + '-search').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function addCriteria() {
+            const container = document.getElementById('criteria-container');
+            const criteriaRow = document.createElement('div');
+            criteriaRow.className = 'criteria-row';
+            criteriaRow.innerHTML = `
+                <select class="criteria-field">
+                    <option value="">Select Field</option>
+                    <option value="first_name">First Name</option>
+                    <option value="last_name">Last Name</option>
+                    <option value="email">Email</option>
+                    <option value="company">Company</option>
+                    <option value="job_title">Job Title</option>
+                    <option value="phone">Phone</option>
+                    <option value="status">Status</option>
+                    <option value="lead_source">Lead Source</option>
+                    <option value="created_date">Created Date</option>
+                    <option value="last_activity">Last Activity</option>
+                    <option value="company_size">Company Size</option>
+                    <option value="industry">Industry</option>
+                    <option value="budget">Budget</option>
+                </select>
+                <select class="criteria-operator">
+                    <option value="equals">Equals</option>
+                    <option value="contains">Contains</option>
+                    <option value="starts_with">Starts With</option>
+                    <option value="ends_with">Ends With</option>
+                    <option value="greater_than">Greater Than</option>
+                    <option value="less_than">Less Than</option>
+                    <option value="between">Between</option>
+                    <option value="is_empty">Is Empty</option>
+                    <option value="is_not_empty">Is Not Empty</option>
+                </select>
+                <input type="text" class="criteria-value" placeholder="Enter value">
+                <button type="button" class="btn-remove-criteria" onclick="removeCriteria(this)">Remove</button>
+            `;
+            container.appendChild(criteriaRow);
+        }
+
+        function removeCriteria(button) {
+            button.parentElement.remove();
+        }
+
+        function performSearch() {
+            // Show results
+            document.getElementById('search-results').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('search-results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearSearch() {
+            // Clear all form fields
+            document.querySelectorAll('input, select, textarea').forEach(field => {
+                field.value = '';
+            });
+            
+            // Remove additional criteria rows
+            const criteriaContainer = document.getElementById('criteria-container');
+            const criteriaRows = criteriaContainer.querySelectorAll('.criteria-row');
+            for (let i = 1; i < criteriaRows.length; i++) {
+                criteriaRows[i].remove();
+            }
+            
+            // Hide results
+            document.getElementById('search-results').style.display = 'none';
+        }
+
+        function saveSearch() {
+            document.getElementById('saveSearchModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('saveSearchModal').style.display = 'none';
+        }
+
+        function quickSearch(type) {
+            clearSearch();
+            
+            switch (type) {
+                case 'new':
+                    document.getElementById('basic-status').value = 'new';
+                    break;
+                case 'qualified':
+                    document.getElementById('basic-status').value = 'qualified';
+                    break;
+                case 'website':
+                    document.getElementById('basic-source').value = 'website';
+                    break;
+                case 'email':
+                    document.getElementById('basic-source').value = 'email';
+                    break;
+                case 'recent':
+                    document.getElementById('basic-date').value = 'this_week';
+                    break;
+                case 'high-value':
+                    // Switch to advanced search and add criteria
+                    switchTab('advanced');
+                    addCriteria();
+                    const criteriaRows = document.querySelectorAll('.criteria-row');
+                    const lastRow = criteriaRows[criteriaRows.length - 1];
+                    lastRow.querySelector('.criteria-field').value = 'company_size';
+                    lastRow.querySelector('.criteria-operator').value = 'greater_than';
+                    lastRow.querySelector('.criteria-value').value = '100';
+                    break;
+            }
+            
+            performSearch();
+        }
+
+        function loadSavedSearch(searchId) {
+            // Load saved search logic
+            alert('Loading saved search...');
+        }
+
+        function editSavedSearch(searchId) {
+            // Edit saved search logic
+            alert('Editing saved search...');
+        }
+
+        function deleteSavedSearch(searchId) {
+            if (confirm('Are you sure you want to delete this saved search?')) {
+                // Delete saved search logic
+                alert('Saved search deleted');
+            }
+        }
+
+        function exportResults() {
+            alert('Exporting search results...');
+        }
+
+        function showQueryExamples() {
+            const examples = `
+-- Example 1: Find leads from large companies
+SELECT * FROM leads 
+WHERE company_size > 100 AND status = 'new'
+
+-- Example 2: Find leads with recent activity
+SELECT * FROM leads 
+WHERE last_activity >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+
+-- Example 3: Find leads by industry and budget
+SELECT * FROM leads 
+WHERE industry = 'Technology' AND budget > 50000
+            `;
+            document.getElementById('custom-query').value = examples;
+        }
+
+        function validateQuery() {
+            const query = document.getElementById('custom-query').value;
+            if (query.trim()) {
+                alert('Query validation: Syntax OK');
+            } else {
+                alert('Please enter a query to validate');
+            }
+        }
+
+        function changePage(page) {
+            // Page change logic
+            console.log('Changing to page:', page);
+        }
+
+        function viewLead(leadId) {
+            window.location.href = `/crm/leads/${leadId}`;
+        }
+
+        // Form submission
+        document.getElementById('saveSearchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchName = document.getElementById('search-name').value;
+            alert(`Search "${searchName}" saved successfully!`);
+            closeModal();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('saveSearchModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html> 

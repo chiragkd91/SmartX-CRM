@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis - CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1em;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .sentiment-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .sentiment-positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        .sentiment-neutral {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        .sentiment-negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .feedback-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .feedback-table th,
+        .feedback-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .feedback-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .insight-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .insight-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .insight-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .keyword-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .keyword {
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        .keyword.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        .keyword.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sentiment Analysis</h1>
+            <div>
+                <a href="/crm/ai/dashboard" class="btn btn-primary">AI Dashboard</a>
+                <a href="/crm/ai/sentiment_analysis/export" class="btn btn-success">Export Report</a>
+                <a href="/crm/ai/sentiment_analysis/refresh" class="btn btn-warning">Refresh Analysis</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_feedback }}</div>
+                <div class="metric-label">Total Feedback</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.avg_sentiment_score) }}</div>
+                <div class="metric-label">Average Sentiment Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.positive_percentage) }}%</div>
+                <div class="metric-label">Positive Sentiment</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.model_accuracy) }}%</div>
+                <div class="metric-label">Model Accuracy</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/crm/ai/sentiment_analysis">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="sentiment">Sentiment:</label>
+                        <select id="sentiment" name="sentiment">
+                            <option value="">All Sentiments</option>
+                            <option value="positive" {% if request.args.get('sentiment') == 'positive' %}selected{% endif %}>Positive</option>
+                            <option value="neutral" {% if request.args.get('sentiment') == 'neutral' %}selected{% endif %}>Neutral</option>
+                            <option value="negative" {% if request.args.get('sentiment') == 'negative' %}selected{% endif %}>Negative</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="source">Feedback Source:</label>
+                        <select id="source" name="source">
+                            <option value="">All Sources</option>
+                            {% for source in feedback_sources %}
+                            <option value="{{ source }}" {% if request.args.get('source') == source %}selected{% endif %}>{{ source }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="date_from">Date From:</label>
+                        <input type="date" id="date_from" name="date_from" value="{{ request.args.get('date_from', '') }}">
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/ai/sentiment_analysis" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Sentiment Distribution</h3>
+                <canvas id="sentimentDistributionChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Model Performance</h3>
+                <div style="margin-bottom: 20px;">
+                    <h4>Analysis Metrics</h4>
+                    <p><strong>Last Updated:</strong> {{ model_info.last_updated }}</p>
+                    <p><strong>Training Data:</strong> {{ model_info.training_samples }} samples</p>
+                    <p><strong>Precision:</strong> {{ "%.2f"|format(model_info.precision) }}</p>
+                    <p><strong>Recall:</strong> {{ "%.2f"|format(model_info.recall) }}</p>
+                    <p><strong>F1 Score:</strong> {{ "%.2f"|format(model_info.f1_score) }}</p>
+                </div>
+                <div>
+                    <h4>Key Insights</h4>
+                    {% for insight in key_insights %}
+                    <div class="insight-item">
+                        <div class="insight-title">{{ insight.title }}</div>
+                        <div class="insight-description">{{ insight.description }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="card-title">Sentiment Trends Over Time</h3>
+            <canvas id="sentimentTrendChart" width="800" height="400"></canvas>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Top Keywords</h3>
+                <div class="keyword-cloud">
+                    {% for keyword in top_keywords %}
+                    <span class="keyword {{ keyword.sentiment }}">{{ keyword.text }} ({{ keyword.count }})</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Sentiment by Source</h3>
+                <canvas id="sentimentBySourceChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Recent Feedback Analysis</h3>
+            <table class="feedback-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Feedback</th>
+                        <th>Source</th>
+                        <th>Sentiment</th>
+                        <th>Confidence</th>
+                        <th>Key Topics</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feedback in recent_feedback %}
+                    <tr>
+                        <td>{{ feedback.customer_name }}</td>
+                        <td>{{ feedback.text[:100] }}...</td>
+                        <td>{{ feedback.source }}</td>
+                        <td>
+                            {% if feedback.sentiment == 'positive' %}
+                                <span class="sentiment-badge sentiment-positive">Positive</span>
+                            {% elif feedback.sentiment == 'neutral' %}
+                                <span class="sentiment-badge sentiment-neutral">Neutral</span>
+                            {% else %}
+                                <span class="sentiment-badge sentiment-negative">Negative</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ "%.1f"|format(feedback.confidence) }}%</td>
+                        <td>{{ feedback.key_topics }}</td>
+                        <td>{{ feedback.date }}</td>
+                        <td>
+                            <a href="/crm/feedback/{{ feedback.id }}" class="btn btn-primary btn-sm">View</a>
+                            <a href="/crm/feedback/{{ feedback.id }}/respond" class="btn btn-warning btn-sm">Respond</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Sentiment Distribution Chart
+        const sentimentDistributionCtx = document.getElementById('sentimentDistributionChart').getContext('2d');
+        new Chart(sentimentDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    data: [65, 20, 15],
+                    backgroundColor: [
+                        '#28a745',
+                        '#6c757d',
+                        '#dc3545'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Sentiment Trend Chart
+        const sentimentTrendCtx = document.getElementById('sentimentTrendChart').getContext('2d');
+        new Chart(sentimentTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Positive Sentiment',
+                    data: [60, 62, 65, 68, 70, 72],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Negative Sentiment',
+                    data: [20, 18, 15, 12, 10, 8],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Sentiment by Source Chart
+        const sentimentBySourceCtx = document.getElementById('sentimentBySourceChart').getContext('2d');
+        new Chart(sentimentBySourceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Email', 'Survey', 'Social Media', 'Support'],
+                datasets: [{
+                    label: 'Positive',
+                    data: [70, 65, 55, 80],
+                    backgroundColor: '#28a745'
+                }, {
+                    label: 'Neutral',
+                    data: [20, 25, 30, 15],
+                    backgroundColor: '#6c757d'
+                }, {
+                    label: 'Negative',
+                    data: [10, 10, 15, 5],
+                    backgroundColor: '#dc3545'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

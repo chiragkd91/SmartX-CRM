@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Settings - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .activity-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .activity-duration {
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Activity Settings</h1>
+                <p>Configure activity management and scheduling settings</p>
+            </div>
+            <div>
+                <a href="/crm/settings" class="btn btn-primary">Back to Settings</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h2>Activity Types</h2>
+            <form method="POST" action="/crm/settings/activities/types">
+                <div class="form-group">
+                    <label for="new_activity_type">Add New Activity Type</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="new_activity_type" name="activity_type" placeholder="Activity Type">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="default_duration" name="default_duration" placeholder="Default Duration (minutes)" min="15" step="15">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Activity Type</button>
+                </div>
+            </form>
+
+            <div class="activity-list">
+                <h4>Current Activity Types</h4>
+                <div class="activity-item">
+                    <div>
+                        <strong>Phone Call</strong>
+                        <div class="activity-duration">30 min</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editActivityType('phone-call')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteActivityType('phone-call')">Delete</button>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div>
+                        <strong>Meeting</strong>
+                        <div class="activity-duration">60 min</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editActivityType('meeting')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteActivityType('meeting')">Delete</button>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div>
+                        <strong>Email</strong>
+                        <div class="activity-duration">15 min</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editActivityType('email')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteActivityType('email')">Delete</button>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div>
+                        <strong>Demo</strong>
+                        <div class="activity-duration">45 min</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editActivityType('demo')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteActivityType('demo')">Delete</button>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div>
+                        <strong>Follow-up</strong>
+                        <div class="activity-duration">20 min</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editActivityType('follow-up')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteActivityType('follow-up')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Calendar Settings</h2>
+            <form method="POST" action="/crm/settings/activities/calendar">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="work_start_time">Work Start Time</label>
+                        <input type="time" id="work_start_time" name="work_start_time" value="{{ settings.work_start_time or '09:00' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="work_end_time">Work End Time</label>
+                        <input type="time" id="work_end_time" name="work_end_time" value="{{ settings.work_end_time or '17:00' }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="time_slot_duration">Time Slot Duration (minutes)</label>
+                        <select id="time_slot_duration" name="time_slot_duration">
+                            <option value="15" {% if settings.time_slot_duration == '15' %}selected{% endif %}>15 minutes</option>
+                            <option value="30" {% if settings.time_slot_duration == '30' %}selected{% endif %}>30 minutes</option>
+                            <option value="60" {% if settings.time_slot_duration == '60' %}selected{% endif %}>1 hour</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="default_view">Default Calendar View</label>
+                        <select id="default_view" name="default_view">
+                            <option value="day" {% if settings.default_view == 'day' %}selected{% endif %}>Day</option>
+                            <option value="week" {% if settings.default_view == 'week' %}selected{% endif %}>Week</option>
+                            <option value="month" {% if settings.default_view == 'month' %}selected{% endif %}>Month</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Working Days</label>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <label><input type="checkbox" name="working_days" value="monday" {% if 'monday' in settings.working_days %}checked{% endif %}> Monday</label>
+                        <label><input type="checkbox" name="working_days" value="tuesday" {% if 'tuesday' in settings.working_days %}checked{% endif %}> Tuesday</label>
+                        <label><input type="checkbox" name="working_days" value="wednesday" {% if 'wednesday' in settings.working_days %}checked{% endif %}> Wednesday</label>
+                        <label><input type="checkbox" name="working_days" value="thursday" {% if 'thursday' in settings.working_days %}checked{% endif %}> Thursday</label>
+                        <label><input type="checkbox" name="working_days" value="friday" {% if 'friday' in settings.working_days %}checked{% endif %}> Friday</label>
+                        <label><input type="checkbox" name="working_days" value="saturday" {% if 'saturday' in settings.working_days %}checked{% endif %}> Saturday</label>
+                        <label><input type="checkbox" name="working_days" value="sunday" {% if 'sunday' in settings.working_days %}checked{% endif %}> Sunday</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Calendar Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Reminder Settings</h2>
+            <form method="POST" action="/crm/settings/activities/reminders">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="default_reminder">Default Reminder Time</label>
+                        <select id="default_reminder" name="default_reminder">
+                            <option value="5" {% if settings.default_reminder == '5' %}selected{% endif %}>5 minutes before</option>
+                            <option value="15" {% if settings.default_reminder == '15' %}selected{% endif %}>15 minutes before</option>
+                            <option value="30" {% if settings.default_reminder == '30' %}selected{% endif %}>30 minutes before</option>
+                            <option value="60" {% if settings.default_reminder == '60' %}selected{% endif %}>1 hour before</option>
+                            <option value="1440" {% if settings.default_reminder == '1440' %}selected{% endif %}>1 day before</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reminder_method">Reminder Method</label>
+                        <select id="reminder_method" name="reminder_method">
+                            <option value="email" {% if settings.reminder_method == 'email' %}selected{% endif %}>Email</option>
+                            <option value="sms" {% if settings.reminder_method == 'sms' %}selected{% endif %}>SMS</option>
+                            <option value="both" {% if settings.reminder_method == 'both' %}selected{% endif %}>Both</option>
+                            <option value="notification" {% if settings.reminder_method == 'notification' %}selected{% endif %}>In-app notification</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_reminders" {% if settings.auto_reminders %}checked{% endif %}>
+                        Enable automatic reminders
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="escalation_reminders" {% if settings.escalation_reminders %}checked{% endif %}>
+                        Enable escalation reminders
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Reminder Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Activity Templates</h2>
+            <form method="POST" action="/crm/settings/activities/templates">
+                <div class="form-group">
+                    <label for="call_template">Phone Call Template</label>
+                    <textarea id="call_template" name="call_template" placeholder="Enter default phone call template">{{ settings.call_template or 'Call with {{contact_name}} to discuss {{subject}}' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="meeting_template">Meeting Template</label>
+                    <textarea id="meeting_template" name="meeting_template" placeholder="Enter default meeting template">{{ settings.meeting_template or 'Meeting with {{contact_name}} to discuss {{subject}}' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_template">Email Template</label>
+                    <textarea id="email_template" name="email_template" placeholder="Enter default email template">{{ settings.email_template or 'Email to {{contact_name}} regarding {{subject}}' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="demo_template">Demo Template</label>
+                    <textarea id="demo_template" name="demo_template" placeholder="Enter default demo template">{{ settings.demo_template or 'Product demo for {{contact_name}} - {{product_name}}' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Templates</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Activity Automation</h2>
+            <form method="POST" action="/crm/settings/activities/automation">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_schedule_followup" {% if settings.auto_schedule_followup %}checked{% endif %}>
+                        Automatically schedule follow-up activities
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_log_emails" {% if settings.auto_log_emails %}checked{% endif %}>
+                        Automatically log email activities
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_log_calls" {% if settings.auto_log_calls %}checked{% endif %}>
+                        Automatically log phone call activities
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="followup_delay">Follow-up Delay (hours)</label>
+                        <input type="number" id="followup_delay" name="followup_delay" value="{{ settings.followup_delay or '24' }}" min="1" max="168">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_followups">Maximum Follow-ups</label>
+                        <input type="number" id="max_followups" name="max_followups" value="{{ settings.max_followups or '5' }}" min="1" max="20">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Automation Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Reporting Settings</h2>
+            <form method="POST" action="/crm/settings/activities/reporting">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="track_activity_metrics" {% if settings.track_activity_metrics %}checked{% endif %}>
+                        Track activity metrics and analytics
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="generate_activity_reports" {% if settings.generate_activity_reports %}checked{% endif %}>
+                        Generate automatic activity reports
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="report_frequency">Report Frequency</label>
+                        <select id="report_frequency" name="report_frequency">
+                            <option value="daily" {% if settings.report_frequency == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="weekly" {% if settings.report_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                            <option value="monthly" {% if settings.report_frequency == 'monthly' %}selected{% endif %}>Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="report_recipients">Report Recipients</label>
+                        <input type="text" id="report_recipients" name="report_recipients" value="{{ settings.report_recipients or '' }}" placeholder="email1@example.com, email2@example.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Reporting Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editActivityType(type) {
+            // Handle activity type editing
+            alert(`Editing activity type: ${type}`);
+        }
+
+        function deleteActivityType(type) {
+            if (confirm(`Are you sure you want to delete the activity type: ${type}?`)) {
+                alert(`Activity type ${type} deleted successfully`);
+            }
+        }
+    </script>
+</body>
+</html> 

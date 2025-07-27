@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+
+{% block title %}Lead Details - {{ lead.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-white">Lead Details</h1>
+            <p class="text-muted mb-0">{{ lead.full_name }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('crm.lead_edit_form', lead_id=lead.id) }}" class="btn btn-modern btn-primary">
+                <i class="fas fa-edit"></i> Edit Lead
+            </a>
+            <a href="{{ url_for('crm.leads_list') }}" class="btn btn-modern btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Lead Information -->
+    <div class="row">
+        <!-- Main Lead Info -->
+        <div class="col-lg-8">
+            <div class="glass-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user text-primary"></i> Lead Information
+                    </h5>
+                    <span class="badge bg-{{ 'success' if lead.status == 'Converted' else 'warning' if lead.status == 'Qualified' else 'info' }}">
+                        {{ lead.status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Full Name</label>
+                                <p class="mb-0 fw-bold">{{ lead.full_name }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Email</label>
+                                <p class="mb-0">
+                                    <a href="mailto:{{ lead.email }}" class="text-decoration-none">{{ lead.email }}</a>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Phone</label>
+                                <p class="mb-0">
+                                    <a href="tel:{{ lead.phone }}" class="text-decoration-none">{{ lead.phone or 'Not provided' }}</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Company</label>
+                                <p class="mb-0 fw-bold">{{ lead.company or 'Not specified' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Job Title</label>
+                                <p class="mb-0">{{ lead.job_title or 'Not specified' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Industry</label>
+                                <p class="mb-0">{{ lead.industry or 'Not specified' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Details -->
+            <div class="glass-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-info"></i> Lead Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Source</label>
+                                <p class="mb-0">{{ lead.source or 'Manual' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Budget</label>
+                                <p class="mb-0">
+                                    {% if lead.budget %}
+                                        ${{ "{:,.2f}".format(lead.budget) }}
+                                    {% else %}
+                                        Not specified
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Timeline</label>
+                                <p class="mb-0">{{ lead.timeline or 'Not specified' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Lead Score</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-{{ 'success' if lead.score >= 75 else 'warning' if lead.score >= 50 else 'danger' }}" 
+                                         role="progressbar" 
+                                         style="width: {{ lead.score or 0 }}%"
+                                         aria-valuenow="{{ lead.score or 0 }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ lead.score or 0 }}/100
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            {% if lead.notes %}
+            <div class="glass-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-sticky-note text-warning"></i> Notes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ lead.notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="glass-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt text-warning"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-modern btn-success" onclick="qualifyLead({{ lead.id }})">
+                            <i class="fas fa-check"></i> Qualify Lead
+                        </button>
+                        <button class="btn btn-modern btn-info" onclick="scoreLead({{ lead.id }})">
+                            <i class="fas fa-chart-line"></i> Score Lead
+                        </button>
+                        <button class="btn btn-modern btn-warning" onclick="nurtureLead({{ lead.id }})">
+                            <i class="fas fa-seedling"></i> Nurture Lead
+                        </button>
+                        <button class="btn btn-modern btn-primary" onclick="convertLead({{ lead.id }})">
+                            <i class="fas fa-exchange-alt"></i> Convert Lead
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Timeline -->
+            <div class="glass-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock text-info"></i> Timeline
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Lead Created</h6>
+                                <small class="text-muted">{{ lead.created_at.strftime('%B %d, %Y at %I:%M %p') if lead.created_at else 'Unknown' }}</small>
+                            </div>
+                        </div>
+                        {% if lead.updated_at and lead.updated_at != lead.created_at %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-info"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Last Updated</h6>
+                                <small class="text-muted">{{ lead.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-address-book text-primary"></i> Contact Info
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="mailto:{{ lead.email }}" class="btn btn-modern btn-outline-primary">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </a>
+                        {% if lead.phone %}
+                        <a href="tel:{{ lead.phone }}" class="btn btn-modern btn-outline-success">
+                            <i class="fas fa-phone"></i> Call
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Convert Lead Modal -->
+<div class="modal fade" id="convertLeadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h5 class="modal-title">Convert Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="convertLeadForm">
+                    <div class="mb-3">
+                        <label class="form-label">Opportunity Name</label>
+                        <input type="text" class="form-input" name="opportunity_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-input" name="amount" step="0.01">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Expected Close Date</label>
+                        <input type="date" class="form-input" name="expected_close_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-modern btn-primary" onclick="submitConvertLead()">Convert Lead</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nurture Lead Modal -->
+<div class="modal fade" id="nurtureLeadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h5 class="modal-title">Nurture Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nurtureLeadForm">
+                    <div class="mb-3">
+                        <label class="form-label">Activity Type</label>
+                        <select class="form-input" name="type" required>
+                            <option value="Email">Email</option>
+                            <option value="Call">Call</option>
+                            <option value="Meeting">Meeting</option>
+                            <option value="Task">Task</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-input" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Delay (days)</label>
+                        <input type="number" class="form-input" name="delay_days" value="1" min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-modern btn-warning" onclick="submitNurtureLead()">Create Activity</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentLeadId = {{ lead.id }};
+
+function qualifyLead(leadId) {
+    fetch(`/crm/leads/${leadId}/qualify`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status: 'Qualified',
+            user_id: 1 // TODO: Get current user ID
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            ModernCRM.showNotification('Lead qualified successfully!', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            ModernCRM.showNotification(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        ModernCRM.showNotification('Error qualifying lead', 'error');
+    });
+}
+
+function scoreLead(leadId) {
+    fetch(`/crm/leads/${leadId}/score`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            ModernCRM.showNotification(`Lead scored: ${data.data.score}/100`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            ModernCRM.showNotification(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        ModernCRM.showNotification('Error scoring lead', 'error');
+    });
+}
+
+function nurtureLead(leadId) {
+    currentLeadId = leadId;
+    new bootstrap.Modal(document.getElementById('nurtureLeadModal')).show();
+}
+
+function submitNurtureLead() {
+    const form = document.getElementById('nurtureLeadForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    fetch(`/crm/leads/${currentLeadId}/nurture`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            ...data,
+            user_id: 1 // TODO: Get current user ID
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            ModernCRM.showNotification('Nurturing activity created!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('nurtureLeadModal')).hide();
+            form.reset();
+        } else {
+            ModernCRM.showNotification(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        ModernCRM.showNotification('Error creating nurturing activity', 'error');
+    });
+}
+
+function convertLead(leadId) {
+    currentLeadId = leadId;
+    new bootstrap.Modal(document.getElementById('convertLeadModal')).show();
+}
+
+function submitConvertLead() {
+    const form = document.getElementById('convertLeadForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    fetch(`/crm/leads/${currentLeadId}/convert`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            ...data,
+            create_opportunity: true,
+            user_id: 1 // TODO: Get current user ID
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            ModernCRM.showNotification('Lead converted successfully!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('convertLeadModal')).hide();
+            form.reset();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            ModernCRM.showNotification(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        ModernCRM.showNotification('Error converting lead', 'error');
+    });
+}
+
+// Initialize ModernCRM
+document.addEventListener('DOMContentLoaded', function() {
+    ModernCRM.init();
+});
+</script>
+{% endblock %} 

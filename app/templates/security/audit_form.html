@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Audit - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Security Audit</h1>
+        <form method="POST" action="{{ url_for('security.security_audit') }}">
+            <div class="form-group">
+                <label for="audit_type">Audit Type:</label>
+                <select name="audit_type" id="audit_type" required>
+                    <option value="full">Full Security Audit</option>
+                    <option value="database">Database Security</option>
+                    <option value="api">API Security</option>
+                    <option value="authentication">Authentication Audit</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Start Security Audit</button>
+        </form>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads Management Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/modern-crm.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/mobile-responsive.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-user-plus me-2"></i>Leads Management
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="{{ url_for('crm.dashboard') }}">CRM Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('crm.leads_list') }}">Leads List</a>
+                    <a class="nav-link" href="{{ url_for('crm.leads_form') }}">Add Lead</a>
+                    <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container-fluid mt-4">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card bg-gradient-success text-white">
+                        <div class="card-body">
+                            <h2><i class="fas fa-user-plus me-2"></i>Leads Management Dashboard</h2>
+                            <p class="mb-0">Track leads, manage scoring, and monitor conversion rates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leads Overview Stats -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Total Leads</h6>
+                                    <h3 class="mb-0">2,847</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-user-plus text-success"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success"><i class="fas fa-arrow-up"></i> 15%</span>
+                                <span class="text-muted">this month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Conversion Rate</h6>
+                                    <h3 class="mb-0">23.5%</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-chart-line text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success"><i class="fas fa-arrow-up"></i> 2.1%</span>
+                                <span class="text-muted">vs last month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Hot Leads</h6>
+                                    <h3 class="mb-0">156</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-fire text-danger"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success"><i class="fas fa-arrow-up"></i> 12</span>
+                                <span class="text-muted">this week</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Avg Response Time</h6>
+                                    <h3 class="mb-0">2.3h</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success"><i class="fas fa-arrow-down"></i> 0.5h</span>
+                                <span class="text-muted">improvement</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Sections -->
+            <div class="row">
+                <!-- Leads Overview & Management -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-list me-2"></i>Leads Overview & Management</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Lead Name</th>
+                                            <th>Company</th>
+                                            <th>Score</th>
+                                            <th>Status</th>
+                                            <th>Source</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-user text-primary me-2"></i>
+                                                John Smith
+                                            </td>
+                                            <td>Tech Solutions Inc</td>
+                                            <td><span class="badge bg-danger">95</span></td>
+                                            <td><span class="badge bg-warning">Qualified</span></td>
+                                            <td>Website</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-outline-success">Convert</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-user text-success me-2"></i>
+                                                Sarah Johnson
+                                            </td>
+                                            <td>Global Manufacturing</td>
+                                            <td><span class="badge bg-warning">78</span></td>
+                                            <td><span class="badge bg-info">Contacted</span></td>
+                                            <td>LinkedIn</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-outline-success">Convert</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-user text-warning me-2"></i>
+                                                Mike Davis
+                                            </td>
+                                            <td>Healthcare Partners</td>
+                                            <td><span class="badge bg-success">65</span></td>
+                                            <td><span class="badge bg-secondary">New</span></td>
+                                            <td>Referral</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-outline-success">Convert</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-user text-info me-2"></i>
+                                                Lisa Wilson
+                                            </td>
+                                            <td>Financial Services Corp</td>
+                                            <td><span class="badge bg-danger">88</span></td>
+                                            <td><span class="badge bg-warning">Qualified</span></td>
+                                            <td>Trade Show</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">View</button>
+                                                <button class="btn btn-sm btn-outline-success">Convert</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                                <a href="{{ url_for('crm.leads_form') }}" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Add New Lead
+                </a>
+                                                <a href="{{ url_for('crm.leads_list') }}" class="btn btn-primary">
+                    <i class="fas fa-list me-2"></i>View All Leads
+                </a>
+                                <a href="{{ url_for('crm.lead_scoring') }}" class="btn btn-warning">
+                                    <i class="fas fa-star me-2"></i>Lead Scoring
+                                </a>
+                                <button class="btn btn-info">
+                                    <i class="fas fa-chart-pie me-2"></i>Lead Analytics
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-download me-2"></i>Export Leads
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lead Sources -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie me-2"></i>Leads by Source</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="source-metric">
+                                <div class="d-flex justify-content-between">
+                                    <span>Website</span>
+                                    <span>1,250</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-primary" style="width: 44%"></div>
+                                </div>
+                            </div>
+                            <div class="source-metric mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>LinkedIn</span>
+                                    <span>890</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-success" style="width: 31%"></div>
+                                </div>
+                            </div>
+                            <div class="source-metric mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Referral</span>
+                                    <span>450</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-warning" style="width: 16%"></div>
+                                </div>
+                            </div>
+                            <div class="source-metric mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Trade Show</span>
+                                    <span>257</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-info" style="width: 9%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Conversion Funnel -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-funnel me-2"></i>Lead Conversion Funnel</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2 text-center">
+                                    <div class="funnel-stage">
+                                        <div class="funnel-number bg-primary">2,847</div>
+                                        <h6>Total Leads</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="funnel-stage">
+                                        <div class="funnel-number bg-info">2,134</div>
+                                        <h6>Contacted</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="funnel-stage">
+                                        <div class="funnel-number bg-warning">1,567</div>
+                                        <h6>Qualified</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="funnel-stage">
+                                        <div class="funnel-number bg-success">892</div>
+                                        <h6>Proposal</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="funnel-stage">
+                                        <div class="funnel-number bg-danger">669</div>
+                                        <h6>Converted</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="funnel-stage">
+                                        <div class="funnel-number bg-dark">23.5%</div>
+                                        <h6>Conversion Rate</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/modern-crm.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/touch-interface.js') }}"></script>
+</body>
+</html> 

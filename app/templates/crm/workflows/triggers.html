@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigger Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .trigger-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        .trigger-item.active {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .trigger-item.inactive {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .trigger-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .trigger-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .trigger-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .trigger-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .trigger-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .trigger-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .trigger-type-card {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .trigger-type-card:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .trigger-type-card.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .trigger-type-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+        .hidden {
+            display: none;
+        }
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .log-time {
+            color: #666;
+            font-size: 12px;
+        }
+        .log-message {
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Trigger Management</h1>
+                <p>Configure and monitor workflow triggers</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateTrigger()">Create Trigger</button>
+                <a href="/crm/workflows" class="btn btn-secondary">Back to Workflows</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Active Triggers -->
+            <div class="card">
+                <h3>Active Triggers</h3>
+                <div class="trigger-item active">
+                    <div class="trigger-header">
+                        <div class="trigger-name">Lead Created Trigger</div>
+                        <span class="trigger-status status-active">Active</span>
+                    </div>
+                    <div class="trigger-description">
+                        Triggers when a new lead is created in the system
+                    </div>
+                    <div class="trigger-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">98.5%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2.3s</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editTrigger('lead_created')">Edit</button>
+                        <button class="btn btn-danger" onclick="deactivateTrigger('lead_created')">Deactivate</button>
+                    </div>
+                </div>
+
+                <div class="trigger-item active">
+                    <div class="trigger-header">
+                        <div class="trigger-name">Email Opened Trigger</div>
+                        <span class="trigger-status status-active">Active</span>
+                    </div>
+                    <div class="trigger-description">
+                        Triggers when a tracked email is opened by the recipient
+                    </div>
+                    <div class="trigger-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">3,891</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">99.2%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">1.8s</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editTrigger('email_opened')">Edit</button>
+                        <button class="btn btn-danger" onclick="deactivateTrigger('email_opened')">Deactivate</button>
+                    </div>
+                </div>
+
+                <div class="trigger-item active">
+                    <div class="trigger-header">
+                        <div class="trigger-name">Deal Stage Changed</div>
+                        <span class="trigger-status status-active">Active</span>
+                    </div>
+                    <div class="trigger-description">
+                        Triggers when a deal moves to a different stage
+                    </div>
+                    <div class="trigger-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">567</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">97.8%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3.1s</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editTrigger('deal_stage_changed')">Edit</button>
+                        <button class="btn btn-danger" onclick="deactivateTrigger('deal_stage_changed')">Deactivate</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inactive Triggers -->
+            <div class="card">
+                <h3>Inactive Triggers</h3>
+                <div class="trigger-item inactive">
+                    <div class="trigger-header">
+                        <div class="trigger-name">Form Submitted Trigger</div>
+                        <span class="trigger-status status-inactive">Inactive</span>
+                    </div>
+                    <div class="trigger-description">
+                        Triggers when a contact form is submitted
+                    </div>
+                    <div class="trigger-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editTrigger('form_submitted')">Edit</button>
+                        <button class="btn btn-success" onclick="activateTrigger('form_submitted')">Activate</button>
+                    </div>
+                </div>
+
+                <div class="trigger-item inactive">
+                    <div class="trigger-header">
+                        <div class="trigger-name">Task Completed Trigger</div>
+                        <span class="trigger-status status-inactive">Inactive</span>
+                    </div>
+                    <div class="trigger-description">
+                        Triggers when a task is marked as completed
+                    </div>
+                    <div class="trigger-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editTrigger('task_completed')">Edit</button>
+                        <button class="btn btn-success" onclick="activateTrigger('task_completed')">Activate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Recent Trigger Activity</h3>
+            <div class="activity-log">
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:32:15</div>
+                    <div class="log-message">Lead Created Trigger executed for lead "John Smith" (ID: 12345)</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:28:42</div>
+                    <div class="log-message">Email Opened Trigger executed for email "Welcome Series #1" to jane@example.com</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:25:18</div>
+                    <div class="log-message">Deal Stage Changed Trigger executed for deal "Enterprise Software License" (Stage: Proposal)</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:20:33</div>
+                    <div class="log-message">Lead Created Trigger executed for lead "Sarah Johnson" (ID: 12344)</div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:15:07</div>
+                    <div class="log-message">Email Opened Trigger executed for email "Product Demo Invitation" to mike@company.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Trigger Modal -->
+    <div id="create-trigger-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; width: 600px; max-height: 80vh; overflow-y: auto;">
+            <h2>Create New Trigger</h2>
+            
+            <div class="form-group">
+                <label>Trigger Name</label>
+                <input type="text" id="trigger-name" placeholder="Enter trigger name">
+            </div>
+
+            <div class="form-group">
+                <label>Trigger Type</label>
+                <div class="trigger-type-grid">
+                    <div class="trigger-type-card" onclick="selectTriggerType('lead_created')">
+                        <div class="trigger-type-icon">👤</div>
+                        <strong>Lead Created</strong>
+                        <p>Triggers when a new lead is created</p>
+                    </div>
+                    <div class="trigger-type-card" onclick="selectTriggerType('email_opened')">
+                        <div class="trigger-type-icon">📧</div>
+                        <strong>Email Opened</strong>
+                        <p>Triggers when an email is opened</p>
+                    </div>
+                    <div class="trigger-type-card" onclick="selectTriggerType('form_submitted')">
+                        <div class="trigger-type-icon">📝</div>
+                        <strong>Form Submitted</strong>
+                        <p>Triggers when a form is submitted</p>
+                    </div>
+                    <div class="trigger-type-card" onclick="selectTriggerType('deal_stage_changed')">
+                        <div class="trigger-type-icon">💰</div>
+                        <strong>Deal Stage Changed</strong>
+                        <p>Triggers when deal stage changes</p>
+                    </div>
+                    <div class="trigger-type-card" onclick="selectTriggerType('task_completed')">
+                        <div class="trigger-type-icon">✅</div>
+                        <strong>Task Completed</strong>
+                        <p>Triggers when a task is completed</p>
+                    </div>
+                    <div class="trigger-type-card" onclick="selectTriggerType('custom')">
+                        <div class="trigger-type-icon">⚙️</div>
+                        <strong>Custom Trigger</strong>
+                        <p>Custom webhook or API trigger</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="trigger-description" rows="3" placeholder="Enter trigger description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Conditions (Optional)</label>
+                <textarea id="trigger-conditions" rows="3" placeholder="Enter trigger conditions in JSON format"></textarea>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="hideCreateTrigger()">Cancel</button>
+                <button class="btn btn-primary" onclick="createTrigger()">Create Trigger</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTriggerType = null;
+
+        function showCreateTrigger() {
+            document.getElementById('create-trigger-modal').classList.remove('hidden');
+        }
+
+        function hideCreateTrigger() {
+            document.getElementById('create-trigger-modal').classList.add('hidden');
+            selectedTriggerType = null;
+            document.querySelectorAll('.trigger-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        function selectTriggerType(type) {
+            selectedTriggerType = type;
+            document.querySelectorAll('.trigger-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.trigger-type-card').classList.add('selected');
+        }
+
+        function createTrigger() {
+            const name = document.getElementById('trigger-name').value;
+            const description = document.getElementById('trigger-description').value;
+            const conditions = document.getElementById('trigger-conditions').value;
+
+            if (!name || !selectedTriggerType) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            console.log('Creating trigger:', { name, type: selectedTriggerType, description, conditions });
+            alert('Trigger created successfully!');
+            hideCreateTrigger();
+        }
+
+        function editTrigger(triggerId) {
+            console.log('Editing trigger:', triggerId);
+            alert('Edit functionality would open trigger configuration');
+        }
+
+        function activateTrigger(triggerId) {
+            console.log('Activating trigger:', triggerId);
+            alert('Trigger activated successfully!');
+        }
+
+        function deactivateTrigger(triggerId) {
+            if (confirm('Are you sure you want to deactivate this trigger?')) {
+                console.log('Deactivating trigger:', triggerId);
+                alert('Trigger deactivated successfully!');
+            }
+        }
+    </script>
+</body>
+</html> 

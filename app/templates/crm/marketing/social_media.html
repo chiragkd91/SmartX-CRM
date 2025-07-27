@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+
+{% block title %}Social Media Marketing{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Social Media Marketing</h1>
+                <div>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#createSocialPostModal">
+                        <i class="fas fa-plus"></i> Create Post
+                    </button>
+                    <button class="btn btn-outline-secondary ml-2">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Overview -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Followers</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">45,280</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Engagement</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">12,450</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Engagement Rate</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">8.2%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Leads Generated</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1,250</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Performance -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Platform Performance</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Platform</th>
+                                    <th>Followers</th>
+                                    <th>Posts</th>
+                                    <th>Engagement</th>
+                                    <th>Engagement Rate</th>
+                                    <th>Leads Generated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fab fa-linkedin fa-2x text-primary mr-3"></i>
+                                            <div>
+                                                <strong>LinkedIn</strong>
+                                                <br><small class="text-muted">Professional network</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>18,500</td>
+                                    <td>45</td>
+                                    <td>5,280</td>
+                                    <td>12.5%</td>
+                                    <td>680</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Manage</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fab fa-twitter fa-2x text-info mr-3"></i>
+                                            <div>
+                                                <strong>Twitter</strong>
+                                                <br><small class="text-muted">Microblogging</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>12,800</td>
+                                    <td>120</td>
+                                    <td>3,450</td>
+                                    <td>8.2%</td>
+                                    <td>320</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Manage</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fab fa-facebook fa-2x text-primary mr-3"></i>
+                                            <div>
+                                                <strong>Facebook</strong>
+                                                <br><small class="text-muted">Social network</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>8,200</td>
+                                    <td>35</td>
+                                    <td>2,180</td>
+                                    <td>6.8%</td>
+                                    <td>180</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Manage</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fab fa-instagram fa-2x text-danger mr-3"></i>
+                                            <div>
+                                                <strong>Instagram</strong>
+                                                <br><small class="text-muted">Visual platform</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>5,780</td>
+                                    <td>28</td>
+                                    <td>1,540</td>
+                                    <td>5.2%</td>
+                                    <td>70</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Manage</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Campaigns -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Social Media Campaigns</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="card-title mb-0">Product Launch Campaign</h6>
+                                        <span class="badge badge-success">Active</span>
+                                    </div>
+                                    <p class="card-text text-muted">Multi-platform campaign for Q1 product launch with targeted messaging.</p>
+                                    <div class="campaign-stats mb-3">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">1,250</div>
+                                                <small class="text-muted">Reach</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">180</div>
+                                                <small class="text-muted">Engagement</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">45</div>
+                                                <small class="text-muted">Leads</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Ends: Mar 25, 2024</small>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="card-title mb-0">Thought Leadership Series</h6>
+                                        <span class="badge badge-info">Ongoing</span>
+                                    </div>
+                                    <p class="card-text text-muted">Weekly content series showcasing industry expertise and insights.</p>
+                                    <div class="campaign-stats mb-3">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">2,800</div>
+                                                <small class="text-muted">Reach</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">420</div>
+                                                <small class="text-muted">Engagement</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">85</div>
+                                                <small class="text-muted">Leads</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Ongoing</small>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="card-title mb-0">Event Promotion</h6>
+                                        <span class="badge badge-warning">Completed</span>
+                                    </div>
+                                    <p class="card-text text-muted">Social media campaign promoting the annual industry conference.</p>
+                                    <div class="campaign-stats mb-3">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">1,650</div>
+                                                <small class="text-muted">Reach</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">280</div>
+                                                <small class="text-muted">Engagement</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="h6 mb-0">120</div>
+                                                <small class="text-muted">Registrations</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Completed: Mar 10, 2024</small>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Analytics -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Engagement Trends</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                            <a class="dropdown-item" href="#">Last 7 Days</a>
+                            <a class="dropdown-item" href="#">Last 30 Days</a>
+                            <a class="dropdown-item" href="#">Last 90 Days</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="socialEngagementChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Platform Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="platformDistributionChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> LinkedIn
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Twitter
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-danger"></i> Instagram
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Calendar -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Content Calendar</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Platform</th>
+                                    <th>Content Type</th>
+                                    <th>Content Preview</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mar 18, 2024</td>
+                                    <td><i class="fab fa-linkedin text-primary"></i> LinkedIn</td>
+                                    <td>Article</td>
+                                    <td>"5 Ways to Improve Your Sales Process in 2024"</td>
+                                    <td><span class="badge badge-success">Scheduled</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="#" class="btn btn-sm btn-outline-warning">Pause</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Mar 19, 2024</td>
+                                    <td><i class="fab fa-twitter text-info"></i> Twitter</td>
+                                    <td>Thread</td>
+                                    <td>"🧵 The future of CRM technology..."</td>
+                                    <td><span class="badge badge-info">Draft</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="#" class="btn btn-sm btn-outline-success">Schedule</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Mar 20, 2024</td>
+                                    <td><i class="fab fa-facebook text-primary"></i> Facebook</td>
+                                    <td>Video</td>
+                                    <td>Product demo video with customer testimonials</td>
+                                    <td><span class="badge badge-secondary">Draft</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="#" class="btn btn-sm btn-outline-success">Schedule</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Mar 21, 2024</td>
+                                    <td><i class="fab fa-instagram text-danger"></i> Instagram</td>
+                                    <td>Story</td>
+                                    <td>Behind-the-scenes office tour</td>
+                                    <td><span class="badge badge-warning">In Progress</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="#" class="btn btn-sm btn-outline-success">Schedule</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Social Post Modal -->
+<div class="modal fade" id="createSocialPostModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Social Media Post</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Platform</label>
+                                <select class="form-control">
+                                    <option>LinkedIn</option>
+                                    <option>Twitter</option>
+                                    <option>Facebook</option>
+                                    <option>Instagram</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Content Type</label>
+                                <select class="form-control">
+                                    <option>Text Post</option>
+                                    <option>Image Post</option>
+                                    <option>Video Post</option>
+                                    <option>Article</option>
+                                    <option>Story</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Content</label>
+                        <textarea class="form-control" rows="4" placeholder="Write your post content here..."></textarea>
+                        <small class="text-muted">Character count: 0/280</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Media</label>
+                        <input type="file" class="form-control-file">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Schedule Date</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control">
+                                    <option>Draft</option>
+                                    <option>Scheduled</option>
+                                    <option>Publish Now</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Campaign</label>
+                        <select class="form-control">
+                            <option>No Campaign</option>
+                            <option>Product Launch</option>
+                            <option>Thought Leadership</option>
+                            <option>Event Promotion</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-primary">Save Draft</button>
+                <button type="button" class="btn btn-primary">Schedule Post</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Social Engagement Chart
+    const engagementCtx = document.getElementById('socialEngagementChart').getContext('2d');
+    new Chart(engagementCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Engagement Rate',
+                data: [6.2, 7.1, 8.5, 7.8, 9.2, 10.1, 9.8, 11.2, 12.5, 11.8, 13.2, 12.8],
+                borderColor: 'rgba(78, 115, 223, 1)',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true
+            }, {
+                label: 'Followers Growth',
+                data: [35, 42, 48, 52, 58, 65, 72, 78, 85, 92, 98, 105],
+                borderColor: 'rgba(28, 200, 138, 1)',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Platform Distribution Chart
+    const platformCtx = document.getElementById('platformDistributionChart').getContext('2d');
+    new Chart(platformCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['LinkedIn', 'Twitter', 'Facebook', 'Instagram'],
+            datasets: [{
+                data: [40, 28, 18, 14],
+                backgroundColor: [
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(54, 185, 204, 0.8)',
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(231, 74, 59, 0.8)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.campaign-stats {
+    background-color: #f8f9fc;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.fab {
+    margin-right: 8px;
+}
+</style>
+{% endblock %} 

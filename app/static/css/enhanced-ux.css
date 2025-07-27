@@ -1,0 +1,689 @@
+/* Enhanced UX Features CSS */
+
+/* ==================== DRAG AND DROP STYLES ==================== */
+.draggable {
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+}
+
+.draggable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.draggable.dragging {
+    cursor: grabbing;
+    opacity: 0.8;
+    transform: rotate(5deg) scale(1.05);
+    z-index: 1000;
+}
+
+.droppable {
+    min-height: 50px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.droppable.drag-over {
+    border-color: #007bff;
+    background: #e3f2fd;
+    transform: scale(1.02);
+}
+
+.droppable.has-items {
+    border-style: solid;
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+/* ==================== NOTIFICATION SYSTEM ==================== */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+}
+
+.notification {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+    overflow: hidden;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    border-left: 4px solid #007bff;
+}
+
+.notification-success {
+    border-left-color: #28a745;
+}
+
+.notification-warning {
+    border-left-color: #ffc107;
+}
+
+.notification-error {
+    border-left-color: #dc3545;
+}
+
+.notification-info {
+    border-left-color: #17a2b8;
+}
+
+.notification-content {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-message {
+    flex: 1;
+    margin-right: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-close:hover {
+    color: #333;
+}
+
+.notification-progress {
+    height: 3px;
+    background: #e9ecef;
+    width: 100%;
+}
+
+.notification-success .notification-progress {
+    background: #28a745;
+}
+
+.notification-warning .notification-progress {
+    background: #ffc107;
+}
+
+.notification-error .notification-progress {
+    background: #dc3545;
+}
+
+.notification-info .notification-progress {
+    background: #17a2b8;
+}
+
+/* ==================== PROGRESS INDICATORS ==================== */
+.global-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #e9ecef;
+    z-index: 10000;
+    display: none;
+}
+
+.global-progress.active {
+    display: block;
+}
+
+.global-progress .progress-bar {
+    height: 100%;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+.global-progress .progress-text {
+    position: absolute;
+    top: 8px;
+    right: 20px;
+    font-size: 12px;
+    color: #666;
+}
+
+.progress-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    padding: 20px;
+    min-width: 300px;
+    z-index: 10001;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.progress-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.progress-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-close:hover {
+    color: #333;
+}
+
+.progress-indicator .progress-bar {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-indicator .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.progress-indicator .progress-text {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+/* ==================== HELP OVERLAY ==================== */
+.help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.help-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.help-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.help-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.help-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.help-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-close:hover {
+    color: #333;
+}
+
+.help-body {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.help-body h4 {
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.help-body ul, .help-body ol {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.help-body li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.help-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.help-prev, .help-next {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.help-prev:hover, .help-next:hover {
+    background: #0056b3;
+}
+
+.help-prev:disabled, .help-next:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* ==================== ONBOARDING WIZARD ==================== */
+.onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 10003;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.onboarding-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.onboarding-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(50px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.onboarding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.onboarding-header h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.onboarding-skip {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.onboarding-skip:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.onboarding-body {
+    padding: 30px;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.onboarding-body h4 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.onboarding-body p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.onboarding-body ul, .onboarding-body ol {
+    margin-bottom: 20px;
+    padding-left: 25px;
+}
+
+.onboarding-body li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.onboarding-body strong {
+    color: #333;
+}
+
+.onboarding-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.onboarding-prev, .onboarding-next {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.onboarding-prev:hover, .onboarding-next:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.onboarding-prev:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.onboarding-progress {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* ==================== HELP TRIGGERS ==================== */
+.help-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-left: 8px;
+}
+
+.help-trigger:hover {
+    background: #0056b3;
+    transform: scale(1.1);
+}
+
+/* ==================== KEYBOARD SHORTCUT HINTS ==================== */
+.shortcut-hint {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.shortcut-hint::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 10px;
+    border: 4px solid transparent;
+    border-top-color: #333;
+}
+
+.element-with-shortcut:hover .shortcut-hint {
+    opacity: 1;
+}
+
+/* ==================== AUTO-SAVE INDICATORS ==================== */
+.auto-save-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 9998;
+}
+
+.auto-save-indicator.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.auto-save-indicator.saving {
+    background: #ffc107;
+    color: #333;
+}
+
+.auto-save-indicator.error {
+    background: #dc3545;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+    .notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .help-content, .onboarding-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .progress-indicator {
+        min-width: 280px;
+        margin: 10px;
+    }
+    
+    .onboarding-header, .onboarding-body, .onboarding-footer {
+        padding: 20px;
+    }
+    
+    .onboarding-header h3 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .notification {
+        margin-bottom: 8px;
+    }
+    
+    .notification-content {
+        padding: 12px;
+    }
+    
+    .help-content, .onboarding-content {
+        width: 98%;
+        margin: 5px;
+    }
+    
+    .onboarding-header, .onboarding-body, .onboarding-footer {
+        padding: 15px;
+    }
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus indicators for keyboard navigation */
+.help-trigger:focus,
+.onboarding-skip:focus,
+.onboarding-prev:focus,
+.onboarding-next:focus,
+.notification-close:focus,
+.progress-close:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .notification {
+        border: 2px solid #000;
+    }
+    
+    .help-content, .onboarding-content {
+        border: 2px solid #000;
+    }
+    
+    .progress-indicator {
+        border: 2px solid #000;
+    }
+} 

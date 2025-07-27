@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Management - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .integration-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .api-key-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .api-endpoints {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .endpoint-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .method-get { background: #28a745; color: white; }
+        .method-post { background: #007bff; color: white; }
+        .method-put { background: #ffc107; color: #212529; }
+        .method-delete { background: #dc3545; color: white; }
+        .endpoint-url {
+            font-family: monospace;
+            color: #666;
+            margin-top: 5px;
+        }
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>API Management</h1>
+                <p>Configure and manage your CRM API access</p>
+            </div>
+            <div>
+                <a href="/crm/integrations" class="btn btn-primary">Back to Integrations</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="integration-card">
+            <h2>API Configuration</h2>
+            <form method="POST" action="/crm/integrations/api">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="api_enabled">API Status</label>
+                        <select id="api_enabled" name="api_enabled">
+                            <option value="enabled" {% if config.api_enabled %}selected{% endif %}>Enabled</option>
+                            <option value="disabled" {% if not config.api_enabled %}selected{% endif %}>Disabled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="api_version">API Version</label>
+                        <select id="api_version" name="api_version">
+                            <option value="v1" {% if config.api_version == 'v1' %}selected{% endif %}>v1.0</option>
+                            <option value="v2" {% if config.api_version == 'v2' %}selected{% endif %}>v2.0</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="base_url">Base URL</label>
+                    <input type="text" id="base_url" name="base_url" value="{{ config.base_url or 'https://api.yourcrm.com' }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Configuration</button>
+                    <button type="button" class="btn btn-warning" onclick="regenerateApiKey()">Regenerate API Key</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="integration-card">
+            <h2>API Keys</h2>
+            <div class="form-group">
+                <label for="api_key">Your API Key</label>
+                <div class="api-key-display" id="api_key_display">
+                    {{ config.api_key or 'No API key generated yet' }}
+                </div>
+                <button type="button" class="btn btn-primary" onclick="copyApiKey()">Copy API Key</button>
+                <button type="button" class="btn btn-warning" onclick="showApiKey()">Show/Hide API Key</button>
+            </div>
+
+            <div class="form-group">
+                <label for="api_secret">API Secret (for webhooks)</label>
+                <div class="api-key-display" id="api_secret_display">
+                    {{ config.api_secret or 'No API secret generated yet' }}
+                </div>
+                <button type="button" class="btn btn-primary" onclick="copyApiSecret()">Copy API Secret</button>
+                <button type="button" class="btn btn-warning" onclick="showApiSecret()">Show/Hide API Secret</button>
+            </div>
+        </div>
+
+        <div class="integration-card">
+            <h2>Rate Limiting</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rate_limit_requests">Requests per minute</label>
+                    <input type="number" id="rate_limit_requests" name="rate_limit_requests" value="{{ config.rate_limit_requests or '1000' }}" min="100" max="10000">
+                </div>
+                <div class="form-group">
+                    <label for="rate_limit_burst">Burst limit</label>
+                    <input type="number" id="rate_limit_burst" name="rate_limit_burst" value="{{ config.rate_limit_burst or '100' }}" min="10" max="1000">
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveRateLimiting()">Save Rate Limiting</button>
+            </div>
+        </div>
+
+        <div class="integration-card">
+            <h2>Authentication</h2>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="require_api_key" {% if config.require_api_key %}checked{% endif %}>
+                    Require API key for all requests
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="enable_oauth" {% if config.enable_oauth %}checked{% endif %}>
+                    Enable OAuth 2.0 authentication
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="enable_jwt" {% if config.enable_jwt %}checked{% endif %}>
+                    Enable JWT token authentication
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="token_expiry">Token Expiry (hours)</label>
+                <input type="number" id="token_expiry" name="token_expiry" value="{{ config.token_expiry or '24' }}" min="1" max="720">
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveAuthentication()">Save Authentication Settings</button>
+            </div>
+        </div>
+
+        <div class="api-endpoints">
+            <h3>Available API Endpoints</h3>
+            <div class="endpoint-item">
+                <span class="endpoint-method method-get">GET</span>
+                <strong>Get Contacts</strong>
+                <div class="endpoint-url">/api/v1/contacts</div>
+            </div>
+            <div class="endpoint-item">
+                <span class="endpoint-method method-post">POST</span>
+                <strong>Create Contact</strong>
+                <div class="endpoint-url">/api/v1/contacts</div>
+            </div>
+            <div class="endpoint-item">
+                <span class="endpoint-method method-get">GET</span>
+                <strong>Get Leads</strong>
+                <div class="endpoint-url">/api/v1/leads</div>
+            </div>
+            <div class="endpoint-item">
+                <span class="endpoint-method method-post">POST</span>
+                <strong>Create Lead</strong>
+                <div class="endpoint-url">/api/v1/leads</div>
+            </div>
+            <div class="endpoint-item">
+                <span class="endpoint-method method-get">GET</span>
+                <strong>Get Opportunities</strong>
+                <div class="endpoint-url">/api/v1/opportunities</div>
+            </div>
+            <div class="endpoint-item">
+                <span class="endpoint-method method-post">POST</span>
+                <strong>Create Opportunity</strong>
+                <div class="endpoint-url">/api/v1/opportunities</div>
+            </div>
+            <div class="form-group" style="margin-top: 20px;">
+                <button type="button" class="btn btn-primary" onclick="viewApiDocs()">View Full API Documentation</button>
+                <button type="button" class="btn btn-warning" onclick="testApiEndpoint()">Test API Endpoint</button>
+            </div>
+        </div>
+
+        <div class="integration-card">
+            <h3>API Usage Statistics</h3>
+            <div class="usage-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ api_stats.total_requests or 0 }}</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ api_stats.successful_requests or 0 }}</div>
+                    <div class="stat-label">Successful Requests</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ api_stats.failed_requests or 0 }}</div>
+                    <div class="stat-label">Failed Requests</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ api_stats.active_keys or 0 }}</div>
+                    <div class="stat-label">Active API Keys</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-warning" onclick="viewApiLogs()">View API Logs</button>
+                <button type="button" class="btn btn-primary" onclick="exportApiData()">Export API Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function regenerateApiKey() {
+            if (confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
+                // Handle API key regeneration
+                alert('API key regenerated successfully');
+            }
+        }
+
+        function copyApiKey() {
+            const apiKey = document.getElementById('api_key_display').textContent;
+            navigator.clipboard.writeText(apiKey).then(() => {
+                alert('API key copied to clipboard');
+            });
+        }
+
+        function copyApiSecret() {
+            const apiSecret = document.getElementById('api_secret_display').textContent;
+            navigator.clipboard.writeText(apiSecret).then(() => {
+                alert('API secret copied to clipboard');
+            });
+        }
+
+        function showApiKey() {
+            const display = document.getElementById('api_key_display');
+            if (display.style.filter === 'blur(5px)') {
+                display.style.filter = 'none';
+            } else {
+                display.style.filter = 'blur(5px)';
+            }
+        }
+
+        function showApiSecret() {
+            const display = document.getElementById('api_secret_display');
+            if (display.style.filter === 'blur(5px)') {
+                display.style.filter = 'none';
+            } else {
+                display.style.filter = 'blur(5px)';
+            }
+        }
+
+        function saveRateLimiting() {
+            // Handle rate limiting saving
+            alert('Rate limiting settings saved successfully');
+        }
+
+        function saveAuthentication() {
+            // Handle authentication settings saving
+            alert('Authentication settings saved successfully');
+        }
+
+        function viewApiDocs() {
+            // Handle viewing API documentation
+            alert('Opening API documentation...');
+        }
+
+        function testApiEndpoint() {
+            // Handle testing API endpoint
+            alert('Testing API endpoint...');
+        }
+
+        function viewApiLogs() {
+            // Handle viewing API logs
+            alert('Opening API logs...');
+        }
+
+        function exportApiData() {
+            // Handle exporting API data
+            alert('Exporting API data...');
+        }
+    </script>
+</body>
+</html> 

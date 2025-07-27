@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lead %}Edit Lead{% else %}Add New Lead{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="text-gradient mb-2">
+                            {% if lead %}Edit Lead{% else %}Add New Lead{% endif %}
+                        </h1>
+                        <p class="text-muted mb-0">
+                            {% if lead %}Update lead information{% else %}Create a new lead record{% endif %}
+                        </p>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('crm.leads_list') }}" class="btn-neon">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Leads
+                        </a>
+                        <a href="{{ url_for('crm.dashboard') }}" class="btn-modern">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>{{ success }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Lead Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <form method="POST" action="{% if lead %}{{ url_for('crm.update_lead', lead_id=lead.id) }}{% else %}{{ url_for('crm.create_lead') }}{% endif %}" class="row g-4">
+                    <!-- Basic Information -->
+                    <div class="col-12">
+                        <h3 class="mb-4">Basic Information</h3>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label">
+                                First Name <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="first_name" name="first_name" 
+                                   value="{{ lead.first_name if lead else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">
+                                Last Name <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="last_name" name="last_name" 
+                                   value="{{ lead.last_name if lead else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                Email <span class="required">*</span>
+                            </label>
+                            <input type="email" class="form-input" id="email" name="email" 
+                                   value="{{ lead.email if lead else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-input" id="phone" name="phone" 
+                                   value="{{ lead.phone if lead else '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="title" class="form-label">Job Title</label>
+                            <input type="text" class="form-input" id="title" name="title" 
+                                   value="{{ lead.title if lead else '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="company_name" class="form-label">Company</label>
+                            <input type="text" class="form-input" id="company_name" name="company_name" 
+                                   value="{{ lead.company_name if lead else '' }}">
+                        </div>
+                    </div>
+
+                    <!-- Company Information -->
+                    <div class="col-12">
+                        <h3 class="mb-4">Company Information</h3>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="industry" class="form-label">Industry</label>
+                            <select class="form-input" id="industry" name="industry">
+                                <option value="">Select Industry</option>
+                                                            <option value="technology" {% if lead and lead.industry == 'technology' %}selected{% endif %}>Technology</option>
+                            <option value="healthcare" {% if lead and lead.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
+                            <option value="finance" {% if lead and lead.industry == 'finance' %}selected{% endif %}>Finance</option>
+                            <option value="education" {% if lead and lead.industry == 'education' %}selected{% endif %}>Education</option>
+                            <option value="retail" {% if lead and lead.industry == 'retail' %}selected{% endif %}>Retail</option>
+                            <option value="manufacturing" {% if lead and lead.industry == 'manufacturing' %}selected{% endif %}>Manufacturing</option>
+                            <option value="consulting" {% if lead and lead.industry == 'consulting' %}selected{% endif %}>Consulting</option>
+                            <option value="other" {% if lead and lead.industry == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="website" class="form-label">Website</label>
+                            <input type="url" class="form-input" id="website" name="website" 
+                                   value="{{ lead.website if lead else '' }}" placeholder="https://example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="annual_revenue" class="form-label">Annual Revenue</label>
+                            <select class="form-input" id="annual_revenue" name="annual_revenue">
+                                <option value="">Select Revenue Range</option>
+                                                            <option value="0-100000" {% if lead and lead.annual_revenue == '0-100000' %}selected{% endif %}>$0 - $100,000</option>
+                            <option value="100000-500000" {% if lead and lead.annual_revenue == '100000-500000' %}selected{% endif %}>$100,000 - $500,000</option>
+                            <option value="500000-1000000" {% if lead and lead.annual_revenue == '500000-1000000' %}selected{% endif %}>$500,000 - $1,000,000</option>
+                            <option value="1000000-5000000" {% if lead and lead.annual_revenue == '1000000-5000000' %}selected{% endif %}>$1,000,000 - $5,000,000</option>
+                            <option value="5000000+" {% if lead and lead.annual_revenue == '5000000+' %}selected{% endif %}>$5,000,000+</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="employee_count" class="form-label">Employee Count</label>
+                            <select class="form-input" id="employee_count" name="employee_count">
+                                <option value="">Select Employee Count</option>
+                                                            <option value="1-10" {% if lead and lead.employee_count == '1-10' %}selected{% endif %}>1-10</option>
+                            <option value="11-50" {% if lead and lead.employee_count == '11-50' %}selected{% endif %}>11-50</option>
+                            <option value="51-200" {% if lead and lead.employee_count == '51-200' %}selected{% endif %}>51-200</option>
+                            <option value="201-1000" {% if lead and lead.employee_count == '201-1000' %}selected{% endif %}>201-1000</option>
+                            <option value="1000+" {% if lead and lead.employee_count == '1000+' %}selected{% endif %}>1000+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Lead Information -->
+                    <div class="col-12">
+                        <h3 class="mb-4">Lead Information</h3>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-input" id="status" name="status">
+                                                            <option value="new" {% if not lead or lead.status == 'new' or not lead.status %}selected{% endif %}>New</option>
+                            <option value="qualified" {% if lead and lead.status == 'qualified' %}selected{% endif %}>Qualified</option>
+                            <option value="contacted" {% if lead and lead.status == 'contacted' %}selected{% endif %}>Contacted</option>
+                            <option value="converted" {% if lead and lead.status == 'converted' %}selected{% endif %}>Converted</option>
+                            <option value="lost" {% if lead and lead.status == 'lost' %}selected{% endif %}>Lost</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="source" class="form-label">Lead Source</label>
+                            <select class="form-input" id="source" name="source">
+                                <option value="">Select Source</option>
+                                                            <option value="website" {% if lead and lead.source == 'website' %}selected{% endif %}>Website</option>
+                            <option value="social_media" {% if lead and lead.source == 'social_media' %}selected{% endif %}>Social Media</option>
+                            <option value="referral" {% if lead and lead.source == 'referral' %}selected{% endif %}>Referral</option>
+                            <option value="cold_call" {% if lead and lead.source == 'cold_call' %}selected{% endif %}>Cold Call</option>
+                            <option value="email_campaign" {% if lead and lead.source == 'email_campaign' %}selected{% endif %}>Email Campaign</option>
+                            <option value="trade_show" {% if lead and lead.source == 'trade_show' %}selected{% endif %}>Trade Show</option>
+                            <option value="other" {% if lead and lead.source == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="score" class="form-label">Lead Score</label>
+                            <input type="range" class="form-range" id="score" name="score" 
+                                   min="0" max="100" value="{{ lead.score if lead else 0 }}" 
+                                   oninput="scoreValue.textContent = this.value">
+                            <div class="d-flex justify-content-between">
+                                <span>0</span>
+                                <span id="scoreValue">{{ lead.score if lead else 0 }}</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="assigned_to" class="form-label">Assigned To</label>
+                            <select class="form-input" id="assigned_to" name="assigned_to">
+                                <option value="">Select User</option>
+                                <option value="1" {% if lead and lead.assigned_to == 1 %}selected{% endif %}>Admin User</option>
+                                <!-- Add more users dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Address Information -->
+                    <div class="col-12">
+                        <h3 class="mb-4">Address Information</h3>
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="address" class="form-label">Address</label>
+                                                          <textarea class="form-input" id="address" name="address" rows="3">{{ lead.address if lead else '' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-input" id="city" name="city" 
+                                   value="{{ lead.city if lead else '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="state" class="form-label">State/Province</label>
+                            <input type="text" class="form-input" id="state" name="state" 
+                                   value="{{ lead.state if lead else '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="postal_code" class="form-label">Postal Code</label>
+                            <input type="text" class="form-input" id="postal_code" name="postal_code" 
+                                   value="{{ lead.postal_code if lead else '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="country" class="form-label">Country</label>
+                            <select class="form-input" id="country" name="country">
+                                <option value="">Select Country</option>
+                                                            <option value="US" {% if lead and lead.country == 'US' %}selected{% endif %}>United States</option>
+                            <option value="CA" {% if lead and lead.country == 'CA' %}selected{% endif %}>Canada</option>
+                            <option value="UK" {% if lead and lead.country == 'UK' %}selected{% endif %}>United Kingdom</option>
+                            <option value="AU" {% if lead and lead.country == 'AU' %}selected{% endif %}>Australia</option>
+                            <option value="DE" {% if lead and lead.country == 'DE' %}selected{% endif %}>Germany</option>
+                            <option value="FR" {% if lead and lead.country == 'FR' %}selected{% endif %}>France</option>
+                            <option value="other" {% if lead and lead.country == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="col-12">
+                        <h3 class="mb-4">Additional Information</h3>
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="notes" class="form-label">Notes</label>
+                                                          <textarea class="form-input" id="notes" name="notes" rows="4" 
+                                placeholder="Add any additional notes about this lead...">{{ lead.notes if lead else '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-3 pt-4 border-top">
+                            <a href="{{ url_for('crm.leads_list') }}" class="btn-neon">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn-modern">
+                                <i class="fas fa-save me-2"></i>
+                                {% if lead %}Update Lead{% else %}Create Lead{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            showNotification('Please fill in all required fields', 'error');
+        }
+    });
+    
+    // Real-time validation
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+});
+
+// Notification system
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 100);
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %} 

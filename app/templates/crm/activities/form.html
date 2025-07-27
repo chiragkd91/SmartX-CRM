@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if activity %}Edit Activity{% else %}New Activity{% endif %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        .required {
+            color: #dc3545;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        .field-error {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{% if activity %}Edit Activity{% else %}New Activity{% endif %}</h1>
+            <div>
+                <a href="/crm/activities" class="btn btn-primary">Back to Activities</a>
+                <a href="/crm/dashboard" class="btn btn-warning">Dashboard</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="form-container">
+            <form method="POST" action="{% if activity %}/crm/activities/{{ activity.id }}/edit{% else %}/crm/activities/new{% endif %}">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="subject">Subject <span class="required">*</span></label>
+                            <input type="text" id="subject" name="subject" value="{{ activity.subject if activity else '' }}" required>
+                            {% if form_errors and form_errors.subject %}
+                            <div class="field-error">{{ form_errors.subject }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Type <span class="required">*</span></label>
+                            <select id="type" name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="Call" {% if activity and activity.type == 'Call' %}selected{% endif %}>Call</option>
+                                <option value="Email" {% if activity and activity.type == 'Email' %}selected{% endif %}>Email</option>
+                                <option value="Meeting" {% if activity and activity.type == 'Meeting' %}selected{% endif %}>Meeting</option>
+                                <option value="Task" {% if activity and activity.type == 'Task' %}selected{% endif %}>Task</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="Pending" {% if activity and activity.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Completed" {% if activity and activity.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                <option value="Overdue" {% if activity and activity.status == 'Overdue' %}selected{% endif %}>Overdue</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority</label>
+                            <select id="priority" name="priority">
+                                <option value="Medium" {% if activity and activity.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                                <option value="High" {% if activity and activity.priority == 'High' %}selected{% endif %}>High</option>
+                                <option value="Low" {% if activity and activity.priority == 'Low' %}selected{% endif %}>Low</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Timing Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="due_date">Due Date <span class="required">*</span></label>
+                            <input type="datetime-local" id="due_date" name="due_date" value="{{ activity.due_date.strftime('%Y-%m-%dT%H:%M') if activity and activity.due_date else '' }}" required>
+                            {% if form_errors and form_errors.due_date %}
+                            <div class="field-error">{{ form_errors.due_date }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Duration (minutes)</label>
+                            <input type="number" id="duration" name="duration" value="{{ activity.duration if activity else '' }}" min="0" step="15">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Assignment & Related Records</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="assigned_to">Assigned To</label>
+                            <select id="assigned_to" name="assigned_to">
+                                <option value="">Select User</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" {% if activity and activity.assigned_to == user.id %}selected{% endif %}>
+                                    {{ user.first_name }} {{ user.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="related_to_type">Related To Type</label>
+                            <select id="related_to_type" name="related_to_type">
+                                <option value="">Select Type</option>
+                                <option value="Lead" {% if activity and activity.related_to_type == 'Lead' %}selected{% endif %}>Lead</option>
+                                <option value="Contact" {% if activity and activity.related_to_type == 'Contact' %}selected{% endif %}>Contact</option>
+                                <option value="Account" {% if activity and activity.related_to_type == 'Account' %}selected{% endif %}>Account</option>
+                                <option value="Opportunity" {% if activity and activity.related_to_type == 'Opportunity' %}selected{% endif %}>Opportunity</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="related_lead_id">Related Lead</label>
+                            <select id="related_lead_id" name="related_lead_id">
+                                <option value="">Select Lead</option>
+                                {% for lead in leads %}
+                                <option value="{{ lead.id }}" {% if activity and activity.related_lead_id == lead.id %}selected{% endif %}>
+                                    {{ lead.first_name }} {{ lead.last_name }} - {{ lead.company }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="related_contact_id">Related Contact</label>
+                            <select id="related_contact_id" name="related_contact_id">
+                                <option value="">Select Contact</option>
+                                {% for contact in contacts %}
+                                <option value="{{ contact.id }}" {% if activity and activity.related_contact_id == contact.id %}selected{% endif %}>
+                                    {{ contact.first_name }} {{ contact.last_name }} - {{ contact.account.name if contact.account else 'No Account' }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="related_account_id">Related Account</label>
+                            <select id="related_account_id" name="related_account_id">
+                                <option value="">Select Account</option>
+                                {% for account in accounts %}
+                                <option value="{{ account.id }}" {% if activity and activity.related_account_id == account.id %}selected{% endif %}>
+                                    {{ account.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="related_opportunity_id">Related Opportunity</label>
+                            <select id="related_opportunity_id" name="related_opportunity_id">
+                                <option value="">Select Opportunity</option>
+                                {% for opportunity in opportunities %}
+                                <option value="{{ opportunity.id }}" {% if activity and activity.related_opportunity_id == opportunity.id %}selected{% endif %}>
+                                    {{ opportunity.name }} - {{ opportunity.account.name if opportunity.account else 'No Account' }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Activity Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" placeholder="Enter activity description...">{{ activity.description if activity else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" value="{{ activity.location if activity else '' }}" placeholder="e.g., Office, Conference Room, Client Site">
+                        </div>
+                        <div class="form-group">
+                            <label for="call_type">Call Type</label>
+                            <select id="call_type" name="call_type">
+                                <option value="">Select Call Type</option>
+                                <option value="Inbound" {% if activity and activity.call_type == 'Inbound' %}selected{% endif %}>Inbound</option>
+                                <option value="Outbound" {% if activity and activity.call_type == 'Outbound' %}selected{% endif %}>Outbound</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Additional Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" name="notes" placeholder="Enter additional notes...">{{ activity.notes if activity else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reminder">Set Reminder</label>
+                            <input type="datetime-local" id="reminder" name="reminder" value="{{ activity.reminder.strftime('%Y-%m-%dT%H:%M') if activity and activity.reminder else '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="reminder_minutes">Reminder Minutes Before</label>
+                            <input type="number" id="reminder_minutes" name="reminder_minutes" value="{{ activity.reminder_minutes if activity else '15' }}" min="0" step="5">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/crm/activities" class="btn btn-warning">Cancel</a>
+                    <button type="submit" class="btn btn-success">
+                        {% if activity %}Update Activity{% else %}Create Activity{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html> 

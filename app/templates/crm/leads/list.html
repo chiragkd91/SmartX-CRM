@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}Leads Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="text-gradient mb-2">Leads Management</h1>
+                        <p class="text-muted mb-0">Manage and track your leads</p>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('crm.leads_form') }}" class="btn-modern">
+                            <i class="fas fa-plus me-2"></i>Add New Lead
+                        </a>
+                        <button class="btn-neon" onclick="showImportModal()">
+                            <i class="fas fa-upload me-2"></i>Import Leads
+                        </button>
+                        <button class="btn-modern" onclick="exportLeads()">
+                            <i class="fas fa-download me-2"></i>Export Leads
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Search & Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <h3 class="mb-4">Search & Filters</h3>
+                <form method="GET" action="{{ url_for('crm.leads_list') }}" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="search" class="form-label">Search</label>
+                        <input type="text" class="form-input" id="search" name="search" 
+                               placeholder="Search by name, email, company..." 
+                               value="{{ request.args.get('search', '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-input" id="status" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="new" {% if request.args.get('status') == 'new' %}selected{% endif %}>New</option>
+                            <option value="qualified" {% if request.args.get('status') == 'qualified' %}selected{% endif %}>Qualified</option>
+                            <option value="contacted" {% if request.args.get('status') == 'contacted' %}selected{% endif %}>Contacted</option>
+                            <option value="converted" {% if request.args.get('status') == 'converted' %}selected{% endif %}>Converted</option>
+                            <option value="lost" {% if request.args.get('status') == 'lost' %}selected{% endif %}>Lost</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="source" class="form-label">Source</label>
+                        <select class="form-input" id="source" name="source">
+                            <option value="">All Sources</option>
+                            <option value="website" {% if request.args.get('source') == 'website' %}selected{% endif %}>Website</option>
+                            <option value="social_media" {% if request.args.get('source') == 'social_media' %}selected{% endif %}>Social Media</option>
+                            <option value="referral" {% if request.args.get('source') == 'referral' %}selected{% endif %}>Referral</option>
+                            <option value="cold_call" {% if request.args.get('source') == 'cold_call' %}selected{% endif %}>Cold Call</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="date_from" class="form-label">Date From</label>
+                        <input type="date" class="form-input" id="date_from" name="date_from" 
+                               value="{{ request.args.get('date_from', '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="date_to" class="form-label">Date To</label>
+                        <input type="date" class="form-input" id="date_to" name="date_to" 
+                               value="{{ request.args.get('date_to', '') }}">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn-modern w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-3">
+                    <a href="{{ url_for('crm.leads_list') }}" class="btn-neon">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-panel">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="select-all">
+                        <label class="form-check-label" for="select-all">Select All</label>
+                    </div>
+                    <button class="btn-modern" onclick="bulkAction('qualify')">
+                        <i class="fas fa-check me-2"></i>Qualify Selected
+                    </button>
+                    <button class="btn-modern" onclick="bulkAction('contact')">
+                        <i class="fas fa-phone me-2"></i>Mark Contacted
+                    </button>
+                    <button class="btn-neon" onclick="bulkAction('delete')">
+                        <i class="fas fa-trash me-2"></i>Delete Selected
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="table-responsive">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-table"></th>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Source</th>
+                                <th>Score</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if leads_data and leads_data.leads %}
+                                {% for lead in leads_data.leads %}
+                                <tr>
+                                    <td><input type="checkbox" class="lead-checkbox" value="{{ lead.id }}"></td>
+                                    <td>
+                                        <strong>{{ lead.first_name }} {{ lead.last_name }}</strong>
+                                        {% if lead.title %}<br><small class="text-muted">{{ lead.title }}</small>{% endif %}
+                                    </td>
+                                    <td>{{ lead.company_name or 'N/A' }}</td>
+                                    <td>{{ lead.email or 'N/A' }}</td>
+                                    <td>{{ lead.phone or 'N/A' }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ lead.status }}">
+                                            {{ lead.status|title if lead.status else 'New' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ lead.source|title if lead.source else 'N/A' }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar" style="width: {{ lead.score or 0 }}%"></div>
+                                        </div>
+                                        <small>{{ lead.score or 0 }}</small>
+                                    </td>
+                                    <td>{{ lead.created_at.strftime('%Y-%m-%d') if lead.created_at else 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('crm.get_lead', lead_id=lead.id) }}" 
+                                               class="btn btn-sm btn-primary" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('crm.update_lead', lead_id=lead.id) }}" 
+                                               class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger" title="Delete" 
+                                                    onclick="deleteLead({{ lead.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="10" class="text-center py-5">
+                                        <div class="text-muted">
+                                            <i class="fas fa-users fa-3x mb-3"></i>
+                                            <p>No leads found. <a href="{{ url_for('crm.leads_form') }}" class="text-primary">Add your first lead</a></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if leads_data and leads_data.pagination %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-center">
+                <nav aria-label="Leads pagination">
+                    <ul class="pagination">
+                        {% if leads_data.pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ leads_data.pagination.prev_num }}&{{ request.query_string.decode() }}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in leads_data.pagination.iter_pages() %}
+                            {% if page_num %}
+                                <li class="page-item {% if page_num == leads_data.pagination.page %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ page_num }}&{{ request.query_string.decode() }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if leads_data.pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ leads_data.pagination.next_num }}&{{ request.query_string.decode() }}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content glass-effect">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Leads</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Choose CSV File</label>
+                        <input type="file" class="form-input" id="file" name="file" accept=".csv" required>
+                    </div>
+                    <div class="mb-3">
+                        <a href="#" class="text-primary">Download sample CSV template</a>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-neon" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-modern" onclick="importLeads()">Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Select all functionality
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.lead-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
+
+document.getElementById('select-all-table').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.lead-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
+
+// Bulk actions
+function bulkAction(action) {
+    const selectedLeads = Array.from(document.querySelectorAll('.lead-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+    
+    if (selectedLeads.length === 0) {
+        showNotification('Please select at least one lead', 'warning');
+        return;
+    }
+
+    if (action === 'delete' && !confirm('Are you sure you want to delete the selected leads?')) {
+        return;
+    }
+
+    fetch('/crm/leads/bulk-action', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            action: action,
+            lead_ids: selectedLeads
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Bulk action completed successfully', 'success');
+            location.reload();
+        } else {
+            showNotification('Error: ' + data.error, 'error');
+        }
+    });
+}
+
+// Delete individual lead
+function deleteLead(leadId) {
+    if (confirm('Are you sure you want to delete this lead?')) {
+        fetch(`/crm/leads/${leadId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Lead deleted successfully', 'success');
+                location.reload();
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        });
+    }
+}
+
+// Import functionality
+function showImportModal() {
+    new bootstrap.Modal(document.getElementById('importModal')).show();
+}
+
+function importLeads() {
+    const formData = new FormData(document.getElementById('importForm'));
+    
+    fetch('/crm/leads/import', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Leads imported successfully', 'success');
+            location.reload();
+        } else {
+            showNotification('Error: ' + data.error, 'error');
+        }
+    });
+}
+
+// Export functionality
+function exportLeads() {
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = `/crm/leads/export?${params.toString()}`;
+}
+
+// Notification system
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 100);
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %} 

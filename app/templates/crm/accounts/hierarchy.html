@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Hierarchy Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .hierarchy-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .hierarchy-tree {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        .tree-node {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tree-node.parent {
+            border-left: 4px solid #007bff;
+            background: #e3f2fd;
+        }
+        .tree-node.child {
+            margin-left: 40px;
+            border-left: 4px solid #28a745;
+        }
+        .tree-node.sub-child {
+            margin-left: 80px;
+            border-left: 4px solid #ffc107;
+        }
+        .node-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .node-info {
+            flex: 1;
+        }
+        .node-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .node-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        .node-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .relationship-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #6c757d;
+        }
+        .relationship-type {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .hierarchy-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .search-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .search-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-group label {
+            font-weight: bold;
+            margin: 0;
+        }
+        .search-group input, .search-group select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .hierarchy-visualization {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .visualization-container {
+            height: 400px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+        }
+        .relationship-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .relationship-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        .relationship-info {
+            flex: 1;
+        }
+        .relationship-accounts {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .relationship-type-info {
+            font-size: 12px;
+            color: #666;
+        }
+        .relationship-actions {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Account Hierarchy Management</h1>
+            <div>
+                <button class="btn btn-primary" onclick="openRelationshipModal()">Add Relationship</button>
+                <button class="btn btn-success" onclick="createAccount()">Create Account</button>
+                <button class="btn btn-warning" onclick="exportHierarchy()">Export</button>
+                <a href="/crm/accounts" class="btn btn-secondary">Back to Accounts</a>
+            </div>
+        </div>
+
+        <!-- Hierarchy Statistics -->
+        <div class="hierarchy-stats">
+            <div class="stat-card">
+                <div class="stat-value">15</div>
+                <div class="stat-label">Total Accounts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Parent Companies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Subsidiaries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">4</div>
+                <div class="stat-label">Branch Offices</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$125M</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2,450</div>
+                <div class="stat-label">Total Employees</div>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="search-container">
+            <div class="search-row">
+                <div class="search-group">
+                    <label>Search:</label>
+                    <input type="text" id="search-accounts" placeholder="Search accounts...">
+                </div>
+                <div class="search-group">
+                    <label>Account Type:</label>
+                    <select id="account-type-filter">
+                        <option value="">All Types</option>
+                        <option value="parent">Parent Company</option>
+                        <option value="subsidiary">Subsidiary</option>
+                        <option value="branch">Branch Office</option>
+                        <option value="partner">Partner</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label>Industry:</label>
+                    <select id="industry-filter">
+                        <option value="">All Industries</option>
+                        <option value="technology">Technology</option>
+                        <option value="finance">Finance</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="manufacturing">Manufacturing</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+
+        <!-- Hierarchy Visualization -->
+        <div class="hierarchy-visualization">
+            <h3>Hierarchy Visualization</h3>
+            <div class="visualization-container">
+                Interactive Hierarchy Chart
+                <br>
+                <small>Drag and drop to reorganize relationships</small>
+            </div>
+        </div>
+
+        <!-- Account Hierarchy Tree -->
+        <div class="hierarchy-container">
+            <h2>Account Hierarchy Tree</h2>
+            
+            <div class="hierarchy-tree">
+                <!-- Parent Company -->
+                <div class="tree-node parent">
+                    <div class="node-avatar">T</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Inc</div>
+                        <div class="node-meta">Parent Company • Technology • $75M Revenue • 1,200 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(1)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(1)">Edit</button>
+                        <button class="btn btn-success" onclick="addChild(1)">Add Child</button>
+                    </div>
+                </div>
+
+                <!-- Subsidiaries -->
+                <div class="tree-node child">
+                    <div class="node-avatar">S</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Solutions</div>
+                        <div class="node-meta">Subsidiary • Technology • $25M Revenue • 400 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(2)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(2)">Edit</button>
+                        <button class="btn btn-success" onclick="addChild(2)">Add Child</button>
+                    </div>
+                </div>
+
+                <div class="tree-node child">
+                    <div class="node-avatar">S</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Services</div>
+                        <div class="node-meta">Subsidiary • Technology • $15M Revenue • 250 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(3)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(3)">Edit</button>
+                        <button class="btn btn-success" onclick="addChild(3)">Add Child</button>
+                    </div>
+                </div>
+
+                <!-- Branch Offices -->
+                <div class="tree-node sub-child">
+                    <div class="node-avatar">B</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Solutions - East</div>
+                        <div class="node-meta">Branch Office • Technology • $8M Revenue • 120 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(4)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(4)">Edit</button>
+                    </div>
+                </div>
+
+                <div class="tree-node sub-child">
+                    <div class="node-avatar">B</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Solutions - West</div>
+                        <div class="node-meta">Branch Office • Technology • $12M Revenue • 180 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(5)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(5)">Edit</button>
+                    </div>
+                </div>
+
+                <div class="tree-node sub-child">
+                    <div class="node-avatar">B</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Services - North</div>
+                        <div class="node-meta">Branch Office • Technology • $6M Revenue • 90 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(6)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(6)">Edit</button>
+                    </div>
+                </div>
+
+                <div class="tree-node sub-child">
+                    <div class="node-avatar">B</div>
+                    <div class="node-info">
+                        <div class="node-name">TechCorp Services - South</div>
+                        <div class="node-meta">Branch Office • Technology • $9M Revenue • 140 Employees</div>
+                    </div>
+                    <div class="node-actions">
+                        <button class="btn btn-primary" onclick="viewAccount(7)">View</button>
+                        <button class="btn btn-warning" onclick="editAccount(7)">Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relationship Management -->
+        <div class="relationship-list">
+            <h2>Account Relationships</h2>
+            
+            <div class="relationship-item">
+                <div class="relationship-info">
+                    <div class="relationship-accounts">TechCorp Inc → TechCorp Solutions</div>
+                    <div class="relationship-type-info">Parent-Subsidiary • 100% Ownership • Established: 2018</div>
+                </div>
+                <div class="relationship-actions">
+                    <button class="btn btn-primary" onclick="viewRelationship(1)">View</button>
+                    <button class="btn btn-warning" onclick="editRelationship(1)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteRelationship(1)">Delete</button>
+                </div>
+            </div>
+
+            <div class="relationship-item">
+                <div class="relationship-info">
+                    <div class="relationship-accounts">TechCorp Inc → TechCorp Services</div>
+                    <div class="relationship-type-info">Parent-Subsidiary • 85% Ownership • Established: 2019</div>
+                </div>
+                <div class="relationship-actions">
+                    <button class="btn btn-primary" onclick="viewRelationship(2)">View</button>
+                    <button class="btn btn-warning" onclick="editRelationship(2)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteRelationship(2)">Delete</button>
+                </div>
+            </div>
+
+            <div class="relationship-item">
+                <div class="relationship-info">
+                    <div class="relationship-accounts">TechCorp Solutions → TechCorp Solutions - East</div>
+                    <div class="relationship-type-info">Parent-Branch • 100% Ownership • Established: 2020</div>
+                </div>
+                <div class="relationship-actions">
+                    <button class="btn btn-primary" onclick="viewRelationship(3)">View</button>
+                    <button class="btn btn-warning" onclick="editRelationship(3)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteRelationship(3)">Delete</button>
+                </div>
+            </div>
+
+            <div class="relationship-item">
+                <div class="relationship-info">
+                    <div class="relationship-accounts">TechCorp Solutions → TechCorp Solutions - West</div>
+                    <div class="relationship-type-info">Parent-Branch • 100% Ownership • Established: 2021</div>
+                </div>
+                <div class="relationship-actions">
+                    <button class="btn btn-primary" onclick="viewRelationship(4)">View</button>
+                    <button class="btn btn-warning" onclick="editRelationship(4)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteRelationship(4)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Relationship Modal -->
+    <div id="relationshipModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add Account Relationship</h2>
+            
+            <form id="relationshipForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="parent-account">Parent Account</label>
+                        <select id="parent-account" required>
+                            <option value="">Select Parent Account</option>
+                            <option value="1">TechCorp Inc</option>
+                            <option value="2">TechCorp Solutions</option>
+                            <option value="3">TechCorp Services</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="child-account">Child Account</label>
+                        <select id="child-account" required>
+                            <option value="">Select Child Account</option>
+                            <option value="2">TechCorp Solutions</option>
+                            <option value="3">TechCorp Services</option>
+                            <option value="4">TechCorp Solutions - East</option>
+                            <option value="5">TechCorp Solutions - West</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="relationship-type">Relationship Type</label>
+                        <select id="relationship-type" required>
+                            <option value="">Select Type</option>
+                            <option value="parent_subsidiary">Parent-Subsidiary</option>
+                            <option value="parent_branch">Parent-Branch</option>
+                            <option value="partnership">Partnership</option>
+                            <option value="joint_venture">Joint Venture</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ownership-percentage">Ownership Percentage</label>
+                        <input type="number" id="ownership-percentage" min="0" max="100" placeholder="e.g., 100">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationship-notes">Notes</label>
+                    <textarea id="relationship-notes" rows="3" placeholder="Additional notes about the relationship..."></textarea>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Relationship</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openRelationshipModal() {
+            document.getElementById('relationshipModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('relationshipModal').style.display = 'none';
+        }
+
+        function viewAccount(accountId) {
+            window.location.href = `/crm/accounts/${accountId}`;
+        }
+
+        function editAccount(accountId) {
+            window.location.href = `/crm/accounts/${accountId}/edit`;
+        }
+
+        function addChild(parentId) {
+            window.location.href = `/crm/accounts/create?parent_id=${parentId}`;
+        }
+
+        function createAccount() {
+            window.location.href = '/crm/accounts/create';
+        }
+
+        function exportHierarchy() {
+            alert('Exporting hierarchy data...');
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-accounts').value;
+            const accountType = document.getElementById('account-type-filter').value;
+            const industry = document.getElementById('industry-filter').value;
+            
+            console.log('Applying filters:', { searchTerm, accountType, industry });
+        }
+
+        function viewRelationship(relationshipId) {
+            alert('Viewing relationship details...');
+        }
+
+        function editRelationship(relationshipId) {
+            alert('Editing relationship...');
+        }
+
+        function deleteRelationship(relationshipId) {
+            if (confirm('Are you sure you want to delete this relationship?')) {
+                alert('Relationship deleted successfully');
+            }
+        }
+
+        // Form submission
+        document.getElementById('relationshipForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Relationship added successfully!');
+            closeModal();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('relationshipModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-accounts').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const nodes = document.querySelectorAll('.tree-node');
+            
+            nodes.forEach(node => {
+                const nodeName = node.querySelector('.node-name').textContent.toLowerCase();
+                if (nodeName.includes(searchTerm)) {
+                    node.style.display = 'flex';
+                } else {
+                    node.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

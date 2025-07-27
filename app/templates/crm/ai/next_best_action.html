@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Best Action - CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1em;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .priority-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .priority-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        .actions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .actions-table th,
+        .actions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .actions-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .action-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .action-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .action-description {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .action-metrics {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .action-type {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Next Best Action</h1>
+            <div>
+                <a href="/crm/ai/dashboard" class="btn btn-primary">AI Dashboard</a>
+                <a href="/crm/ai/next_best_action/export" class="btn btn-success">Export Actions</a>
+                <a href="/crm/ai/next_best_action/refresh" class="btn btn-warning">Refresh Recommendations</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_actions }}</div>
+                <div class="metric-label">Total Actions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.high_priority_actions }}</div>
+                <div class="metric-label">High Priority Actions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.avg_confidence) }}%</div>
+                <div class="metric-label">Average Confidence</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.completed_actions }}</div>
+                <div class="metric-label">Completed Actions</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/crm/ai/next_best_action">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="priority">Priority Level:</label>
+                        <select id="priority" name="priority">
+                            <option value="">All Priorities</option>
+                            <option value="high" {% if request.args.get('priority') == 'high' %}selected{% endif %}>High Priority</option>
+                            <option value="medium" {% if request.args.get('priority') == 'medium' %}selected{% endif %}>Medium Priority</option>
+                            <option value="low" {% if request.args.get('priority') == 'low' %}selected{% endif %}>Low Priority</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="action_type">Action Type:</label>
+                        <select id="action_type" name="action_type">
+                            <option value="">All Types</option>
+                            {% for type in action_types %}
+                            <option value="{{ type }}" {% if request.args.get('action_type') == type %}selected{% endif %}>{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="owner">Owner:</label>
+                        <select id="owner" name="owner">
+                            <option value="">All Owners</option>
+                            {% for owner in action_owners %}
+                            <option value="{{ owner.id }}" {% if request.args.get('owner')|int == owner.id %}selected{% endif %}>{{ owner.first_name }} {{ owner.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/ai/next_best_action" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Action Distribution by Type</h3>
+                <canvas id="actionTypeChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Model Performance</h3>
+                <div style="margin-bottom: 20px;">
+                    <h4>Recommendation Metrics</h4>
+                    <p><strong>Last Updated:</strong> {{ model_info.last_updated }}</p>
+                    <p><strong>Training Data:</strong> {{ model_info.training_samples }} samples</p>
+                    <p><strong>Accuracy:</strong> {{ "%.2f"|format(model_info.accuracy) }}</p>
+                    <p><strong>Precision:</strong> {{ "%.2f"|format(model_info.precision) }}</p>
+                    <p><strong>Recall:</strong> {{ "%.2f"|format(model_info.recall) }}</p>
+                </div>
+                <div>
+                    <h4>Action Categories</h4>
+                    {% for category in action_categories %}
+                    <div class="action-item">
+                        <div class="action-title">
+                            <span>{{ category.name }}</span>
+                            <span class="action-type">{{ category.count }} actions</span>
+                        </div>
+                        <div class="action-description">{{ category.description }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="card-title">Action Completion Trends</h3>
+            <canvas id="completionTrendChart" width="800" height="400"></canvas>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Recommended Actions</h3>
+            <table class="actions-table">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Confidence</th>
+                        <th>Expected Outcome</th>
+                        <th>Owner</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for action in recommended_actions %}
+                    <tr>
+                        <td>{{ action.title }}</td>
+                        <td>{{ action.target_name }}</td>
+                        <td>{{ action.type }}</td>
+                        <td>
+                            {% if action.priority == 'high' %}
+                                <span class="priority-badge priority-high">High</span>
+                            {% elif action.priority == 'medium' %}
+                                <span class="priority-badge priority-medium">Medium</span>
+                            {% else %}
+                                <span class="priority-badge priority-low">Low</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ "%.1f"|format(action.confidence) }}%</td>
+                        <td>{{ action.expected_outcome }}</td>
+                        <td>{{ action.owner_name }}</td>
+                        <td>{{ action.due_date }}</td>
+                        <td>
+                            <a href="/crm/actions/{{ action.id }}" class="btn btn-primary btn-sm">View</a>
+                            <a href="/crm/actions/{{ action.id }}/execute" class="btn btn-success btn-sm">Execute</a>
+                            <a href="/crm/actions/{{ action.id }}/edit" class="btn btn-warning btn-sm">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Action Type Distribution Chart
+        const actionTypeCtx = document.getElementById('actionTypeChart').getContext('2d');
+        new Chart(actionTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Follow-up', 'Proposal', 'Meeting', 'Call', 'Email', 'Other'],
+                datasets: [{
+                    data: [30, 20, 15, 15, 12, 8],
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1',
+                        '#fd7e14'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Completion Trend Chart
+        const completionTrendCtx = document.getElementById('completionTrendChart').getContext('2d');
+        new Chart(completionTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Actions Completed',
+                    data: [85, 92, 88, 95, 89, 94],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Actions Recommended',
+                    data: [100, 105, 98, 110, 102, 108],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

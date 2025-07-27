@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Forecasting{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Sales Forecasting</h1>
+        </div>
+    </div>
+
+    <!-- Forecast Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label">Forecast Period</label>
+                            <select class="form-control">
+                                <option>Next 30 Days</option>
+                                <option>Next 90 Days</option>
+                                <option>Next 6 Months</option>
+                                <option>Next Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Confidence Level</label>
+                            <select class="form-control">
+                                <option>Conservative (80%)</option>
+                                <option>Realistic (90%)</option>
+                                <option>Optimistic (95%)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Territory</label>
+                            <select class="form-control">
+                                <option>All Territories</option>
+                                <option>North America</option>
+                                <option>Europe</option>
+                                <option>Asia Pacific</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button class="btn btn-primary">Update Forecast</button>
+                                <button class="btn btn-outline-secondary ml-2">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forecast Summary -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Forecasted Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$3,200,000</div>
+                            <small class="text-success">+12% vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Expected Deals</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">28</div>
+                            <small class="text-success">+5 vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-handshake fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Average Deal Size</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$114,286</div>
+                            <small class="text-success">+8% vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Forecast Accuracy</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">87%</div>
+                            <small class="text-success">+3% vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bullseye fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forecast Charts -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Revenue Forecast Trend</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                            <a class="dropdown-item" href="#">This Week</a>
+                            <a class="dropdown-item" href="#">This Month</a>
+                            <a class="dropdown-item" href="#">This Quarter</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Forecast by Stage</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="stageForecastChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Prospecting
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Qualification
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Proposal
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-warning"></i> Negotiation
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forecast Details -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Forecast Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Sales Rep</th>
+                                    <th>Territory</th>
+                                    <th>Pipeline Value</th>
+                                    <th>Forecasted Revenue</th>
+                                    <th>Confidence</th>
+                                    <th>Expected Deals</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sarah Johnson</td>
+                                    <td>North America</td>
+                                    <td>$850,000</td>
+                                    <td>$680,000</td>
+                                    <td><span class="badge badge-success">High (90%)</span></td>
+                                    <td>8</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Mike Chen</td>
+                                    <td>Asia Pacific</td>
+                                    <td>$720,000</td>
+                                    <td>$576,000</td>
+                                    <td><span class="badge badge-warning">Medium (75%)</span></td>
+                                    <td>6</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lisa Rodriguez</td>
+                                    <td>Europe</td>
+                                    <td>$650,000</td>
+                                    <td>$520,000</td>
+                                    <td><span class="badge badge-success">High (85%)</span></td>
+                                    <td>7</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>David Wilson</td>
+                                    <td>North America</td>
+                                    <td>$580,000</td>
+                                    <td>$464,000</td>
+                                    <td><span class="badge badge-info">Medium (80%)</span></td>
+                                    <td>5</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View Details</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Analysis -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Risk Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>High Risk Deals</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">TechCorp Enterprise</h6>
+                                        <small class="text-muted">Risk: Budget constraints, competitor pressure</small>
+                                    </div>
+                                    <span class="badge badge-danger badge-pill">$125K</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Global Solutions</h6>
+                                        <small class="text-muted">Risk: Decision maker change, timeline delay</small>
+                                    </div>
+                                    <span class="badge badge-danger badge-pill">$85K</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Opportunities for Growth</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Startup Partnership</h6>
+                                        <small class="text-muted">Upsell opportunity, expansion potential</small>
+                                    </div>
+                                    <span class="badge badge-success badge-pill">+$50K</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Enterprise Upgrade</h6>
+                                        <small class="text-muted">Contract renewal, feature expansion</small>
+                                    </div>
+                                    <span class="badge badge-success badge-pill">+$75K</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Revenue Forecast Trend Chart
+    const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+    new Chart(forecastCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Actual Revenue',
+                data: [180, 220, 250, 280, 320, 350, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(78, 115, 223, 1)',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true
+            }, {
+                label: 'Forecasted Revenue',
+                data: [null, null, null, null, null, null, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(28, 200, 138, 1)',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                fill: true,
+                borderDash: [5, 5]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Forecast by Stage Chart
+    const stageCtx = document.getElementById('stageForecastChart').getContext('2d');
+    new Chart(stageCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Prospecting', 'Qualification', 'Proposal', 'Negotiation'],
+            datasets: [{
+                data: [25, 30, 25, 20],
+                backgroundColor: [
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(28, 200, 138, 0.8)',
+                    'rgba(54, 185, 204, 0.8)',
+                    'rgba(246, 194, 62, 0.8)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

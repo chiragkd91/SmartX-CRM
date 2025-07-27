@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Templates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .contract-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .contract-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .contract-item.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .contract-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .contract-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .contract-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .contract-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .contract-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .contract-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .clause-builder {
+            margin-top: 20px;
+        }
+        .clause-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .clause-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .clause-title {
+            font-weight: bold;
+        }
+        .clause-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .clause-content {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .hidden {
+            display: none;
+        }
+        .preview-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            font-family: 'Times New Roman', serif;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #333;
+        }
+        .preview-section {
+            margin-bottom: 25px;
+        }
+        .preview-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .preview-section p {
+            line-height: 1.8;
+            color: #333;
+            text-align: justify;
+        }
+        .clause-library {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .clause-category {
+            margin-bottom: 15px;
+        }
+        .clause-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .clause-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .clause-option:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .clause-option-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .clause-option-desc {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Contract Templates</h1>
+                <p>Create and manage legal contract templates</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateContract()">Create Template</button>
+                <a href="/crm/templates" class="btn btn-secondary">Back to Templates</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Contract Library -->
+            <div class="card">
+                <h3>Contract Library</h3>
+                <div class="contract-item" onclick="selectContract('service_agreement')">
+                    <div class="contract-header">
+                        <div class="contract-name">Service Agreement</div>
+                        <span class="contract-type">Service</span>
+                    </div>
+                    <div class="contract-description">
+                        Standard service agreement template for consulting and professional services
+                    </div>
+                    <div class="contract-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">95.2%</div>
+                            <div class="stat-label">Acceptance</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Clauses</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contract-item" onclick="selectContract('nda')">
+                    <div class="contract-header">
+                        <div class="contract-name">Non-Disclosure Agreement</div>
+                        <span class="contract-type">Legal</span>
+                    </div>
+                    <div class="contract-description">
+                        Confidentiality agreement template for protecting sensitive information
+                    </div>
+                    <div class="contract-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">98.7%</div>
+                            <div class="stat-label">Acceptance</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Clauses</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contract-item" onclick="selectContract('software_license')">
+                    <div class="contract-header">
+                        <div class="contract-name">Software License Agreement</div>
+                        <span class="contract-type">Software</span>
+                    </div>
+                    <div class="contract-description">
+                        License agreement template for software products and services
+                    </div>
+                    <div class="contract-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">67</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">92.1%</div>
+                            <div class="stat-label">Acceptance</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Clauses</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contract-item" onclick="selectContract('partnership')">
+                    <div class="contract-header">
+                        <div class="contract-name">Partnership Agreement</div>
+                        <span class="contract-type">Partnership</span>
+                    </div>
+                    <div class="contract-description">
+                        Partnership agreement template for business collaborations
+                    </div>
+                    <div class="contract-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">34</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">88.9%</div>
+                            <div class="stat-label">Acceptance</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">18</div>
+                            <div class="stat-label">Clauses</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract Builder -->
+            <div class="card">
+                <h3>Contract Builder</h3>
+                <div class="contract-builder">
+                    <div class="form-group">
+                        <label>Contract Name</label>
+                        <input type="text" id="contract-name" placeholder="Enter contract name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contract Type</label>
+                        <select id="contract-type">
+                            <option value="">Select contract type</option>
+                            <option value="service">Service Agreement</option>
+                            <option value="nda">Non-Disclosure Agreement</option>
+                            <option value="software">Software License</option>
+                            <option value="partnership">Partnership Agreement</option>
+                            <option value="employment">Employment Contract</option>
+                            <option value="vendor">Vendor Agreement</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="contract-description" rows="3" placeholder="Enter contract description"></textarea>
+                    </div>
+
+                    <div class="clause-builder">
+                        <h4>Contract Clauses</h4>
+                        <div class="clause-item">
+                            <div class="clause-header">
+                                <div class="clause-title">Parties</div>
+                                <div class="clause-actions">
+                                    <button class="btn btn-secondary" onclick="editClause('parties')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeClause('parties')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="clause-content">
+                                This agreement is entered into between [Company Name] ("Provider") and [Client Name] ("Client")...
+                            </div>
+                        </div>
+                        <div class="clause-item">
+                            <div class="clause-header">
+                                <div class="clause-title">Services</div>
+                                <div class="clause-actions">
+                                    <button class="btn btn-secondary" onclick="editClause('services')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeClause('services')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="clause-content">
+                                The Provider shall provide the following services to the Client: [Service Description]...
+                            </div>
+                        </div>
+                        <div class="clause-item">
+                            <div class="clause-header">
+                                <div class="clause-title">Payment Terms</div>
+                                <div class="clause-actions">
+                                    <button class="btn btn-secondary" onclick="editClause('payment')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeClause('payment')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="clause-content">
+                                The Client shall pay the Provider [Amount] for the services rendered...
+                            </div>
+                        </div>
+                        <div class="clause-item">
+                            <div class="clause-header">
+                                <div class="clause-title">Term and Termination</div>
+                                <div class="clause-actions">
+                                    <button class="btn btn-secondary" onclick="editClause('termination')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeClause('termination')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="clause-content">
+                                This agreement shall commence on [Start Date] and continue until [End Date]...
+                            </div>
+                        </div>
+                        <div class="clause-item">
+                            <div class="clause-header">
+                                <div class="clause-title">Confidentiality</div>
+                                <div class="clause-actions">
+                                    <button class="btn btn-secondary" onclick="editClause('confidentiality')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeClause('confidentiality')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="clause-content">
+                                Both parties agree to maintain the confidentiality of any proprietary information...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="addClause()">Add Clause</button>
+                        <button class="btn btn-success" onclick="saveContract()">Save Contract</button>
+                        <button class="btn btn-primary" onclick="previewContract()">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clause Library -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Clause Library</h3>
+            <div class="clause-library">
+                <div class="clause-category">
+                    <h4>Standard Clauses</h4>
+                    <div class="clause-option" onclick="addClauseFromLibrary('parties')">
+                        <div class="clause-option-title">Parties Clause</div>
+                        <div class="clause-option-desc">Identifies the parties entering into the agreement</div>
+                    </div>
+                    <div class="clause-option" onclick="addClauseFromLibrary('services')">
+                        <div class="clause-option-title">Services Clause</div>
+                        <div class="clause-option-desc">Defines the services to be provided</div>
+                    </div>
+                    <div class="clause-option" onclick="addClauseFromLibrary('payment')">
+                        <div class="clause-option-title">Payment Terms</div>
+                        <div class="clause-option-desc">Specifies payment amounts and schedules</div>
+                    </div>
+                </div>
+
+                <div class="clause-category">
+                    <h4>Legal Clauses</h4>
+                    <div class="clause-option" onclick="addClauseFromLibrary('confidentiality')">
+                        <div class="clause-option-title">Confidentiality</div>
+                        <div class="clause-option-desc">Protects confidential information</div>
+                    </div>
+                    <div class="clause-option" onclick="addClauseFromLibrary('liability')">
+                        <div class="clause-option-title">Liability</div>
+                        <div class="clause-option-desc">Limits liability and defines responsibilities</div>
+                    </div>
+                    <div class="clause-option" onclick="addClauseFromLibrary('governing_law')">
+                        <div class="clause-option-title">Governing Law</div>
+                        <div class="clause-option-desc">Specifies applicable law and jurisdiction</div>
+                    </div>
+                </div>
+
+                <div class="clause-category">
+                    <h4>Termination Clauses</h4>
+                    <div class="clause-option" onclick="addClauseFromLibrary('termination')">
+                        <div class="clause-option-title">Term and Termination</div>
+                        <div class="clause-option-desc">Defines contract duration and termination conditions</div>
+                    </div>
+                    <div class="clause-option" onclick="addClauseFromLibrary('force_majeure')">
+                        <div class="clause-option-title">Force Majeure</div>
+                        <div class="clause-option-desc">Addresses unforeseeable circumstances</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Preview -->
+        <div id="contract-preview" class="card hidden" style="margin-top: 20px;">
+            <h3>Contract Preview</h3>
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h1>SERVICE AGREEMENT</h1>
+                    <p>This Service Agreement (the "Agreement") is entered into as of [Date]</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>1. PARTIES</h3>
+                    <p>This agreement is entered into between [Company Name], a [State] corporation with its principal place of business at [Address] ("Provider"), and [Client Name], a [State] corporation with its principal place of business at [Address] ("Client").</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>2. SERVICES</h3>
+                    <p>The Provider shall provide the following services to the Client: [Service Description]. The Provider shall perform all services in a professional manner and in accordance with industry standards.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>3. PAYMENT TERMS</h3>
+                    <p>The Client shall pay the Provider [Amount] for the services rendered. Payment shall be made within [Payment Terms] days of receipt of invoice. Late payments shall incur interest at the rate of [Interest Rate]% per month.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>4. TERM AND TERMINATION</h3>
+                    <p>This agreement shall commence on [Start Date] and continue until [End Date], unless earlier terminated as provided herein. Either party may terminate this agreement upon [Notice Period] days written notice to the other party.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>5. CONFIDENTIALITY</h3>
+                    <p>Both parties agree to maintain the confidentiality of any proprietary information disclosed during the term of this agreement. This obligation shall survive the termination of this agreement for a period of [Confidentiality Period] years.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedContract = null;
+
+        function showCreateContract() {
+            document.getElementById('contract-name').focus();
+        }
+
+        function selectContract(contractId) {
+            selectedContract = contractId;
+            
+            // Remove previous selection
+            document.querySelectorAll('.contract-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('selected');
+            
+            console.log('Selected contract:', contractId);
+        }
+
+        function addClause() {
+            const clauseName = prompt('Enter clause name:');
+            if (clauseName) {
+                console.log('Adding clause:', clauseName);
+                alert('Clause added successfully!');
+            }
+        }
+
+        function addClauseFromLibrary(clauseType) {
+            console.log('Adding clause from library:', clauseType);
+            alert('Clause added from library successfully!');
+        }
+
+        function editClause(clauseId) {
+            console.log('Editing clause:', clauseId);
+            alert('Edit functionality would open clause editor');
+        }
+
+        function removeClause(clauseId) {
+            if (confirm('Are you sure you want to remove this clause?')) {
+                console.log('Removing clause:', clauseId);
+                alert('Clause removed successfully!');
+            }
+        }
+
+        function saveContract() {
+            const name = document.getElementById('contract-name').value;
+            const type = document.getElementById('contract-type').value;
+            const description = document.getElementById('contract-description').value;
+            
+            if (!name || !type) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Saving contract:', { name, type, description });
+            alert('Contract saved successfully!');
+        }
+
+        function previewContract() {
+            document.getElementById('contract-preview').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html> 

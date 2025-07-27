@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM System - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .nav-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: #333;
+        }
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .nav-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .nav-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 CRM System</h1>
+            <p>Complete Customer Relationship Management Solution</p>
+        </div>
+        
+        <div class="nav-grid">
+            <a href="{{ url_for('crm.dashboard') }}" class="nav-card">
+                <h3>📊 Dashboard</h3>
+                <p>Access your CRM dashboard with leads, accounts, opportunities, and analytics</p>
+                <div class="btn">Go to Dashboard</div>
+            </a>
+            
+            <a href="{{ url_for('crm.get_leads') }}" class="nav-card">
+                <h3>👥 Leads</h3>
+                <p>Manage your leads, track conversions, and nurture prospects</p>
+                <div class="btn">Manage Leads</div>
+            </a>
+            
+            <a href="{{ url_for('crm.get_accounts') }}" class="nav-card">
+                <h3>🏢 Accounts</h3>
+                <p>Manage customer accounts and company information</p>
+                <div class="btn">View Accounts</div>
+            </a>
+            
+            <a href="{{ url_for('crm.get_opportunities') }}" class="nav-card">
+                <h3>💰 Opportunities</h3>
+                <p>Track sales opportunities and manage your pipeline</p>
+                <div class="btn">View Opportunities</div>
+            </a>
+            
+            <a href="{{ url_for('mobile.get_mobile_features') }}" class="nav-card">
+                <h3>📱 Mobile</h3>
+                <p>Access mobile features and cross-platform support</p>
+                <div class="btn">Mobile Features</div>
+            </a>
+            
+            <a href="{{ url_for('developer.home') }}" class="nav-card">
+                <h3>🔧 Developer</h3>
+                <p>API documentation and developer tools</p>
+                <div class="btn">Developer Portal</div>
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

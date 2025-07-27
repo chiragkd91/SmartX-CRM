@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Templates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .quote-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .quote-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .quote-item.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .quote-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .quote-category {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .quote-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .quote-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .quote-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .product-catalog {
+            margin-top: 20px;
+        }
+        .product-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .product-description {
+            color: #666;
+            font-size: 14px;
+        }
+        .product-price {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 15px;
+        }
+        .product-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .preview-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .preview-section {
+            margin-bottom: 25px;
+        }
+        .preview-section h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .preview-section p {
+            line-height: 1.6;
+            color: #333;
+        }
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .quote-table th, .quote-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .quote-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .quote-table .total-row {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .pricing-options {
+            margin-top: 20px;
+        }
+        .pricing-option {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .pricing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .pricing-name {
+            font-weight: bold;
+        }
+        .pricing-price {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 18px;
+        }
+        .pricing-description {
+            color: #666;
+            font-size: 14px;
+        }
+        .discount-calculator {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .discount-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .discount-label {
+            font-weight: bold;
+        }
+        .discount-value {
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Quote Templates</h1>
+                <p>Create and manage professional quote templates</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateQuote()">Create Template</button>
+                <a href="/crm/templates" class="btn btn-secondary">Back to Templates</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Quote Library -->
+            <div class="card">
+                <h3>Quote Library</h3>
+                <div class="quote-item" onclick="selectQuote('software_license')">
+                    <div class="quote-header">
+                        <div class="quote-name">Software License Quote</div>
+                        <span class="quote-category">Software</span>
+                    </div>
+                    <div class="quote-description">
+                        Professional quote template for software licensing and subscriptions
+                    </div>
+                    <div class="quote-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">234</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">67.8%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$890K</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quote-item" onclick="selectQuote('consulting')">
+                    <div class="quote-header">
+                        <div class="quote-name">Consulting Services</div>
+                        <span class="quote-category">Services</span>
+                    </div>
+                    <div class="quote-description">
+                        Quote template for consulting and professional services
+                    </div>
+                    <div class="quote-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">72.4%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$450K</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quote-item" onclick="selectQuote('hardware')">
+                    <div class="quote-header">
+                        <div class="quote-name">Hardware & Equipment</div>
+                        <span class="quote-category">Hardware</span>
+                    </div>
+                    <div class="quote-description">
+                        Quote template for hardware sales and equipment purchases
+                    </div>
+                    <div class="quote-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">58.9%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$320K</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quote-item" onclick="selectQuote('maintenance')">
+                    <div class="quote-header">
+                        <div class="quote-name">Maintenance & Support</div>
+                        <span class="quote-category">Support</span>
+                    </div>
+                    <div class="quote-description">
+                        Quote template for maintenance contracts and support services
+                    </div>
+                    <div class="quote-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">123</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">81.3%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$180K</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Builder -->
+            <div class="card">
+                <h3>Quote Builder</h3>
+                <div class="quote-builder">
+                    <div class="form-group">
+                        <label>Quote Name</label>
+                        <input type="text" id="quote-name" placeholder="Enter quote name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Quote Type</label>
+                        <select id="quote-type">
+                            <option value="">Select quote type</option>
+                            <option value="software">Software License</option>
+                            <option value="consulting">Consulting Services</option>
+                            <option value="hardware">Hardware & Equipment</option>
+                            <option value="maintenance">Maintenance & Support</option>
+                            <option value="custom">Custom Solution</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="quote-description" rows="3" placeholder="Enter quote description"></textarea>
+                    </div>
+
+                    <div class="product-catalog">
+                        <h4>Product Catalog</h4>
+                        <div class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">Enterprise Software License</div>
+                                <div class="product-description">Full-featured enterprise software with unlimited users</div>
+                            </div>
+                            <div class="product-price">$25,000</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="addProduct('enterprise_license')">Add</button>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">Professional Services</div>
+                                <div class="product-description">Implementation and training services</div>
+                            </div>
+                            <div class="product-price">$15,000</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="addProduct('professional_services')">Add</button>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">Annual Support</div>
+                                <div class="product-description">24/7 technical support and maintenance</div>
+                            </div>
+                            <div class="product-price">$5,000</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="addProduct('annual_support')">Add</button>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">Custom Development</div>
+                                <div class="product-description">Custom features and integrations</div>
+                            </div>
+                            <div class="product-price">$10,000</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="addProduct('custom_development')">Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="addCustomProduct()">Add Custom Product</button>
+                        <button class="btn btn-success" onclick="saveQuote()">Save Quote</button>
+                        <button class="btn btn-primary" onclick="previewQuote()">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Options -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Pricing Options</h3>
+            <div class="pricing-options">
+                <div class="pricing-option">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Basic Package</div>
+                        <div class="pricing-price">$35,000</div>
+                    </div>
+                    <div class="pricing-description">
+                        Includes software license and basic implementation support
+                    </div>
+                </div>
+                <div class="pricing-option">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Standard Package</div>
+                        <div class="pricing-price">$45,000</div>
+                    </div>
+                    <div class="pricing-description">
+                        Includes software license, implementation, and 1 year of support
+                    </div>
+                </div>
+                <div class="pricing-option">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Premium Package</div>
+                        <div class="pricing-price">$55,000</div>
+                    </div>
+                    <div class="pricing-description">
+                        Includes software license, full implementation, custom development, and 2 years of support
+                    </div>
+                </div>
+            </div>
+
+            <div class="discount-calculator">
+                <h4>Discount Calculator</h4>
+                <div class="discount-row">
+                    <div class="discount-label">Subtotal:</div>
+                    <div class="discount-value">$55,000</div>
+                </div>
+                <div class="discount-row">
+                    <div class="discount-label">Volume Discount (10%):</div>
+                    <div class="discount-value">-$5,500</div>
+                </div>
+                <div class="discount-row">
+                    <div class="discount-label">Early Payment Discount (5%):</div>
+                    <div class="discount-value">-$2,475</div>
+                </div>
+                <div class="discount-row">
+                    <div class="discount-label">Tax (8.5%):</div>
+                    <div class="discount-value">$3,994</div>
+                </div>
+                <div class="discount-row" style="border-top: 2px solid #007bff; padding-top: 10px; font-weight: bold;">
+                    <div class="discount-label">Total:</div>
+                    <div class="discount-value">$51,019</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quote Preview -->
+        <div id="quote-preview" class="card hidden" style="margin-top: 20px;">
+            <h3>Quote Preview</h3>
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h1>QUOTE</h1>
+                    <p>Quote #: QT-2024-001</p>
+                    <p>Date: January 15, 2024</p>
+                    <p>Valid Until: February 15, 2024</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Client Information</h3>
+                    <p><strong>Client:</strong> [Client Name]<br>
+                    <strong>Company:</strong> [Company Name]<br>
+                    <strong>Address:</strong> [Client Address]<br>
+                    <strong>Contact:</strong> [Contact Person]</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Proposed Solution</h3>
+                    <p>We are pleased to provide you with a comprehensive solution that addresses your business needs. This quote includes software licensing, implementation services, and ongoing support to ensure your success.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Pricing Breakdown</h3>
+                    <table class="quote-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Enterprise Software License</td>
+                                <td>Full-featured enterprise software with unlimited users</td>
+                                <td>1</td>
+                                <td>$25,000</td>
+                                <td>$25,000</td>
+                            </tr>
+                            <tr>
+                                <td>Professional Services</td>
+                                <td>Implementation and training services</td>
+                                <td>1</td>
+                                <td>$15,000</td>
+                                <td>$15,000</td>
+                            </tr>
+                            <tr>
+                                <td>Annual Support</td>
+                                <td>24/7 technical support and maintenance</td>
+                                <td>1</td>
+                                <td>$5,000</td>
+                                <td>$5,000</td>
+                            </tr>
+                            <tr>
+                                <td>Custom Development</td>
+                                <td>Custom features and integrations</td>
+                                <td>1</td>
+                                <td>$10,000</td>
+                                <td>$10,000</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="4"><strong>Subtotal</strong></td>
+                                <td><strong>$55,000</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">Volume Discount (10%)</td>
+                                <td>-$5,500</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">Early Payment Discount (5%)</td>
+                                <td>-$2,475</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">Tax (8.5%)</td>
+                                <td>$3,994</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="4"><strong>Total</strong></td>
+                                <td><strong>$51,019</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Terms and Conditions</h3>
+                    <p>This quote is valid for 30 days from the date of issue. Payment terms are net 30 days. Implementation will begin within 2 weeks of contract signing. Support services commence upon go-live.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedQuote = null;
+
+        function showCreateQuote() {
+            document.getElementById('quote-name').focus();
+        }
+
+        function selectQuote(quoteId) {
+            selectedQuote = quoteId;
+            
+            // Remove previous selection
+            document.querySelectorAll('.quote-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('selected');
+            
+            console.log('Selected quote:', quoteId);
+        }
+
+        function addProduct(productId) {
+            console.log('Adding product:', productId);
+            alert('Product added to quote successfully!');
+        }
+
+        function addCustomProduct() {
+            const productName = prompt('Enter product name:');
+            const productPrice = prompt('Enter product price:');
+            if (productName && productPrice) {
+                console.log('Adding custom product:', { name: productName, price: productPrice });
+                alert('Custom product added successfully!');
+            }
+        }
+
+        function saveQuote() {
+            const name = document.getElementById('quote-name').value;
+            const type = document.getElementById('quote-type').value;
+            const description = document.getElementById('quote-description').value;
+            
+            if (!name || !type) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Saving quote:', { name, type, description });
+            alert('Quote saved successfully!');
+        }
+
+        function previewQuote() {
+            document.getElementById('quote-preview').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html> 

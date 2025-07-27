@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Dashboard - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Monitoring Dashboard</h1>
+        
+        {% if monitoring_data %}
+        <div class="monitoring-grid">
+            <div class="monitoring-card system-health">
+                <h3>System Health</h3>
+                <div class="health-indicators">
+                    <div class="indicator">
+                        <span class="indicator-label">CPU Usage:</span>
+                        <span class="indicator-value">{{ monitoring_data.get('cpu_usage', 'N/A') }}%</span>
+                    </div>
+                    <div class="indicator">
+                        <span class="indicator-label">Memory Usage:</span>
+                        <span class="indicator-value">{{ monitoring_data.get('memory_usage', 'N/A') }}%</span>
+                    </div>
+                    <div class="indicator">
+                        <span class="indicator-label">Disk Usage:</span>
+                        <span class="indicator-value">{{ monitoring_data.get('disk_usage', 'N/A') }}%</span>
+                    </div>
+                    <div class="indicator">
+                        <span class="indicator-label">Uptime:</span>
+                        <span class="indicator-value">{{ monitoring_data.get('uptime', 'N/A') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="monitoring-card performance">
+                <h3>Performance Metrics</h3>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Response Time:</span>
+                        <span class="metric-value">{{ monitoring_data.get('response_time', 'N/A') }}ms</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Requests/sec:</span>
+                        <span class="metric-value">{{ monitoring_data.get('requests_per_sec', 'N/A') }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Error Rate:</span>
+                        <span class="metric-value">{{ monitoring_data.get('error_rate', 'N/A') }}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="monitoring-card alerts">
+                <h3>Active Alerts</h3>
+                {% if monitoring_data.get('alerts') %}
+                <div class="alerts-list">
+                    {% for alert in monitoring_data.alerts %}
+                    <div class="alert-item {{ alert.severity }}">
+                        <span class="alert-severity">{{ alert.severity.upper() }}</span>
+                        <span class="alert-message">{{ alert.message }}</span>
+                        <span class="alert-time">{{ alert.timestamp }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No active alerts</p>
+                {% endif %}
+                <a href="{{ url_for('monitoring.get_alerts') }}" class="btn btn-primary">View All Alerts</a>
+            </div>
+        </div>
+
+        <div class="monitoring-actions">
+            <a href="{{ url_for('monitoring.get_metrics') }}" class="btn btn-secondary">Detailed Metrics</a>
+            <a href="{{ url_for('monitoring.export_metrics') }}" class="btn btn-secondary">Export Data</a>
+            <a href="{{ url_for('monitoring.generate_report') }}" class="btn btn-secondary">Generate Report</a>
+        </div>
+        {% else %}
+        <p>Monitoring data not available.</p>
+        {% endif %}
+
+        <div class="navigation">
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-primary">Back to Admin</a>
+        </div>
+    </div>
+</body>
+</html> 

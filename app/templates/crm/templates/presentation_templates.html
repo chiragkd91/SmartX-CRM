@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation Templates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .presentation-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .presentation-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .presentation-item.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .presentation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .presentation-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .presentation-category {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .presentation-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .presentation-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .presentation-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .slide-builder {
+            margin-top: 20px;
+        }
+        .slide-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .slide-title {
+            font-weight: bold;
+        }
+        .slide-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .slide-content {
+            color: #666;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .preview-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+        }
+        .slide-preview {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 40px;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .slide-preview h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .slide-preview p {
+            font-size: 24px;
+            opacity: 0.9;
+        }
+        .slide-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .slide-thumbnail {
+            width: 80px;
+            height: 60px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .slide-thumbnail.active {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .slide-thumbnail:hover {
+            border-color: #007bff;
+        }
+        .slide-library {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .slide-category {
+            margin-bottom: 15px;
+        }
+        .slide-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .slide-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .slide-option:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .slide-option-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .slide-option-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .content-editor {
+            margin-top: 20px;
+        }
+        .editor-toolbar {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .editor-toolbar button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .editor-toolbar button:hover {
+            background: #e9ecef;
+        }
+        .editor-content {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 200px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Presentation Templates</h1>
+                <p>Create and manage professional presentation templates</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreatePresentation()">Create Template</button>
+                <a href="/crm/templates" class="btn btn-secondary">Back to Templates</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Presentation Library -->
+            <div class="card">
+                <h3>Presentation Library</h3>
+                <div class="presentation-item" onclick="selectPresentation('sales_pitch')">
+                    <div class="presentation-header">
+                        <div class="presentation-name">Sales Pitch Deck</div>
+                        <span class="presentation-category">Sales</span>
+                    </div>
+                    <div class="presentation-description">
+                        Professional sales presentation template with compelling visuals
+                    </div>
+                    <div class="presentation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Slides</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">78.5%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="presentation-item" onclick="selectPresentation('product_demo')">
+                    <div class="presentation-header">
+                        <div class="presentation-name">Product Demo</div>
+                        <span class="presentation-category">Product</span>
+                    </div>
+                    <div class="presentation-description">
+                        Interactive product demonstration template with feature highlights
+                    </div>
+                    <div class="presentation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Slides</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">82.3%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="presentation-item" onclick="selectPresentation('executive_summary')">
+                    <div class="presentation-header">
+                        <div class="presentation-name">Executive Summary</div>
+                        <span class="presentation-category">Executive</span>
+                    </div>
+                    <div class="presentation-description">
+                        High-level executive presentation for strategic decisions
+                    </div>
+                    <div class="presentation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">67</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Slides</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">91.2%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="presentation-item" onclick="selectPresentation('training')">
+                    <div class="presentation-header">
+                        <div class="presentation-name">Training Presentation</div>
+                        <span class="presentation-category">Training</span>
+                    </div>
+                    <div class="presentation-description">
+                        Educational presentation template for training and workshops
+                    </div>
+                    <div class="presentation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">123</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">20</div>
+                            <div class="stat-label">Slides</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">95.8%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Presentation Builder -->
+            <div class="card">
+                <h3>Presentation Builder</h3>
+                <div class="presentation-builder">
+                    <div class="form-group">
+                        <label>Presentation Name</label>
+                        <input type="text" id="presentation-name" placeholder="Enter presentation name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Presentation Type</label>
+                        <select id="presentation-type">
+                            <option value="">Select presentation type</option>
+                            <option value="sales">Sales Pitch</option>
+                            <option value="product">Product Demo</option>
+                            <option value="executive">Executive Summary</option>
+                            <option value="training">Training</option>
+                            <option value="proposal">Proposal</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="presentation-description" rows="3" placeholder="Enter presentation description"></textarea>
+                    </div>
+
+                    <div class="slide-builder">
+                        <h4>Presentation Slides</h4>
+                        <div class="slide-item">
+                            <div class="slide-header">
+                                <div class="slide-title">Title Slide</div>
+                                <div class="slide-actions">
+                                    <button class="btn btn-secondary" onclick="editSlide('title')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSlide('title')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="slide-content">
+                                Company logo, presentation title, and presenter information
+                            </div>
+                        </div>
+                        <div class="slide-item">
+                            <div class="slide-header">
+                                <div class="slide-title">Agenda</div>
+                                <div class="slide-actions">
+                                    <button class="btn btn-secondary" onclick="editSlide('agenda')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSlide('agenda')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="slide-content">
+                                Overview of presentation topics and structure
+                            </div>
+                        </div>
+                        <div class="slide-item">
+                            <div class="slide-header">
+                                <div class="slide-title">Problem Statement</div>
+                                <div class="slide-actions">
+                                    <button class="btn btn-secondary" onclick="editSlide('problem')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSlide('problem')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="slide-content">
+                                Current challenges and pain points analysis
+                            </div>
+                        </div>
+                        <div class="slide-item">
+                            <div class="slide-header">
+                                <div class="slide-title">Solution Overview</div>
+                                <div class="slide-actions">
+                                    <button class="btn btn-secondary" onclick="editSlide('solution')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSlide('solution')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="slide-content">
+                                Proposed solution and key benefits
+                            </div>
+                        </div>
+                        <div class="slide-item">
+                            <div class="slide-header">
+                                <div class="slide-title">Call to Action</div>
+                                <div class="slide-actions">
+                                    <button class="btn btn-secondary" onclick="editSlide('cta')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSlide('cta')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="slide-content">
+                                Next steps and contact information
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="addSlide()">Add Slide</button>
+                        <button class="btn btn-success" onclick="savePresentation()">Save Presentation</button>
+                        <button class="btn btn-primary" onclick="previewPresentation()">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Library -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Slide Library</h3>
+            <div class="slide-library">
+                <div class="slide-category">
+                    <h4>Introduction Slides</h4>
+                    <div class="slide-option" onclick="addSlideFromLibrary('title')">
+                        <div class="slide-option-title">Title Slide</div>
+                        <div class="slide-option-desc">Company logo, title, and presenter info</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('agenda')">
+                        <div class="slide-option-title">Agenda</div>
+                        <div class="slide-option-desc">Presentation overview and structure</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('objectives')">
+                        <div class="slide-option-title">Objectives</div>
+                        <div class="slide-option-desc">Presentation goals and outcomes</div>
+                    </div>
+                </div>
+
+                <div class="slide-category">
+                    <h4>Content Slides</h4>
+                    <div class="slide-option" onclick="addSlideFromLibrary('problem')">
+                        <div class="slide-option-title">Problem Statement</div>
+                        <div class="slide-option-desc">Current challenges and pain points</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('solution')">
+                        <div class="slide-option-title">Solution Overview</div>
+                        <div class="slide-option-desc">Proposed solution and benefits</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('features')">
+                        <div class="slide-option-title">Key Features</div>
+                        <div class="slide-option-desc">Product or service features</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('benefits')">
+                        <div class="slide-option-title">Benefits</div>
+                        <div class="slide-option-desc">Value proposition and advantages</div>
+                    </div>
+                </div>
+
+                <div class="slide-category">
+                    <h4>Data Slides</h4>
+                    <div class="slide-option" onclick="addSlideFromLibrary('metrics')">
+                        <div class="slide-option-title">Metrics & KPIs</div>
+                        <div class="slide-option-desc">Performance indicators and data</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('comparison')">
+                        <div class="slide-option-title">Comparison</div>
+                        <div class="slide-option-desc">Competitive analysis and comparisons</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('timeline')">
+                        <div class="slide-option-title">Timeline</div>
+                        <div class="slide-option-desc">Project timeline and milestones</div>
+                    </div>
+                </div>
+
+                <div class="slide-category">
+                    <h4>Closing Slides</h4>
+                    <div class="slide-option" onclick="addSlideFromLibrary('summary')">
+                        <div class="slide-option-title">Summary</div>
+                        <div class="slide-option-desc">Key points and takeaways</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('cta')">
+                        <div class="slide-option-title">Call to Action</div>
+                        <div class="slide-option-desc">Next steps and contact info</div>
+                    </div>
+                    <div class="slide-option" onclick="addSlideFromLibrary('qanda')">
+                        <div class="slide-option-title">Q&A</div>
+                        <div class="slide-option-desc">Questions and answers section</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Presentation Preview -->
+        <div id="presentation-preview" class="card hidden" style="margin-top: 20px;">
+            <h3>Presentation Preview</h3>
+            <div class="preview-container">
+                <div class="slide-preview">
+                    <h1>Sales Pitch Deck</h1>
+                    <p>Presented by [Your Name]<br>[Company Name]</p>
+                </div>
+
+                <div class="slide-navigation">
+                    <div class="slide-thumbnail active" onclick="showSlide(1)">1</div>
+                    <div class="slide-thumbnail" onclick="showSlide(2)">2</div>
+                    <div class="slide-thumbnail" onclick="showSlide(3)">3</div>
+                    <div class="slide-thumbnail" onclick="showSlide(4)">4</div>
+                    <div class="slide-thumbnail" onclick="showSlide(5)">5</div>
+                </div>
+
+                <div class="content-editor">
+                    <h4>Slide Content Editor</h4>
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><strong>B</strong></button>
+                        <button onclick="formatText('italic')"><em>I</em></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="addBullet()">•</button>
+                        <button onclick="addNumber()">1.</button>
+                        <button onclick="addImage()">📷</button>
+                        <button onclick="addChart()">📊</button>
+                    </div>
+                    <div class="editor-content" contenteditable="true">
+                        Click here to edit slide content...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPresentation = null;
+        let currentSlide = 1;
+
+        function showCreatePresentation() {
+            document.getElementById('presentation-name').focus();
+        }
+
+        function selectPresentation(presentationId) {
+            selectedPresentation = presentationId;
+            
+            // Remove previous selection
+            document.querySelectorAll('.presentation-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('selected');
+            
+            console.log('Selected presentation:', presentationId);
+        }
+
+        function addSlide() {
+            const slideName = prompt('Enter slide name:');
+            if (slideName) {
+                console.log('Adding slide:', slideName);
+                alert('Slide added successfully!');
+            }
+        }
+
+        function addSlideFromLibrary(slideType) {
+            console.log('Adding slide from library:', slideType);
+            alert('Slide added from library successfully!');
+        }
+
+        function editSlide(slideId) {
+            console.log('Editing slide:', slideId);
+            alert('Edit functionality would open slide editor');
+        }
+
+        function removeSlide(slideId) {
+            if (confirm('Are you sure you want to remove this slide?')) {
+                console.log('Removing slide:', slideId);
+                alert('Slide removed successfully!');
+            }
+        }
+
+        function savePresentation() {
+            const name = document.getElementById('presentation-name').value;
+            const type = document.getElementById('presentation-type').value;
+            const description = document.getElementById('presentation-description').value;
+            
+            if (!name || !type) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Saving presentation:', { name, type, description });
+            alert('Presentation saved successfully!');
+        }
+
+        function previewPresentation() {
+            document.getElementById('presentation-preview').classList.remove('hidden');
+        }
+
+        function showSlide(slideNumber) {
+            currentSlide = slideNumber;
+            
+            // Update active thumbnail
+            document.querySelectorAll('.slide-thumbnail').forEach((thumb, index) => {
+                thumb.classList.remove('active');
+                if (index === slideNumber - 1) {
+                    thumb.classList.add('active');
+                }
+            });
+            
+            console.log('Showing slide:', slideNumber);
+        }
+
+        function formatText(format) {
+            console.log('Formatting text:', format);
+            // Text formatting functionality would be implemented here
+        }
+
+        function addBullet() {
+            console.log('Adding bullet point');
+            // Bullet point functionality would be implemented here
+        }
+
+        function addNumber() {
+            console.log('Adding numbered list');
+            // Numbered list functionality would be implemented here
+        }
+
+        function addImage() {
+            console.log('Adding image');
+            // Image insertion functionality would be implemented here
+        }
+
+        function addChart() {
+            console.log('Adding chart');
+            // Chart insertion functionality would be implemented here
+        }
+    </script>
+</body>
+</html> 

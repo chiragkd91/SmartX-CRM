@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Settings - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .security-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .security-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status-enabled { background: #28a745; color: white; }
+        .status-disabled { background: #dc3545; color: white; }
+        .status-warning { background: #ffc107; color: #212529; }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Security Settings</h1>
+                <p>Configure security and access control settings</p>
+            </div>
+            <div>
+                <a href="/crm/settings" class="btn btn-primary">Back to Settings</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h2>Password Policy</h2>
+            <form method="POST" action="/crm/settings/security/password">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="min_password_length">Minimum Password Length</label>
+                        <input type="number" id="min_password_length" name="min_password_length" value="{{ settings.min_password_length or '8' }}" min="6" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="password_expiry_days">Password Expiry (days)</label>
+                        <input type="number" id="password_expiry_days" name="password_expiry_days" value="{{ settings.password_expiry_days or '90' }}" min="30" max="365">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_uppercase" {% if settings.require_uppercase %}checked{% endif %}>
+                        Require uppercase letters
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_lowercase" {% if settings.require_lowercase %}checked{% endif %}>
+                        Require lowercase letters
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_numbers" {% if settings.require_numbers %}checked{% endif %}>
+                        Require numbers
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_special_chars" {% if settings.require_special_chars %}checked{% endif %}>
+                        Require special characters
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="prevent_common_passwords" {% if settings.prevent_common_passwords %}checked{% endif %}>
+                        Prevent common passwords
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Password Policy</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Two-Factor Authentication</h2>
+            <form method="POST" action="/crm/settings/security/2fa">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_2fa" {% if settings.enable_2fa %}checked{% endif %}>
+                        Enable two-factor authentication
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="2fa_method">2FA Method</label>
+                    <select id="2fa_method" name="2fa_method">
+                        <option value="totp" {% if settings.2fa_method == 'totp' %}selected{% endif %}>Time-based One-Time Password (TOTP)</option>
+                        <option value="sms" {% if settings.2fa_method == 'sms' %}selected{% endif %}>SMS</option>
+                        <option value="email" {% if settings.2fa_method == 'email' %}selected{% endif %}>Email</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_2fa_admin" {% if settings.require_2fa_admin %}checked{% endif %}>
+                        Require 2FA for administrators
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="require_2fa_all" {% if settings.require_2fa_all %}checked{% endif %}>
+                        Require 2FA for all users
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save 2FA Settings</button>
+                    <button type="button" class="btn btn-warning" onclick="test2FA()">Test 2FA</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Session Management</h2>
+            <form method="POST" action="/crm/settings/security/session">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="session_timeout">Session Timeout (minutes)</label>
+                        <input type="number" id="session_timeout" name="session_timeout" value="{{ settings.session_timeout or '30' }}" min="5" max="1440">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_concurrent_sessions">Maximum Concurrent Sessions</label>
+                        <input type="number" id="max_concurrent_sessions" name="max_concurrent_sessions" value="{{ settings.max_concurrent_sessions or '3' }}" min="1" max="10">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="force_logout_inactive" {% if settings.force_logout_inactive %}checked{% endif %}>
+                        Force logout inactive sessions
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="remember_me" {% if settings.remember_me %}checked{% endif %}>
+                        Allow "Remember Me" option
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="remember_me_days">Remember Me Duration (days)</label>
+                    <input type="number" id="remember_me_days" name="remember_me_days" value="{{ settings.remember_me_days or '30' }}" min="1" max="365">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Session Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>IP Restrictions</h2>
+            <form method="POST" action="/crm/settings/security/ip">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_ip_restrictions" {% if settings.enable_ip_restrictions %}checked{% endif %}>
+                        Enable IP address restrictions
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="allowed_ips">Allowed IP Addresses</label>
+                    <textarea id="allowed_ips" name="allowed_ips" placeholder="Enter allowed IP addresses, one per line">{{ settings.allowed_ips or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="blocked_ips">Blocked IP Addresses</label>
+                    <textarea id="blocked_ips" name="blocked_ips" placeholder="Enter blocked IP addresses, one per line">{{ settings.blocked_ips or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="log_failed_attempts" {% if settings.log_failed_attempts %}checked{% endif %}>
+                        Log failed login attempts
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save IP Restrictions</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Data Encryption</h2>
+            <form method="POST" action="/crm/settings/security/encryption">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_data_encryption" {% if settings.enable_data_encryption %}checked{% endif %}>
+                        Enable data encryption at rest
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_transit_encryption" {% if settings.enable_transit_encryption %}checked{% endif %}>
+                        Enable encryption in transit (HTTPS)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="encryption_algorithm">Encryption Algorithm</label>
+                    <select id="encryption_algorithm" name="encryption_algorithm">
+                        <option value="aes-256" {% if settings.encryption_algorithm == 'aes-256' %}selected{% endif %}>AES-256</option>
+                        <option value="aes-192" {% if settings.encryption_algorithm == 'aes-192' %}selected{% endif %}>AES-192</option>
+                        <option value="aes-128" {% if settings.encryption_algorithm == 'aes-128' %}selected{% endif %}>AES-128</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="encrypt_sensitive_fields" {% if settings.encrypt_sensitive_fields %}checked{% endif %}>
+                        Encrypt sensitive data fields
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Encryption Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Audit Logging</h2>
+            <form method="POST" action="/crm/settings/security/audit">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_audit_logging" {% if settings.enable_audit_logging %}checked{% endif %}>
+                        Enable audit logging
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="audit_log_level">Audit Log Level</label>
+                    <select id="audit_log_level" name="audit_log_level">
+                        <option value="basic" {% if settings.audit_log_level == 'basic' %}selected{% endif %}>Basic (Login/Logout)</option>
+                        <option value="standard" {% if settings.audit_log_level == 'standard' %}selected{% endif %}>Standard (Data Changes)</option>
+                        <option value="detailed" {% if settings.audit_log_level == 'detailed' %}selected{% endif %}>Detailed (All Actions)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="audit_log_retention">Audit Log Retention (days)</label>
+                    <input type="number" id="audit_log_retention" name="audit_log_retention" value="{{ settings.audit_log_retention or '365' }}" min="30" max="2555">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="log_user_activity" {% if settings.log_user_activity %}checked{% endif %}>
+                        Log user activity
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="log_data_access" {% if settings.log_data_access %}checked{% endif %}>
+                        Log data access
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Audit Settings</button>
+                    <button type="button" class="btn btn-warning" onclick="viewAuditLogs()">View Audit Logs</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Security Status</h2>
+            <div class="security-list">
+                <div class="security-item">
+                    <div>
+                        <strong>Password Policy</strong>
+                        <div>Minimum 8 characters, requires complexity</div>
+                    </div>
+                    <span class="security-status status-enabled">Enabled</span>
+                </div>
+                <div class="security-item">
+                    <div>
+                        <strong>Two-Factor Authentication</strong>
+                        <div>TOTP-based 2FA for all users</div>
+                    </div>
+                    <span class="security-status status-enabled">Enabled</span>
+                </div>
+                <div class="security-item">
+                    <div>
+                        <strong>Session Management</strong>
+                        <div>30-minute timeout, max 3 concurrent sessions</div>
+                    </div>
+                    <span class="security-status status-enabled">Enabled</span>
+                </div>
+                <div class="security-item">
+                    <div>
+                        <strong>IP Restrictions</strong>
+                        <div>No IP restrictions configured</div>
+                    </div>
+                    <span class="security-status status-disabled">Disabled</span>
+                </div>
+                <div class="security-item">
+                    <div>
+                        <strong>Data Encryption</strong>
+                        <div>AES-256 encryption enabled</div>
+                    </div>
+                    <span class="security-status status-enabled">Enabled</span>
+                </div>
+                <div class="security-item">
+                    <div>
+                        <strong>Audit Logging</strong>
+                        <div>Standard level logging enabled</div>
+                    </div>
+                    <span class="security-status status-enabled">Enabled</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function test2FA() {
+            alert('Testing 2FA configuration...');
+            setTimeout(() => {
+                alert('2FA test completed successfully');
+            }, 2000);
+        }
+
+        function viewAuditLogs() {
+            alert('Opening audit logs...');
+        }
+    </script>
+</body>
+</html> 

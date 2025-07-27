@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Lead Operations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .bulk-actions-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .selection-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .selected-count {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .leads-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .table-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-new {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-contacted {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-qualified {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .status-lost {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s ease;
+        }
+        .batch-summary {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pagination button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .pagination button:hover:not(.active) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bulk Lead Operations</h1>
+            <a href="/crm/leads" class="btn btn-secondary">Back to Leads</a>
+        </div>
+
+        <!-- Bulk Actions Bar -->
+        <div class="bulk-actions-bar">
+            <div class="selection-info">
+                <input type="checkbox" id="select-all" onchange="toggleSelectAll()">
+                <label for="select-all">Select All</label>
+                <span class="selected-count" id="selected-count">0 selected</span>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="openBulkActionModal('update-status')">Update Status</button>
+                <button class="btn btn-warning" onclick="openBulkActionModal('assign')">Assign to User</button>
+                <button class="btn btn-success" onclick="openBulkActionModal('export')">Export Selected</button>
+                <button class="btn btn-danger" onclick="openBulkActionModal('delete')">Delete Selected</button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-container">
+            <h3>Filter Leads</h3>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="status-filter">Status</label>
+                    <select id="status-filter">
+                        <option value="">All Statuses</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="qualified">Qualified</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="source-filter">Lead Source</label>
+                    <select id="source-filter">
+                        <option value="">All Sources</option>
+                        <option value="website">Website</option>
+                        <option value="email">Email Campaign</option>
+                        <option value="social">Social Media</option>
+                        <option value="referral">Referral</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="date-filter">Created Date</label>
+                    <select id="date-filter">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="this_week">This Week</option>
+                        <option value="this_month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="search-filter">Search</label>
+                    <input type="text" id="search-filter" placeholder="Search leads...">
+                </div>
+            </div>
+            <div class="filter-row">
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+            </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="leads-table">
+            <div class="table-header">
+                <h3>Leads (Showing 50 of 1,247)</h3>
+                <div>
+                    <select id="page-size">
+                        <option value="25">25 per page</option>
+                        <option value="50" selected>50 per page</option>
+                        <option value="100">100 per page</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox" id="header-checkbox" onchange="toggleSelectAll()">
+                        </th>
+                        <th>Lead Name</th>
+                        <th>Company</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="leads-tbody">
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="lead-checkbox" value="1" onchange="updateSelection()">
+                        </td>
+                        <td>John Smith</td>
+                        <td>TechCorp Inc</td>
+                        <td>john.smith@techcorp.com</td>
+                        <td>(555) 123-4567</td>
+                        <td><span class="status-badge status-new">New</span></td>
+                        <td>Website</td>
+                        <td>2024-01-15</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewLead(1)">View</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="lead-checkbox" value="2" onchange="updateSelection()">
+                        </td>
+                        <td>Sarah Johnson</td>
+                        <td>Innovate Solutions</td>
+                        <td>sarah.j@innovate.com</td>
+                        <td>(555) 234-5678</td>
+                        <td><span class="status-badge status-contacted">Contacted</span></td>
+                        <td>Email Campaign</td>
+                        <td>2024-01-14</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewLead(2)">View</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="lead-checkbox" value="3" onchange="updateSelection()">
+                        </td>
+                        <td>Mike Davis</td>
+                        <td>StartupXYZ</td>
+                        <td>mike@startupxyz.com</td>
+                        <td>(555) 345-6789</td>
+                        <td><span class="status-badge status-qualified">Qualified</span></td>
+                        <td>Social Media</td>
+                        <td>2024-01-13</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewLead(3)">View</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="lead-checkbox" value="4" onchange="updateSelection()">
+                        </td>
+                        <td>Lisa Wilson</td>
+                        <td>Global Enterprises</td>
+                        <td>lisa.w@global.com</td>
+                        <td>(555) 456-7890</td>
+                        <td><span class="status-badge status-lost">Lost</span></td>
+                        <td>Referral</td>
+                        <td>2024-01-12</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewLead(4)">View</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button onclick="changePage(1)">First</button>
+            <button onclick="changePage(1)">Previous</button>
+            <button class="active">1</button>
+            <button onclick="changePage(2)">2</button>
+            <button onclick="changePage(3)">3</button>
+            <button onclick="changePage(2)">Next</button>
+            <button onclick="changePage(25)">Last</button>
+        </div>
+    </div>
+
+    <!-- Bulk Action Modals -->
+    <div id="bulkActionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Bulk Action</h2>
+            
+            <div id="modal-content">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedLeads = new Set();
+        let currentAction = '';
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const headerCheckbox = document.getElementById('header-checkbox');
+            const leadCheckboxes = document.querySelectorAll('.lead-checkbox');
+            
+            const isChecked = selectAllCheckbox.checked || headerCheckbox.checked;
+            
+            leadCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+                if (isChecked) {
+                    selectedLeads.add(checkbox.value);
+                } else {
+                    selectedLeads.delete(checkbox.value);
+                }
+            });
+            
+            updateSelectionCount();
+        }
+
+        function updateSelection() {
+            selectedLeads.clear();
+            const leadCheckboxes = document.querySelectorAll('.lead-checkbox:checked');
+            leadCheckboxes.forEach(checkbox => {
+                selectedLeads.add(checkbox.value);
+            });
+            
+            updateSelectionCount();
+            
+            // Update header checkbox
+            const totalCheckboxes = document.querySelectorAll('.lead-checkbox').length;
+            const checkedCheckboxes = leadCheckboxes.length;
+            
+            document.getElementById('select-all').checked = checkedCheckboxes === totalCheckboxes;
+            document.getElementById('header-checkbox').checked = checkedCheckboxes === totalCheckboxes;
+        }
+
+        function updateSelectionCount() {
+            const count = selectedLeads.size;
+            document.getElementById('selected-count').textContent = `${count} selected`;
+        }
+
+        function openBulkActionModal(action) {
+            if (selectedLeads.size === 0) {
+                alert('Please select at least one lead to perform bulk actions.');
+                return;
+            }
+            
+            currentAction = action;
+            const modal = document.getElementById('bulkActionModal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            switch (action) {
+                case 'update-status':
+                    modalTitle.textContent = 'Update Lead Status';
+                    modalContent.innerHTML = `
+                        <div class="batch-summary">
+                            <div class="summary-item">
+                                <span>Selected Leads:</span>
+                                <strong>${selectedLeads.size}</strong>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-status">New Status</label>
+                            <select id="new-status" required>
+                                <option value="">Select Status</option>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="qualified">Qualified</option>
+                                <option value="lost">Lost</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status-notes">Notes (Optional)</label>
+                            <textarea id="status-notes" rows="3" placeholder="Add notes about the status change..."></textarea>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="executeBulkAction()">Update Status</button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'assign':
+                    modalTitle.textContent = 'Assign Leads to User';
+                    modalContent.innerHTML = `
+                        <div class="batch-summary">
+                            <div class="summary-item">
+                                <span>Selected Leads:</span>
+                                <strong>${selectedLeads.size}</strong>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="assign-user">Assign to User</label>
+                            <select id="assign-user" required>
+                                <option value="">Select User</option>
+                                <option value="user1">John Doe</option>
+                                <option value="user2">Jane Smith</option>
+                                <option value="user3">Mike Johnson</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assign-notes">Notes (Optional)</label>
+                            <textarea id="assign-notes" rows="3" placeholder="Add notes about the assignment..."></textarea>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="executeBulkAction()">Assign Leads</button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'export':
+                    modalTitle.textContent = 'Export Selected Leads';
+                    modalContent.innerHTML = `
+                        <div class="batch-summary">
+                            <div class="summary-item">
+                                <span>Selected Leads:</span>
+                                <strong>${selectedLeads.size}</strong>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="export-format">Export Format</label>
+                            <select id="export-format" required>
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="pdf">PDF</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="export-fields">Include Fields</label>
+                            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                                <label><input type="checkbox" value="name" checked> Name</label><br>
+                                <label><input type="checkbox" value="company" checked> Company</label><br>
+                                <label><input type="checkbox" value="email" checked> Email</label><br>
+                                <label><input type="checkbox" value="phone" checked> Phone</label><br>
+                                <label><input type="checkbox" value="status" checked> Status</label><br>
+                                <label><input type="checkbox" value="source" checked> Source</label><br>
+                                <label><input type="checkbox" value="created_date" checked> Created Date</label><br>
+                                <label><input type="checkbox" value="notes"> Notes</label>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-success" onclick="executeBulkAction()">Export Leads</button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'delete':
+                    modalTitle.textContent = 'Delete Selected Leads';
+                    modalContent.innerHTML = `
+                        <div class="batch-summary">
+                            <div class="summary-item">
+                                <span>Selected Leads:</span>
+                                <strong>${selectedLeads.size}</strong>
+                            </div>
+                            <div class="summary-item">
+                                <span>Warning:</span>
+                                <strong style="color: #dc3545;">This action cannot be undone!</strong>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="delete-confirmation">Type "DELETE" to confirm</label>
+                            <input type="text" id="delete-confirmation" placeholder="Type DELETE to confirm" required>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button class="btn btn-danger" onclick="executeBulkAction()">Delete Leads</button>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function executeBulkAction() {
+            const selectedCount = selectedLeads.size;
+            
+            switch (currentAction) {
+                case 'update-status':
+                    const newStatus = document.getElementById('new-status').value;
+                    if (!newStatus) {
+                        alert('Please select a status.');
+                        return;
+                    }
+                    // Simulate bulk status update
+                    showProgress('Updating lead statuses...', () => {
+                        alert(`Successfully updated status for ${selectedCount} leads to ${newStatus}`);
+                        closeModal();
+                        clearSelection();
+                    });
+                    break;
+                    
+                case 'assign':
+                    const assignUser = document.getElementById('assign-user').value;
+                    if (!assignUser) {
+                        alert('Please select a user.');
+                        return;
+                    }
+                    // Simulate bulk assignment
+                    showProgress('Assigning leads...', () => {
+                        alert(`Successfully assigned ${selectedCount} leads to user`);
+                        closeModal();
+                        clearSelection();
+                    });
+                    break;
+                    
+                case 'export':
+                    const exportFormat = document.getElementById('export-format').value;
+                    // Simulate export
+                    showProgress('Preparing export...', () => {
+                        alert(`Exporting ${selectedCount} leads in ${exportFormat.toUpperCase()} format`);
+                        closeModal();
+                        clearSelection();
+                    });
+                    break;
+                    
+                case 'delete':
+                    const confirmation = document.getElementById('delete-confirmation').value;
+                    if (confirmation !== 'DELETE') {
+                        alert('Please type "DELETE" to confirm.');
+                        return;
+                    }
+                    // Simulate bulk delete
+                    showProgress('Deleting leads...', () => {
+                        alert(`Successfully deleted ${selectedCount} leads`);
+                        closeModal();
+                        clearSelection();
+                    });
+                    break;
+            }
+        }
+
+        function showProgress(message, callback) {
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div style="text-align: center;">
+                    <h3>${message}</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="progress-text">Processing...</p>
+                </div>
+            `;
+            
+            // Simulate progress
+            let progress = 0;
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Processing... ${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(callback, 500);
+                }
+            }, 200);
+        }
+
+        function clearSelection() {
+            selectedLeads.clear();
+            document.querySelectorAll('.lead-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('select-all').checked = false;
+            document.getElementById('header-checkbox').checked = false;
+            updateSelectionCount();
+        }
+
+        function closeModal() {
+            document.getElementById('bulkActionModal').style.display = 'none';
+        }
+
+        function applyFilters() {
+            // Apply filter logic
+            console.log('Applying filters...');
+        }
+
+        function clearFilters() {
+            document.getElementById('status-filter').value = '';
+            document.getElementById('source-filter').value = '';
+            document.getElementById('date-filter').value = '';
+            document.getElementById('search-filter').value = '';
+        }
+
+        function changePage(page) {
+            // Page change logic
+            console.log('Changing to page:', page);
+        }
+
+        function viewLead(leadId) {
+            window.location.href = `/crm/leads/${leadId}`;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('bulkActionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize
+        updateSelectionCount();
+    </script>
+</body>
+</html> 

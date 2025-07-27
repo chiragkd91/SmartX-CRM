@@ -1,0 +1,606 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Sales Analytics</h1>
+                <div>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#analyticsInsightModal">
+                        <i class="fas fa-plus"></i> Add Insight
+                    </button>
+                    <button class="btn btn-outline-secondary ml-2">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-control">
+                                <option>Last 30 Days</option>
+                                <option>Last 90 Days</option>
+                                <option>Last 6 Months</option>
+                                <option>Last Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Territory</label>
+                            <select class="form-control">
+                                <option>All Territories</option>
+                                <option>North America</option>
+                                <option>Europe</option>
+                                <option>Asia Pacific</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Product</label>
+                            <select class="form-control">
+                                <option>All Products</option>
+                                <option>Enterprise Software</option>
+                                <option>Cloud Services</option>
+                                <option>Consulting</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sales Rep</label>
+                            <select class="form-control">
+                                <option>All Reps</option>
+                                <option>Sarah Johnson</option>
+                                <option>Mike Chen</option>
+                                <option>Lisa Rodriguez</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button class="btn btn-primary">Apply Filters</button>
+                                <button class="btn btn-outline-secondary ml-2">Reset</button>
+                                <button class="btn btn-outline-info ml-2">Save View</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Revenue Growth</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">+15.2%</div>
+                            <small class="text-success">vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Conversion Rate</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">23.5%</div>
+                            <small class="text-success">+2.1% vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Customer Lifetime Value</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$45,200</div>
+                            <small class="text-success">+8.7% vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-dollar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Sales Velocity</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$12,500</div>
+                            <small class="text-success">+12.3% vs last period</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tachometer-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Analytics Charts -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Revenue Trend Analysis</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                            <a class="dropdown-item" href="#">Daily</a>
+                            <a class="dropdown-item" href="#">Weekly</a>
+                            <a class="dropdown-item" href="#">Monthly</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="revenueTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Sales Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="salesDistributionChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Enterprise
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Mid-Market
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> SMB
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Predictive Analytics -->
+    <div class="row mb-4">
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Predictive Revenue Forecast</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="predictiveChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="border-right">
+                                    <div class="h5 mb-0">$2.8M</div>
+                                    <small class="text-muted">Next Month</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border-right">
+                                    <div class="h5 mb-0">$3.2M</div>
+                                    <small class="text-muted">Next Quarter</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="h5 mb-0">$12.5M</div>
+                                <small class="text-muted">Next Year</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Customer Segmentation</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="segmentationChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="h5 mb-0 text-primary">45%</div>
+                                    <small class="text-muted">High Value</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="h5 mb-0 text-success">55%</div>
+                                    <small class="text-muted">Growth Potential</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Insights -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">AI-Powered Insights</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="insight-card mb-3 p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-lightbulb text-warning mr-2"></i>
+                                    <h6 class="mb-0">Revenue Opportunity</h6>
+                                </div>
+                                <p class="mb-2">Based on historical data, there's a 78% chance of closing the TechCorp deal within the next 30 days.</p>
+                                <small class="text-muted">Confidence: High • Impact: $125K</small>
+                            </div>
+
+                            <div class="insight-card mb-3 p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-exclamation-triangle text-danger mr-2"></i>
+                                    <h6 class="mb-0">Risk Alert</h6>
+                                </div>
+                                <p class="mb-2">Sales cycle for enterprise deals has increased by 15% this quarter. Consider reviewing qualification criteria.</p>
+                                <small class="text-muted">Confidence: Medium • Impact: -$200K</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="insight-card mb-3 p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-chart-line text-success mr-2"></i>
+                                    <h6 class="mb-0">Trend Analysis</h6>
+                                </div>
+                                <p class="mb-2">Mid-market segment shows 25% higher conversion rates when contacted within 24 hours of lead creation.</p>
+                                <small class="text-muted">Confidence: High • Impact: +$150K</small>
+                            </div>
+
+                            <div class="insight-card mb-3 p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-users text-info mr-2"></i>
+                                    <h6 class="mb-0">Team Performance</h6>
+                                </div>
+                                <p class="mb-2">Sarah Johnson's win rate is 15% higher when deals involve technical stakeholders. Consider pairing with solutions engineer.</p>
+                                <small class="text-muted">Confidence: Medium • Impact: +$75K</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Correlation Analysis -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Correlation Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Factor</th>
+                                    <th>Correlation</th>
+                                    <th>Impact</th>
+                                    <th>Recommendation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Response Time</td>
+                                    <td><span class="badge badge-success">+0.85</span></td>
+                                    <td>High Positive</td>
+                                    <td>Implement auto-response system for leads</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Implement</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Deal Size vs Cycle</td>
+                                    <td><span class="badge badge-warning">-0.72</span></td>
+                                    <td>High Negative</td>
+                                    <td>Focus on larger deals with longer cycles</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Review</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Demo Attendance</td>
+                                    <td><span class="badge badge-success">+0.68</span></td>
+                                    <td>Medium Positive</td>
+                                    <td>Increase demo scheduling and follow-up</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Optimize</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Competitor Presence</td>
+                                    <td><span class="badge badge-danger">-0.45</span></td>
+                                    <td>Medium Negative</td>
+                                    <td>Develop competitive positioning strategy</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">Develop</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Insight Modal -->
+<div class="modal fade" id="analyticsInsightModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Analytics Insight</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Insight Type</label>
+                                <select class="form-control">
+                                    <option>Revenue Opportunity</option>
+                                    <option>Risk Alert</option>
+                                    <option>Trend Analysis</option>
+                                    <option>Performance Insight</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Confidence Level</label>
+                                <select class="form-control">
+                                    <option>High</option>
+                                    <option>Medium</option>
+                                    <option>Low</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Insight Title</label>
+                        <input type="text" class="form-control" placeholder="Enter insight title">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" rows="3" placeholder="Describe the insight"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Impact</label>
+                                <input type="text" class="form-control" placeholder="e.g., +$100K">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Priority</label>
+                                <select class="form-control">
+                                    <option>High</option>
+                                    <option>Medium</option>
+                                    <option>Low</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Add Insight</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Revenue Trend Chart
+    const trendCtx = document.getElementById('revenueTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Actual Revenue',
+                data: [180, 220, 250, 280, 320, 350, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(78, 115, 223, 1)',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true
+            }, {
+                label: 'Forecasted Revenue',
+                data: [null, null, null, null, null, null, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(28, 200, 138, 1)',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                fill: true,
+                borderDash: [5, 5]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Sales Distribution Chart
+    const distributionCtx = document.getElementById('salesDistributionChart').getContext('2d');
+    new Chart(distributionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Enterprise', 'Mid-Market', 'SMB'],
+            datasets: [{
+                data: [45, 35, 20],
+                backgroundColor: [
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(28, 200, 138, 0.8)',
+                    'rgba(54, 185, 204, 0.8)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Predictive Chart
+    const predictiveCtx = document.getElementById('predictiveChart').getContext('2d');
+    new Chart(predictiveCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Historical',
+                data: [180, 220, 250, 280, 320, 350, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(78, 115, 223, 1)',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: false
+            }, {
+                label: 'Predicted',
+                data: [null, null, null, null, null, null, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(231, 74, 59, 1)',
+                backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                fill: true,
+                borderDash: [5, 5]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value + 'K';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Segmentation Chart
+    const segmentationCtx = document.getElementById('segmentationChart').getContext('2d');
+    new Chart(segmentationCtx, {
+        type: 'bar',
+        data: {
+            labels: ['High Value', 'Growth Potential', 'At Risk', 'New'],
+            datasets: [{
+                label: 'Customer Count',
+                data: [45, 55, 20, 30],
+                backgroundColor: [
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(28, 200, 138, 0.8)',
+                    'rgba(231, 74, 59, 0.8)',
+                    'rgba(246, 194, 62, 0.8)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+.insight-card {
+    background-color: #f8f9fc;
+    transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+    background-color: #eaecf4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %} 

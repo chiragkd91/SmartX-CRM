@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Audit Results - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Security Audit Results</h1>
+        
+        {% if audit_results %}
+        <div class="audit-summary">
+            <h2>Audit Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Overall Score:</span>
+                    <span class="stat-value">{{ audit_results.get('overall_score', 'N/A') }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Critical Issues:</span>
+                    <span class="stat-value">{{ audit_results.get('critical_issues', [])|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Warnings:</span>
+                    <span class="stat-value">{{ audit_results.get('warnings', [])|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if audit_results.get('critical_issues') %}
+        <div class="issues-section">
+            <h3>Critical Issues</h3>
+            <ul class="issues-list">
+                {% for issue in audit_results.critical_issues %}
+                <li class="issue critical">{{ issue }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if audit_results.get('warnings') %}
+        <div class="issues-section">
+            <h3>Warnings</h3>
+            <ul class="issues-list">
+                {% for warning in audit_results.warnings %}
+                <li class="issue warning">{{ warning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if audit_results.get('recommendations') %}
+        <div class="recommendations-section">
+            <h3>Recommendations</h3>
+            <ul class="recommendations-list">
+                {% for rec in audit_results.recommendations %}
+                <li class="recommendation">{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% else %}
+        <p>No audit results available.</p>
+        {% endif %}
+
+        <div class="actions">
+            <a href="{{ url_for('security.security_audit') }}" class="btn btn-secondary">Run New Audit</a>
+            <a href="{{ url_for('security.security_dashboard') }}" class="btn btn-primary">Security Dashboard</a>
+        </div>
+    </div>
+</body>
+</html> 

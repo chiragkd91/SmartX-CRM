@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequence Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .sequence-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        .sequence-item.active {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .sequence-item.inactive {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .sequence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sequence-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .sequence-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .sequence-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .sequence-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .sequence-timeline {
+            margin: 20px 0;
+            position: relative;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .timeline-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 50px;
+            width: 2px;
+            height: 20px;
+            background: #007bff;
+        }
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .step-description {
+            color: #666;
+            font-size: 14px;
+        }
+        .step-delay {
+            background: #fff3cd;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        .hidden {
+            display: none;
+        }
+        .sequence-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .step-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .step-option {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .step-option:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .step-option.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .execution-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .log-time {
+            color: #666;
+            font-size: 12px;
+        }
+        .log-message {
+            margin-top: 4px;
+        }
+        .log-success {
+            color: #155724;
+        }
+        .log-error {
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Sequence Management</h1>
+                <p>Create and manage automated workflow sequences</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateSequence()">Create Sequence</button>
+                <a href="/crm/workflows" class="btn btn-secondary">Back to Workflows</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Active Sequences -->
+            <div class="card">
+                <h3>Active Sequences</h3>
+                <div class="sequence-item active">
+                    <div class="sequence-header">
+                        <div class="sequence-name">Lead Nurturing Sequence</div>
+                        <span class="sequence-status status-active">Active</span>
+                    </div>
+                    <div class="sequence-description">
+                        Automated follow-up sequence for new leads
+                    </div>
+                    <div class="sequence-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">78.5%</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editSequence('lead_nurturing')">Edit</button>
+                        <button class="btn btn-success" onclick="viewSequence('lead_nurturing')">View</button>
+                        <button class="btn btn-danger" onclick="deactivateSequence('lead_nurturing')">Deactivate</button>
+                    </div>
+                </div>
+
+                <div class="sequence-item active">
+                    <div class="sequence-header">
+                        <div class="sequence-name">Deal Acceleration</div>
+                        <span class="sequence-status status-active">Active</span>
+                    </div>
+                    <div class="sequence-description">
+                        Sequence to accelerate deals in proposal stage
+                    </div>
+                    <div class="sequence-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">456</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">82.3%</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editSequence('deal_acceleration')">Edit</button>
+                        <button class="btn btn-success" onclick="viewSequence('deal_acceleration')">View</button>
+                        <button class="btn btn-danger" onclick="deactivateSequence('deal_acceleration')">Deactivate</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inactive Sequences -->
+            <div class="card">
+                <h3>Inactive Sequences</h3>
+                <div class="sequence-item inactive">
+                    <div class="sequence-header">
+                        <div class="sequence-name">Customer Onboarding</div>
+                        <span class="sequence-status status-inactive">Inactive</span>
+                    </div>
+                    <div class="sequence-description">
+                        Welcome sequence for new customers
+                    </div>
+                    <div class="sequence-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editSequence('customer_onboarding')">Edit</button>
+                        <button class="btn btn-success" onclick="activateSequence('customer_onboarding')">Activate</button>
+                    </div>
+                </div>
+
+                <div class="sequence-item inactive">
+                    <div class="sequence-header">
+                        <div class="sequence-name">Re-engagement</div>
+                        <span class="sequence-status status-inactive">Inactive</span>
+                    </div>
+                    <div class="sequence-description">
+                        Re-engagement sequence for inactive leads
+                    </div>
+                    <div class="sequence-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editSequence('re_engagement')">Edit</button>
+                        <button class="btn btn-success" onclick="activateSequence('re_engagement')">Activate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sequence Builder -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Sequence Builder</h3>
+            <div class="sequence-builder">
+                <div class="form-group">
+                    <label>Sequence Name</label>
+                    <input type="text" id="sequence-name" placeholder="Enter sequence name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="sequence-description" rows="3" placeholder="Enter sequence description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Add Step</label>
+                    <div class="step-selector">
+                        <div class="step-option" onclick="addStep('send_email')">
+                            <div style="font-size: 24px;">📧</div>
+                            <strong>Send Email</strong>
+                        </div>
+                        <div class="step-option" onclick="addStep('create_task')">
+                            <div style="font-size: 24px;">✅</div>
+                            <strong>Create Task</strong>
+                        </div>
+                        <div class="step-option" onclick="addStep('wait')">
+                            <div style="font-size: 24px;">⏰</div>
+                            <strong>Wait</strong>
+                        </div>
+                        <div class="step-option" onclick="addStep('condition')">
+                            <div style="font-size: 24px;">❓</div>
+                            <strong>Condition</strong>
+                        </div>
+                        <div class="step-option" onclick="addStep('update_record')">
+                            <div style="font-size: 24px;">📝</div>
+                            <strong>Update Record</strong>
+                        </div>
+                        <div class="step-option" onclick="addStep('webhook')">
+                            <div style="font-size: 24px;">🔗</div>
+                            <strong>Webhook</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sequence-timeline" class="sequence-timeline">
+                    <!-- Timeline steps will be added here -->
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="saveSequence()">Save Sequence</button>
+                    <button class="btn btn-primary" onclick="testSequence()">Test Sequence</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution Log -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Recent Sequence Executions</h3>
+            <div class="execution-log">
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:32:15</div>
+                    <div class="log-message log-success">
+                        ✓ Lead Nurturing Sequence started for lead "John Smith" (ID: 12345)
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:30:42</div>
+                    <div class="log-message log-success">
+                        ✓ Step 1 completed: Welcome email sent to jane@example.com
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:28:18</div>
+                    <div class="log-message log-success">
+                        ✓ Deal Acceleration Sequence completed for deal "Enterprise License" (ID: 45678)
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:25:33</div>
+                    <div class="log-message log-error">
+                        ✗ Step 3 failed: Email template not found for sequence "Customer Onboarding"
+                    </div>
+                </div>
+                <div class="log-entry">
+                    <div class="log-time">2024-01-15 14:20:07</div>
+                    <div class="log-message log-success">
+                        ✓ Lead Nurturing Sequence started for lead "Mike Johnson" (ID: 12346)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sequenceSteps = [];
+        let stepCounter = 0;
+
+        function showCreateSequence() {
+            document.getElementById('sequence-name').focus();
+        }
+
+        function addStep(stepType) {
+            stepCounter++;
+            const step = {
+                id: stepCounter,
+                type: stepType,
+                title: getStepTitle(stepType),
+                description: getStepDescription(stepType),
+                delay: stepType === 'wait' ? 24 : 0
+            };
+            
+            sequenceSteps.push(step);
+            renderSequenceTimeline();
+        }
+
+        function getStepTitle(type) {
+            const titles = {
+                'send_email': 'Send Email',
+                'create_task': 'Create Task',
+                'wait': 'Wait',
+                'condition': 'Condition Check',
+                'update_record': 'Update Record',
+                'webhook': 'Webhook Call'
+            };
+            return titles[type] || 'Unknown Step';
+        }
+
+        function getStepDescription(type) {
+            const descriptions = {
+                'send_email': 'Send automated email to contact',
+                'create_task': 'Create a new task for follow-up',
+                'wait': 'Wait for specified duration',
+                'condition': 'Check if condition is met',
+                'update_record': 'Update lead or contact information',
+                'webhook': 'Call external API endpoint'
+            };
+            return descriptions[type] || 'Step description';
+        }
+
+        function renderSequenceTimeline() {
+            const timeline = document.getElementById('sequence-timeline');
+            timeline.innerHTML = '';
+
+            sequenceSteps.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'timeline-step';
+                stepElement.innerHTML = `
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-content">
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-description">${step.description}</div>
+                        ${step.delay > 0 ? `<div class="step-delay">Wait ${step.delay} hours</div>` : ''}
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-secondary" onclick="editStep(${step.id})">Edit</button>
+                            <button class="btn btn-danger" onclick="removeStep(${step.id})">Remove</button>
+                        </div>
+                    </div>
+                `;
+                timeline.appendChild(stepElement);
+            });
+        }
+
+        function editStep(stepId) {
+            const step = sequenceSteps.find(s => s.id === stepId);
+            if (step) {
+                console.log('Editing step:', step);
+                alert(`Edit functionality would open configuration for ${step.title}`);
+            }
+        }
+
+        function removeStep(stepId) {
+            if (confirm('Are you sure you want to remove this step?')) {
+                sequenceSteps = sequenceSteps.filter(s => s.id !== stepId);
+                renderSequenceTimeline();
+            }
+        }
+
+        function saveSequence() {
+            const name = document.getElementById('sequence-name').value;
+            const description = document.getElementById('sequence-description').value;
+            
+            if (!name) {
+                alert('Please enter a sequence name');
+                return;
+            }
+            
+            if (sequenceSteps.length === 0) {
+                alert('Please add at least one step to the sequence');
+                return;
+            }
+            
+            console.log('Saving sequence:', { name, description, steps: sequenceSteps });
+            alert('Sequence saved successfully!');
+        }
+
+        function testSequence() {
+            if (sequenceSteps.length === 0) {
+                alert('Please add steps to the sequence before testing');
+                return;
+            }
+            
+            console.log('Testing sequence with steps:', sequenceSteps);
+            alert('Sequence test started! Check execution logs for results.');
+        }
+
+        function editSequence(sequenceId) {
+            console.log('Editing sequence:', sequenceId);
+            alert('Edit functionality would open sequence configuration');
+        }
+
+        function viewSequence(sequenceId) {
+            console.log('Viewing sequence:', sequenceId);
+            alert('View functionality would show sequence details');
+        }
+
+        function activateSequence(sequenceId) {
+            console.log('Activating sequence:', sequenceId);
+            alert('Sequence activated successfully!');
+        }
+
+        function deactivateSequence(sequenceId) {
+            if (confirm('Are you sure you want to deactivate this sequence?')) {
+                console.log('Deactivating sequence:', sequenceId);
+                alert('Sequence deactivated successfully!');
+            }
+        }
+    </script>
+</body>
+</html> 

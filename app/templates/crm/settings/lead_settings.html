@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Settings - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .status-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 3px;
+        }
+        .status-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Lead Management Settings</h1>
+                <p>Configure lead management and workflow settings</p>
+            </div>
+            <div>
+                <a href="/crm/settings" class="btn btn-primary">Back to Settings</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h2>Lead Status Configuration</h2>
+            <form method="POST" action="/crm/settings/leads/status">
+                <div class="form-group">
+                    <label for="new_status">Add New Status</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="new_status" name="status_name" placeholder="Status Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="color" id="status_color" name="status_color" value="#007bff">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Status</button>
+                </div>
+            </form>
+
+            <div class="status-list">
+                <h4>Current Lead Statuses</h4>
+                <div class="status-item">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-color" style="background: #28a745;"></div>
+                        <span>New</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStatus('new')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStatus('new')">Delete</button>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-color" style="background: #ffc107;"></div>
+                        <span>Contacted</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStatus('contacted')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStatus('contacted')">Delete</button>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-color" style="background: #007bff;"></div>
+                        <span>Qualified</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStatus('qualified')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStatus('qualified')">Delete</button>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div style="display: flex; align-items: center;">
+                        <div class="status-color" style="background: #dc3545;"></div>
+                        <span>Disqualified</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="editStatus('disqualified')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteStatus('disqualified')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Lead Sources</h2>
+            <form method="POST" action="/crm/settings/leads/sources">
+                <div class="form-group">
+                    <label for="new_source">Add New Source</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="new_source" name="source_name" placeholder="Source Name">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="source_description" name="source_description" placeholder="Description">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Source</button>
+                </div>
+            </form>
+
+            <div class="status-list">
+                <h4>Current Lead Sources</h4>
+                <div class="status-item">
+                    <span>Website</span>
+                    <div>
+                        <button class="btn btn-warning" onclick="editSource('website')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteSource('website')">Delete</button>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span>Social Media</span>
+                    <div>
+                        <button class="btn btn-warning" onclick="editSource('social')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteSource('social')">Delete</button>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span>Referral</span>
+                    <div>
+                        <button class="btn btn-warning" onclick="editSource('referral')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteSource('referral')">Delete</button>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span>Cold Call</span>
+                    <div>
+                        <button class="btn btn-warning" onclick="editSource('cold-call')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteSource('cold-call')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Lead Scoring</h2>
+            <form method="POST" action="/crm/settings/leads/scoring">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="score_website_visit">Website Visit</label>
+                        <input type="number" id="score_website_visit" name="score_website_visit" value="{{ settings.score_website_visit or '5' }}" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="score_email_open">Email Open</label>
+                        <input type="number" id="score_email_open" name="score_email_open" value="{{ settings.score_email_open or '3' }}" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="score_email_click">Email Click</label>
+                        <input type="number" id="score_email_click" name="score_email_click" value="{{ settings.score_email_click or '5' }}" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="score_form_submit">Form Submission</label>
+                        <input type="number" id="score_form_submit" name="score_form_submit" value="{{ settings.score_form_submit or '10' }}" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="score_phone_call">Phone Call</label>
+                        <input type="number" id="score_phone_call" name="score_phone_call" value="{{ settings.score_phone_call or '15' }}" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="score_meeting">Meeting Scheduled</label>
+                        <input type="number" id="score_meeting" name="score_meeting" value="{{ settings.score_meeting or '25' }}" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qualification_threshold">Qualification Threshold</label>
+                    <input type="number" id="qualification_threshold" name="qualification_threshold" value="{{ settings.qualification_threshold or '50' }}" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Scoring Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Lead Assignment</h2>
+            <form method="POST" action="/crm/settings/leads/assignment">
+                <div class="form-group">
+                    <label for="assignment_method">Assignment Method</label>
+                    <select id="assignment_method" name="assignment_method">
+                        <option value="round_robin" {% if settings.assignment_method == 'round_robin' %}selected{% endif %}>Round Robin</option>
+                        <option value="manual" {% if settings.assignment_method == 'manual' %}selected{% endif %}>Manual Assignment</option>
+                        <option value="territory" {% if settings.assignment_method == 'territory' %}selected{% endif %}>Territory Based</option>
+                        <option value="workload" {% if settings.assignment_method == 'workload' %}selected{% endif %}>Workload Based</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_assign_leads" {% if settings.auto_assign_leads %}checked{% endif %}>
+                        Automatically assign new leads
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="assignment_notification">Assignment Notification</label>
+                    <select id="assignment_notification" name="assignment_notification">
+                        <option value="email" {% if settings.assignment_notification == 'email' %}selected{% endif %}>Email</option>
+                        <option value="sms" {% if settings.assignment_notification == 'sms' %}selected{% endif %}>SMS</option>
+                        <option value="both" {% if settings.assignment_notification == 'both' %}selected{% endif %}>Both</option>
+                        <option value="none" {% if settings.assignment_notification == 'none' %}selected{% endif %}>None</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Assignment Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Lead Follow-up</h2>
+            <form method="POST" action="/crm/settings/leads/followup">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="followup_delay">Follow-up Delay (hours)</label>
+                        <input type="number" id="followup_delay" name="followup_delay" value="{{ settings.followup_delay or '24' }}" min="1" max="168">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_followups">Maximum Follow-ups</label>
+                        <input type="number" id="max_followups" name="max_followups" value="{{ settings.max_followups or '5' }}" min="1" max="20">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_followup" {% if settings.auto_followup %}checked{% endif %}>
+                        Enable automatic follow-up reminders
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="followup_template">Default Follow-up Template</label>
+                    <textarea id="followup_template" name="followup_template" placeholder="Enter your default follow-up message template">{{ settings.followup_template or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Follow-up Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Lead Import/Export</h2>
+            <div class="form-group">
+                <label for="import_format">Import Format</label>
+                <select id="import_format" name="import_format">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (XLSX)</option>
+                    <option value="json">JSON</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="auto_import" {% if settings.auto_import %}checked{% endif %}>
+                    Enable automatic lead import
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="import_folder">Import Folder Path</label>
+                <input type="text" id="import_folder" name="import_folder" value="{{ settings.import_folder or '/imports/leads' }}">
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-warning" onclick="testImport()">Test Import</button>
+                <button type="button" class="btn btn-primary" onclick="exportLeads()">Export Leads</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editStatus(status) {
+            // Handle status editing
+            alert(`Editing status: ${status}`);
+        }
+
+        function deleteStatus(status) {
+            if (confirm(`Are you sure you want to delete the status: ${status}?`)) {
+                alert(`Status ${status} deleted successfully`);
+            }
+        }
+
+        function editSource(source) {
+            // Handle source editing
+            alert(`Editing source: ${source}`);
+        }
+
+        function deleteSource(source) {
+            if (confirm(`Are you sure you want to delete the source: ${source}?`)) {
+                alert(`Source ${source} deleted successfully`);
+            }
+        }
+
+        function testImport() {
+            alert('Testing lead import...');
+            setTimeout(() => {
+                alert('Import test completed successfully');
+            }, 2000);
+        }
+
+        function exportLeads() {
+            alert('Exporting leads...');
+            setTimeout(() => {
+                alert('Lead export completed');
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 

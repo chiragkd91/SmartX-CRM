@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Settings - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .workflow-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .workflow-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .workflow-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status-active { background: #28a745; color: white; }
+        .status-inactive { background: #6c757d; color: white; }
+        .status-draft { background: #ffc107; color: #212529; }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Automation Settings</h1>
+                <p>Configure workflow automation and business process rules</p>
+            </div>
+            <div>
+                <a href="/crm/settings" class="btn btn-primary">Back to Settings</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h2>Lead Automation</h2>
+            <form method="POST" action="/crm/settings/automation/leads">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_assign_leads" {% if settings.auto_assign_leads %}checked{% endif %}>
+                        Automatically assign new leads to sales team
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_score_leads" {% if settings.auto_score_leads %}checked{% endif %}>
+                        Automatically score leads based on activity
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_convert_leads" {% if settings.auto_convert_leads %}checked{% endif %}>
+                        Automatically convert qualified leads to opportunities
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lead_score_threshold">Lead Score Threshold</label>
+                        <input type="number" id="lead_score_threshold" name="lead_score_threshold" value="{{ settings.lead_score_threshold or '50' }}" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="lead_qualification_time">Lead Qualification Time (days)</label>
+                        <input type="number" id="lead_qualification_time" name="lead_qualification_time" value="{{ settings.lead_qualification_time or '30' }}" min="1" max="365">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Lead Automation</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Opportunity Automation</h2>
+            <form method="POST" action="/crm/settings/automation/opportunities">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_update_probability" {% if settings.auto_update_probability %}checked{% endif %}>
+                        Automatically update opportunity probability based on stage
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_create_tasks" {% if settings.auto_create_tasks %}checked{% endif %}>
+                        Automatically create tasks for opportunity stages
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_send_notifications" {% if settings.auto_send_notifications %}checked{% endif %}>
+                        Automatically send notifications for opportunity updates
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_close_expired" {% if settings.auto_close_expired %}checked{% endif %}>
+                        Automatically close expired opportunities
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="opportunity_expiry_days">Opportunity Expiry (days)</label>
+                        <input type="number" id="opportunity_expiry_days" name="opportunity_expiry_days" value="{{ settings.opportunity_expiry_days or '90' }}" min="1" max="365">
+                    </div>
+                    <div class="form-group">
+                        <label for="stage_timeout_days">Stage Timeout (days)</label>
+                        <input type="number" id="stage_timeout_days" name="stage_timeout_days" value="{{ settings.stage_timeout_days or '30' }}" min="1" max="365">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Opportunity Automation</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Email Automation</h2>
+            <form method="POST" action="/crm/settings/automation/email">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_send_welcome" {% if settings.auto_send_welcome %}checked{% endif %}>
+                        Automatically send welcome emails to new leads
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_send_followup" {% if settings.auto_send_followup %}checked{% endif %}>
+                        Automatically send follow-up emails
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_send_reminders" {% if settings.auto_send_reminders %}checked{% endif %}>
+                        Automatically send reminder emails
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="welcome_email_delay">Welcome Email Delay (hours)</label>
+                        <input type="number" id="welcome_email_delay" name="welcome_email_delay" value="{{ settings.welcome_email_delay or '1' }}" min="0" max="72">
+                    </div>
+                    <div class="form-group">
+                        <label for="followup_email_delay">Follow-up Email Delay (hours)</label>
+                        <input type="number" id="followup_email_delay" name="followup_email_delay" value="{{ settings.followup_email_delay or '24' }}" min="1" max="168">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="max_email_sequence">Maximum Email Sequence</label>
+                    <input type="number" id="max_email_sequence" name="max_email_sequence" value="{{ settings.max_email_sequence or '5' }}" min="1" max="20">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Email Automation</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Task Automation</h2>
+            <form method="POST" action="/crm/settings/automation/tasks">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_create_followup_tasks" {% if settings.auto_create_followup_tasks %}checked{% endif %}>
+                        Automatically create follow-up tasks
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_assign_tasks" {% if settings.auto_assign_tasks %}checked{% endif %}>
+                        Automatically assign tasks to team members
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="auto_escalate_tasks" {% if settings.auto_escalate_tasks %}checked{% endif %}>
+                        Automatically escalate overdue tasks
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task_escalation_hours">Task Escalation (hours)</label>
+                        <input type="number" id="task_escalation_hours" name="task_escalation_hours" value="{{ settings.task_escalation_hours or '24' }}" min="1" max="168">
+                    </div>
+                    <div class="form-group">
+                        <label for="task_reminder_hours">Task Reminder (hours)</label>
+                        <input type="number" id="task_reminder_hours" name="task_reminder_hours" value="{{ settings.task_reminder_hours or '2' }}" min="1" max="24">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Task Automation</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Workflow Rules</h2>
+            <div class="workflow-list">
+                <h4>Active Workflows</h4>
+                <div class="workflow-item">
+                    <div>
+                        <strong>Lead Qualification Workflow</strong>
+                        <div>Automatically qualifies leads based on activity and engagement</div>
+                    </div>
+                    <div>
+                        <span class="workflow-status status-active">Active</span>
+                        <button class="btn btn-warning" onclick="editWorkflow('lead-qualification')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteWorkflow('lead-qualification')">Delete</button>
+                    </div>
+                </div>
+                <div class="workflow-item">
+                    <div>
+                        <strong>Opportunity Follow-up Workflow</strong>
+                        <div>Creates follow-up tasks and sends reminders for opportunities</div>
+                    </div>
+                    <div>
+                        <span class="workflow-status status-active">Active</span>
+                        <button class="btn btn-warning" onclick="editWorkflow('opportunity-followup')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteWorkflow('opportunity-followup')">Delete</button>
+                    </div>
+                </div>
+                <div class="workflow-item">
+                    <div>
+                        <strong>Email Campaign Workflow</strong>
+                        <div>Sends automated email sequences to leads and contacts</div>
+                    </div>
+                    <div>
+                        <span class="workflow-status status-draft">Draft</span>
+                        <button class="btn btn-warning" onclick="editWorkflow('email-campaign')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteWorkflow('email-campaign')">Delete</button>
+                    </div>
+                </div>
+                <div class="workflow-item">
+                    <div>
+                        <strong>Task Escalation Workflow</strong>
+                        <div>Escalates overdue tasks to managers</div>
+                    </div>
+                    <div>
+                        <span class="workflow-status status-inactive">Inactive</span>
+                        <button class="btn btn-warning" onclick="editWorkflow('task-escalation')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteWorkflow('task-escalation')">Delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 20px;">
+                <button type="button" class="btn btn-success" onclick="createWorkflow()">Create New Workflow</button>
+                <button type="button" class="btn btn-primary" onclick="importWorkflow()">Import Workflow</button>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Automation Monitoring</h2>
+            <form method="POST" action="/crm/settings/automation/monitoring">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_automation_logging" {% if settings.enable_automation_logging %}checked{% endif %}>
+                        Enable automation logging and monitoring
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="send_automation_alerts" {% if settings.send_automation_alerts %}checked{% endif %}>
+                        Send alerts for automation failures
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="log_retention_days">Log Retention (days)</label>
+                        <input type="number" id="log_retention_days" name="log_retention_days" value="{{ settings.log_retention_days or '30' }}" min="1" max="365">
+                    </div>
+                    <div class="form-group">
+                        <label for="alert_threshold">Alert Threshold (failures)</label>
+                        <input type="number" id="alert_threshold" name="alert_threshold" value="{{ settings.alert_threshold or '5' }}" min="1" max="100">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Monitoring Settings</button>
+                    <button type="button" class="btn btn-warning" onclick="viewAutomationLogs()">View Automation Logs</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editWorkflow(workflow) {
+            // Handle workflow editing
+            alert(`Editing workflow: ${workflow}`);
+        }
+
+        function deleteWorkflow(workflow) {
+            if (confirm(`Are you sure you want to delete the workflow: ${workflow}?`)) {
+                alert(`Workflow ${workflow} deleted successfully`);
+            }
+        }
+
+        function createWorkflow() {
+            // Handle creating new workflow
+            alert('Opening workflow builder...');
+        }
+
+        function importWorkflow() {
+            // Handle importing workflow
+            alert('Opening workflow import dialog...');
+        }
+
+        function viewAutomationLogs() {
+            // Handle viewing automation logs
+            alert('Opening automation logs...');
+        }
+    </script>
+</body>
+</html> 

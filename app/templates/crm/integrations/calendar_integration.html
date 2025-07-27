@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Integration - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .integration-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-connected {
+            background: #28a745;
+        }
+        .status-disconnected {
+            background: #dc3545;
+        }
+        .calendar-preview {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .calendar-event {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .event-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .event-title {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .sync-status {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Calendar Integration</h1>
+                <p>Connect and sync with your calendar services</p>
+            </div>
+            <div>
+                <a href="/crm/integrations" class="btn btn-primary">Back to Integrations</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="integration-card">
+            <h2>Calendar Service Configuration</h2>
+            <form method="POST" action="/crm/integrations/calendar">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="calendar_provider">Calendar Provider</label>
+                        <select id="calendar_provider" name="calendar_provider" required>
+                            <option value="">Select Provider</option>
+                            <option value="google" {% if config.calendar_provider == 'google' %}selected{% endif %}>Google Calendar</option>
+                            <option value="outlook" {% if config.calendar_provider == 'outlook' %}selected{% endif %}>Outlook Calendar</option>
+                            <option value="apple" {% if config.calendar_provider == 'apple' %}selected{% endif %}>Apple Calendar</option>
+                            <option value="ical" {% if config.calendar_provider == 'ical' %}selected{% endif %}>iCal/CalDAV</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="connection_status">Connection Status</label>
+                        <div>
+                            <span class="status-indicator {% if config.connected %}status-connected{% else %}status-disconnected{% endif %}"></span>
+                            {% if config.connected %}Connected{% else %}Disconnected{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="calendar_email">Calendar Email</label>
+                        <input type="email" id="calendar_email" name="calendar_email" value="{{ config.calendar_email or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="api_key">API Key / Client ID</label>
+                        <input type="text" id="api_key" name="api_key" value="{{ config.api_key or '' }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="calendar_id">Calendar ID</label>
+                        <input type="text" id="calendar_id" name="calendar_id" value="{{ config.calendar_id or '' }}" placeholder="primary">
+                    </div>
+                    <div class="form-group">
+                        <label for="timezone">Timezone</label>
+                        <select id="timezone" name="timezone">
+                            <option value="UTC" {% if config.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                            <option value="America/New_York" {% if config.timezone == 'America/New_York' %}selected{% endif %}>Eastern Time</option>
+                            <option value="America/Chicago" {% if config.timezone == 'America/Chicago' %}selected{% endif %}>Central Time</option>
+                            <option value="America/Denver" {% if config.timezone == 'America/Denver' %}selected{% endif %}>Mountain Time</option>
+                            <option value="America/Los_Angeles" {% if config.timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Configuration</button>
+                    <button type="button" class="btn btn-warning" onclick="testConnection()">Test Connection</button>
+                    <button type="button" class="btn btn-danger" onclick="disconnectCalendar()">Disconnect</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="integration-card">
+            <h2>Sync Settings</h2>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="auto_sync_activities" {% if config.auto_sync_activities %}checked{% endif %}>
+                    Automatically sync CRM activities to calendar
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="auto_sync_meetings" {% if config.auto_sync_meetings %}checked{% endif %}>
+                    Automatically sync calendar meetings to CRM
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="create_reminders" {% if config.create_reminders %}checked{% endif %}>
+                    Create calendar reminders for follow-ups
+                </label>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sync_interval">Sync Interval (minutes)</label>
+                    <select id="sync_interval" name="sync_interval">
+                        <option value="5" {% if config.sync_interval == '5' %}selected{% endif %}>5 minutes</option>
+                        <option value="15" {% if config.sync_interval == '15' %}selected{% endif %}>15 minutes</option>
+                        <option value="30" {% if config.sync_interval == '30' %}selected{% endif %}>30 minutes</option>
+                        <option value="60" {% if config.sync_interval == '60' %}selected{% endif %}>1 hour</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reminder_time">Reminder Time (minutes before)</label>
+                    <input type="number" id="reminder_time" name="reminder_time" value="{{ config.reminder_time or '15' }}" min="5" max="1440">
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveSyncSettings()">Save Sync Settings</button>
+                <button type="button" class="btn btn-warning" onclick="manualSync()">Manual Sync Now</button>
+            </div>
+        </div>
+
+        <div class="integration-card">
+            <h2>Event Templates</h2>
+            <div class="form-group">
+                <label for="meeting_template">Meeting Event Template</label>
+                <textarea id="meeting_template" name="meeting_template" rows="3">{{ config.meeting_template or 'Meeting with {{contact_name}} - {{subject}}' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="followup_template">Follow-up Event Template</label>
+                <textarea id="followup_template" name="followup_template" rows="3">{{ config.followup_template or 'Follow-up with {{contact_name}} - {{lead_source}}' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="call_template">Call Event Template</label>
+                <textarea id="call_template" name="call_template" rows="3">{{ config.call_template or 'Call with {{contact_name}} - {{purpose}}' }}</textarea>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveTemplates()">Save Templates</button>
+            </div>
+        </div>
+
+        <div class="calendar-preview">
+            <h3>Recent Calendar Events</h3>
+            <div id="calendar-events">
+                <div class="calendar-event">
+                    <div class="event-time">Today, 2:00 PM - 3:00 PM</div>
+                    <div class="event-title">Meeting with John Smith - Product Demo</div>
+                    <div>Lead: John Smith | Source: Website</div>
+                </div>
+                <div class="calendar-event">
+                    <div class="event-time">Tomorrow, 10:00 AM - 10:30 AM</div>
+                    <div class="event-title">Follow-up with Sarah Johnson</div>
+                    <div>Lead: Sarah Johnson | Source: LinkedIn</div>
+                </div>
+                <div class="calendar-event">
+                    <div class="event-time">Tomorrow, 3:00 PM - 4:00 PM</div>
+                    <div class="event-title">Call with Mike Davis - Proposal Discussion</div>
+                    <div>Opportunity: Enterprise Solution | Value: $50,000</div>
+                </div>
+            </div>
+            <div class="sync-status">
+                <strong>Last Sync:</strong> {{ config.last_sync or 'Never' }} | 
+                <strong>Next Sync:</strong> {{ config.next_sync or 'Not scheduled' }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testConnection() {
+            // Simulate connection test
+            alert('Testing calendar connection...');
+        }
+
+        function disconnectCalendar() {
+            if (confirm('Are you sure you want to disconnect the calendar integration?')) {
+                // Handle disconnect
+                alert('Calendar integration disconnected');
+            }
+        }
+
+        function saveSyncSettings() {
+            // Handle sync settings saving
+            alert('Sync settings saved successfully');
+        }
+
+        function saveTemplates() {
+            // Handle template saving
+            alert('Event templates saved successfully');
+        }
+
+        function manualSync() {
+            // Simulate manual sync
+            alert('Starting manual calendar sync...');
+            setTimeout(() => {
+                alert('Calendar sync completed successfully');
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 

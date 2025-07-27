@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .metric-change {
+            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .full-width-chart {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CRM Analytics Dashboard</h1>
+            <div>
+                <a href="/crm/dashboard" class="btn btn-primary">Main Dashboard</a>
+                <a href="/crm/analytics/export" class="btn btn-success">Export Report</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="filters">
+            <form method="GET" action="/crm/analytics">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="date_from">Date From:</label>
+                        <input type="date" id="date_from" name="date_from" value="{{ request.args.get('date_from', '') }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="date_to">Date To:</label>
+                        <input type="date" id="date_to" name="date_to" value="{{ request.args.get('date_to', '') }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="user">User:</label>
+                        <select id="user" name="user">
+                            <option value="">All Users</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if request.args.get('user')|int == user.id %}selected{% endif %}>{{ user.first_name }} {{ user.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/analytics" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_leads }}</div>
+                <div class="metric-label">Total Leads</div>
+                <div class="metric-change {% if metrics.lead_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.lead_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.lead_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_opportunities }}</div>
+                <div class="metric-label">Total Opportunities</div>
+                <div class="metric-change {% if metrics.opportunity_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.opportunity_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.opportunity_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">${{ "{:,.0f}".format(metrics.total_revenue) }}</div>
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-change {% if metrics.revenue_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.revenue_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.revenue_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.conversion_rate) }}%</div>
+                <div class="metric-label">Lead Conversion Rate</div>
+                <div class="metric-change {% if metrics.conversion_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.conversion_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.conversion_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.won_opportunities }}</div>
+                <div class="metric-label">Won Opportunities</div>
+                <div class="metric-change {% if metrics.win_rate_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.win_rate_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.win_rate_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.active_activities }}</div>
+                <div class="metric-label">Active Activities</div>
+                <div class="metric-change {% if metrics.activity_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.activity_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.activity_growth) }}% vs last period
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Sales Pipeline by Stage</h3>
+                <canvas id="pipelineChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Lead Sources Distribution</h3>
+                <canvas id="leadSourcesChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Monthly Revenue Trend</h3>
+                <canvas id="revenueChart" width="400" height="300"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">User Performance</h3>
+                <canvas id="userPerformanceChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="full-width-chart">
+            <h3 class="chart-title">Opportunity Funnel</h3>
+            <canvas id="funnelChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Sales Pipeline Chart
+        const pipelineCtx = document.getElementById('pipelineChart').getContext('2d');
+        new Chart(pipelineCtx, {
+            type: 'doughnut',
+            data: {
+                labels: JSON.parse('{{ pipeline_labels | tojson | safe }}'),
+                datasets: [{
+                    data: JSON.parse('{{ pipeline_data | tojson | safe }}'),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Lead Sources Chart
+        const leadSourcesCtx = document.getElementById('leadSourcesChart').getContext('2d');
+        new Chart(leadSourcesCtx, {
+            type: 'pie',
+            data: {
+                labels: JSON.parse('{{ lead_sources_labels | tojson | safe }}'),
+                datasets: [{
+                    data: JSON.parse('{{ lead_sources_data | tojson | safe }}'),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40',
+                        '#FF6384'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Revenue Trend Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: JSON.parse('{{ revenue_labels | tojson | safe }}'),
+                datasets: [{
+                    label: 'Revenue',
+                    data: JSON.parse('{{ revenue_data | tojson | safe }}'),
+                    borderColor: '#36A2EB',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // User Performance Chart
+        const userPerformanceCtx = document.getElementById('userPerformanceChart').getContext('2d');
+        new Chart(userPerformanceCtx, {
+            type: 'bar',
+            data: {
+                labels: JSON.parse('{{ user_performance_labels | tojson | safe }}'),
+                datasets: [{
+                    label: 'Opportunities Won',
+                    data: JSON.parse('{{ user_performance_data | tojson | safe }}'),
+                    backgroundColor: '#4BC0C0'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Opportunity Funnel Chart
+        const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+        new Chart(funnelCtx, {
+            type: 'bar',
+            data: {
+                labels: JSON.parse('{{ funnel_labels | tojson | safe }}'),
+                datasets: [{
+                    label: 'Count',
+                    data: JSON.parse('{{ funnel_data | tojson | safe }}'),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

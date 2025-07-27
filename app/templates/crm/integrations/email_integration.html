@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Integration - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .integration-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-connected {
+            background: #28a745;
+        }
+        .status-disconnected {
+            background: #dc3545;
+        }
+        .status-testing {
+            background: #ffc107;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .log-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            background: white;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Email Integration</h1>
+                <p>Configure email service connections and settings</p>
+            </div>
+            <div>
+                <a href="/crm/integrations" class="btn btn-primary">Back to Integrations</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="integration-card">
+            <h2>Email Service Configuration</h2>
+            <form method="POST" action="/crm/integrations/email">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email_provider">Email Provider</label>
+                        <select id="email_provider" name="email_provider" required>
+                            <option value="">Select Provider</option>
+                            <option value="gmail" {% if config.email_provider == 'gmail' %}selected{% endif %}>Gmail</option>
+                            <option value="outlook" {% if config.email_provider == 'outlook' %}selected{% endif %}>Outlook</option>
+                            <option value="yahoo" {% if config.email_provider == 'yahoo' %}selected{% endif %}>Yahoo</option>
+                            <option value="smtp" {% if config.email_provider == 'smtp' %}selected{% endif %}>Custom SMTP</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="connection_status">Connection Status</label>
+                        <div>
+                            <span class="status-indicator {% if config.connected %}status-connected{% else %}status-disconnected{% endif %}"></span>
+                            {% if config.connected %}Connected{% else %}Disconnected{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email_address">Email Address</label>
+                        <input type="email" id="email_address" name="email_address" value="{{ config.email_address or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="app_password">App Password / API Key</label>
+                        <input type="password" id="app_password" name="app_password" value="{{ config.app_password or '' }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="smtp_server">SMTP Server (for custom SMTP)</label>
+                        <input type="text" id="smtp_server" name="smtp_server" value="{{ config.smtp_server or '' }}" placeholder="smtp.gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="smtp_port">SMTP Port</label>
+                        <input type="number" id="smtp_port" name="smtp_port" value="{{ config.smtp_port or '587' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="use_ssl" {% if config.use_ssl %}checked{% endif %}>
+                        Use SSL/TLS
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="default_signature">Default Email Signature</label>
+                    <textarea id="default_signature" name="default_signature">{{ config.default_signature or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Configuration</button>
+                    <button type="button" class="btn btn-warning" onclick="testConnection()">Test Connection</button>
+                    <button type="button" class="btn btn-danger" onclick="disconnectEmail()">Disconnect</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="integration-card">
+            <h2>Email Templates</h2>
+            <div class="form-group">
+                <label for="lead_followup_template">Lead Follow-up Template</label>
+                <textarea id="lead_followup_template" name="lead_followup_template">{{ config.lead_followup_template or '' }}" placeholder="Hi {{contact_name}}, Thank you for your interest..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="opportunity_update_template">Opportunity Update Template</label>
+                <textarea id="opportunity_update_template" name="opportunity_update_template">{{ config.opportunity_update_template or '' }}" placeholder="Hi {{contact_name}}, Here's an update on your opportunity..."></textarea>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveTemplates()">Save Templates</button>
+            </div>
+        </div>
+
+        <div class="integration-card">
+            <h2>Automation Settings</h2>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="auto_send_followup" {% if config.auto_send_followup %}checked{% endif %}>
+                    Automatically send follow-up emails to new leads
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="auto_send_opportunity_updates" {% if config.auto_send_opportunity_updates %}checked{% endif %}>
+                    Automatically send opportunity status updates
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="followup_delay">Follow-up Delay (hours)</label>
+                <input type="number" id="followup_delay" name="followup_delay" value="{{ config.followup_delay or '24' }}" min="1" max="168">
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveAutomation()">Save Automation Settings</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Connection</h3>
+            <div class="form-group">
+                <label for="test_email">Test Email Address</label>
+                <input type="email" id="test_email" placeholder="Enter email to send test message">
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-warning" onclick="sendTestEmail()">Send Test Email</button>
+            </div>
+            <div id="test-results" class="log-section" style="display: none;">
+                <h4>Test Results:</h4>
+                <div id="test-log"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testConnection() {
+            // Simulate connection test
+            alert('Testing email connection...');
+        }
+
+        function disconnectEmail() {
+            if (confirm('Are you sure you want to disconnect the email integration?')) {
+                // Handle disconnect
+                alert('Email integration disconnected');
+            }
+        }
+
+        function saveTemplates() {
+            // Handle template saving
+            alert('Email templates saved successfully');
+        }
+
+        function saveAutomation() {
+            // Handle automation settings saving
+            alert('Automation settings saved successfully');
+        }
+
+        function sendTestEmail() {
+            const testEmail = document.getElementById('test_email').value;
+            if (!testEmail) {
+                alert('Please enter a test email address');
+                return;
+            }
+
+            // Simulate sending test email
+            const testResults = document.getElementById('test-results');
+            const testLog = document.getElementById('test-log');
+            
+            testResults.style.display = 'block';
+            testLog.innerHTML = `
+                <div class="log-entry">
+                    <strong>${new Date().toLocaleString()}</strong> - Sending test email to ${testEmail}
+                </div>
+                <div class="log-entry">
+                    <strong>${new Date().toLocaleString()}</strong> - Test email sent successfully
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 

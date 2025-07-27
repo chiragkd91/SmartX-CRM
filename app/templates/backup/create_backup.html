@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Backup - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create Backup</h1>
+        <form method="POST" action="{{ url_for('backup.create_backup') }}">
+            <div class="form-group">
+                <label for="backup_type">Backup Type:</label>
+                <select name="backup_type" id="backup_type" required>
+                    <option value="full">Full Backup</option>
+                    <option value="database">Database Only</option>
+                    <option value="files">Files Only</option>
+                    <option value="config">Configuration Only</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Backup</button>
+        </form>
+    </div>
+</body>
+</html> 

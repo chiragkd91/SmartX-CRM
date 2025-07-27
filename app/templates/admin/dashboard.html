@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        
+        {% if system_overview %}
+        <div class="overview-grid">
+            <div class="overview-card security">
+                <h3>Security</h3>
+                <div class="overview-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Last Audit:</span>
+                        <span class="stat-value">{{ system_overview.security.last_audit or 'Never' }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Critical Issues:</span>
+                        <span class="stat-value">{{ system_overview.security.critical_issues }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Security Score:</span>
+                        <span class="stat-value">{{ system_overview.security.security_score }}/100</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('admin.security_overview') }}" class="btn btn-primary">Security Overview</a>
+            </div>
+
+            <div class="overview-card backup">
+                <h3>Backup & Recovery</h3>
+                <div class="overview-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Backups:</span>
+                        <span class="stat-value">{{ system_overview.backup.total_backups }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Last Backup:</span>
+                        <span class="stat-value">{{ system_overview.backup.last_backup or 'Never' }}</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('admin.backup_overview') }}" class="btn btn-primary">Backup Overview</a>
+            </div>
+
+            <div class="overview-card monitoring">
+                <h3>Monitoring</h3>
+                <div class="overview-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Uptime:</span>
+                        <span class="stat-value">{{ system_overview.monitoring.uptime }}%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Active Alerts:</span>
+                        <span class="stat-value">{{ system_overview.monitoring.alerts }}</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('admin.monitoring_overview') }}" class="btn btn-primary">Monitoring Overview</a>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="actions-grid">
+                <a href="{{ url_for('security.security_audit') }}" class="action-btn">Run Security Audit</a>
+                <a href="{{ url_for('backup.create_backup') }}" class="action-btn">Create Backup</a>
+                <a href="{{ url_for('monitoring.monitoring_dashboard') }}" class="action-btn">View Monitoring</a>
+                <a href="{{ url_for('admin.system_status') }}" class="action-btn">System Status</a>
+            </div>
+        </div>
+        {% else %}
+        <p>System overview not available.</p>
+        {% endif %}
+
+        <div class="navigation">
+            <h3>Admin Navigation</h3>
+            <div class="nav-links">
+                <a href="{{ url_for('admin.security_overview') }}">Security</a>
+                <a href="{{ url_for('admin.backup_overview') }}">Backup & Recovery</a>
+                <a href="{{ url_for('admin.monitoring_overview') }}">Monitoring</a>
+                <a href="{{ url_for('admin.api_overview') }}">API Management</a>
+                <a href="{{ url_for('admin.system_status') }}">System Status</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

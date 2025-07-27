@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .settings-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .notification-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .notification-channels {
+            display: flex;
+            gap: 10px;
+        }
+        .channel-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            background: #e9ecef;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Notification Settings</h1>
+                <p>Configure notification preferences and delivery methods</p>
+            </div>
+            <div>
+                <a href="/crm/settings" class="btn btn-primary">Back to Settings</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h2>Email Notifications</h2>
+            <form method="POST" action="/crm/settings/notifications/email">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_email_notifications" {% if settings.enable_email_notifications %}checked{% endif %}>
+                        Enable email notifications
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_frequency">Email Frequency</label>
+                    <select id="email_frequency" name="email_frequency">
+                        <option value="immediate" {% if settings.email_frequency == 'immediate' %}selected{% endif %}>Immediate</option>
+                        <option value="hourly" {% if settings.email_frequency == 'hourly' %}selected{% endif %}>Hourly Digest</option>
+                        <option value="daily" {% if settings.email_frequency == 'daily' %}selected{% endif %}>Daily Digest</option>
+                        <option value="weekly" {% if settings.email_frequency == 'weekly' %}selected{% endif %}>Weekly Digest</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_time">Daily Digest Time</label>
+                    <input type="time" id="email_time" name="email_time" value="{{ settings.email_time or '09:00' }}">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Email Settings</button>
+                    <button type="button" class="btn btn-warning" onclick="testEmailNotification()">Test Email</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>SMS Notifications</h2>
+            <form method="POST" action="/crm/settings/notifications/sms">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_sms_notifications" {% if settings.enable_sms_notifications %}checked{% endif %}>
+                        Enable SMS notifications
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="sms_provider">SMS Provider</label>
+                    <select id="sms_provider" name="sms_provider">
+                        <option value="twilio" {% if settings.sms_provider == 'twilio' %}selected{% endif %}>Twilio</option>
+                        <option value="nexmo" {% if settings.sms_provider == 'nexmo' %}selected{% endif %}>Nexmo</option>
+                        <option value="aws_sns" {% if settings.sms_provider == 'aws_sns' %}selected{% endif %}>AWS SNS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sms_api_key">SMS API Key</label>
+                    <input type="text" id="sms_api_key" name="sms_api_key" value="{{ settings.sms_api_key or '' }}" placeholder="Enter SMS API key">
+                </div>
+
+                <div class="form-group">
+                    <label for="sms_api_secret">SMS API Secret</label>
+                    <input type="password" id="sms_api_secret" name="sms_api_secret" value="{{ settings.sms_api_secret or '' }}" placeholder="Enter SMS API secret">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save SMS Settings</button>
+                    <button type="button" class="btn btn-warning" onclick="testSmsNotification()">Test SMS</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>In-App Notifications</h2>
+            <form method="POST" action="/crm/settings/notifications/inapp">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_inapp_notifications" {% if settings.enable_inapp_notifications %}checked{% endif %}>
+                        Enable in-app notifications
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="notification_position">Notification Position</label>
+                    <select id="notification_position" name="notification_position">
+                        <option value="top-right" {% if settings.notification_position == 'top-right' %}selected{% endif %}>Top Right</option>
+                        <option value="top-left" {% if settings.notification_position == 'top-left' %}selected{% endif %}>Top Left</option>
+                        <option value="bottom-right" {% if settings.notification_position == 'bottom-right' %}selected{% endif %}>Bottom Right</option>
+                        <option value="bottom-left" {% if settings.notification_position == 'bottom-left' %}selected{% endif %}>Bottom Left</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notification_duration">Notification Duration (seconds)</label>
+                    <input type="number" id="notification_duration" name="notification_duration" value="{{ settings.notification_duration or '5' }}" min="1" max="30">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="enable_sound" {% if settings.enable_sound %}checked{% endif %}>
+                        Enable notification sounds
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save In-App Settings</button>
+                    <button type="button" class="btn btn-warning" onclick="testInAppNotification()">Test Notification</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Notification Types</h2>
+            <div class="notification-list">
+                <div class="notification-item">
+                    <div>
+                        <strong>New Lead Assignment</strong>
+                        <div>When a new lead is assigned to you</div>
+                    </div>
+                    <div class="notification-channels">
+                        <span class="channel-badge">Email</span>
+                        <span class="channel-badge">SMS</span>
+                        <span class="channel-badge">In-App</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="configureNotification('new-lead')">Configure</button>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div>
+                        <strong>Opportunity Updates</strong>
+                        <div>When opportunity status or value changes</div>
+                    </div>
+                    <div class="notification-channels">
+                        <span class="channel-badge">Email</span>
+                        <span class="channel-badge">In-App</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="configureNotification('opportunity-update')">Configure</button>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div>
+                        <strong>Task Reminders</strong>
+                        <div>When tasks are due or overdue</div>
+                    </div>
+                    <div class="notification-channels">
+                        <span class="channel-badge">Email</span>
+                        <span class="channel-badge">SMS</span>
+                        <span class="channel-badge">In-App</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="configureNotification('task-reminder')">Configure</button>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div>
+                        <strong>Meeting Reminders</strong>
+                        <div>Before scheduled meetings and calls</div>
+                    </div>
+                    <div class="notification-channels">
+                        <span class="channel-badge">Email</span>
+                        <span class="channel-badge">SMS</span>
+                        <span class="channel-badge">In-App</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="configureNotification('meeting-reminder')">Configure</button>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div>
+                        <strong>System Alerts</strong>
+                        <div>Important system notifications and updates</div>
+                    </div>
+                    <div class="notification-channels">
+                        <span class="channel-badge">Email</span>
+                        <span class="channel-badge">In-App</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="configureNotification('system-alert')">Configure</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>Notification Templates</h2>
+            <form method="POST" action="/crm/settings/notifications/templates">
+                <div class="form-group">
+                    <label for="lead_assignment_template">Lead Assignment Template</label>
+                    <textarea id="lead_assignment_template" name="lead_assignment_template" placeholder="Enter lead assignment notification template">{{ settings.lead_assignment_template or 'New lead {{lead_name}} has been assigned to you. Please follow up within {{followup_time}}.' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="opportunity_update_template">Opportunity Update Template</label>
+                    <textarea id="opportunity_update_template" name="opportunity_update_template" placeholder="Enter opportunity update notification template">{{ settings.opportunity_update_template or 'Opportunity {{opportunity_name}} has been updated. New value: {{new_value}}' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="task_reminder_template">Task Reminder Template</label>
+                    <textarea id="task_reminder_template" name="task_reminder_template" placeholder="Enter task reminder notification template">{{ settings.task_reminder_template or 'Task {{task_name}} is due {{due_date}}. Please complete it soon.' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="meeting_reminder_template">Meeting Reminder Template</label>
+                    <textarea id="meeting_reminder_template" name="meeting_reminder_template" placeholder="Enter meeting reminder notification template">{{ settings.meeting_reminder_template or 'Meeting with {{contact_name}} is scheduled for {{meeting_time}}. Don\'t forget to prepare!' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Templates</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2>Notification Schedule</h2>
+            <form method="POST" action="/crm/settings/notifications/schedule">
+                <div class="form-group">
+                    <label>Quiet Hours</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quiet_start_time">Start Time</label>
+                            <input type="time" id="quiet_start_time" name="quiet_start_time" value="{{ settings.quiet_start_time or '22:00' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="quiet_end_time">End Time</label>
+                            <input type="time" id="quiet_end_time" name="quiet_end_time" value="{{ settings.quiet_end_time or '08:00' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Quiet Days</label>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <label><input type="checkbox" name="quiet_days" value="saturday" {% if 'saturday' in settings.quiet_days %}checked{% endif %}> Saturday</label>
+                        <label><input type="checkbox" name="quiet_days" value="sunday" {% if 'sunday' in settings.quiet_days %}checked{% endif %}> Sunday</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="respect_quiet_hours" {% if settings.respect_quiet_hours %}checked{% endif %}>
+                        Respect quiet hours for notifications
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="urgent_override_quiet" {% if settings.urgent_override_quiet %}checked{% endif %}>
+                        Allow urgent notifications during quiet hours
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Schedule Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function testEmailNotification() {
+            alert('Sending test email notification...');
+            setTimeout(() => {
+                alert('Test email notification sent successfully');
+            }, 2000);
+        }
+
+        function testSmsNotification() {
+            alert('Sending test SMS notification...');
+            setTimeout(() => {
+                alert('Test SMS notification sent successfully');
+            }, 2000);
+        }
+
+        function testInAppNotification() {
+            alert('Showing test in-app notification...');
+        }
+
+        function configureNotification(type) {
+            alert(`Configuring notification: ${type}`);
+        }
+    </script>
+</body>
+</html> 

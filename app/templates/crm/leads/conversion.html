@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Conversion Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .conversion-funnel {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .funnel-stages {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .funnel-stage {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .stage-info {
+            flex: 1;
+        }
+        .stage-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .stage-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stage-rate {
+            color: #666;
+            font-size: 14px;
+        }
+        .stage-arrow {
+            font-size: 24px;
+            color: #007bff;
+            margin: 0 20px;
+        }
+        .conversion-metrics {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .conversion-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .table-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .conversion-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-converted {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-lost {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .chart-placeholder {
+            height: 300px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+        }
+        .time-filter {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-weight: bold;
+            margin: 0;
+        }
+        .filter-group select, .filter-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lead Conversion Tracking</h1>
+            <div>
+                <button class="btn btn-primary" onclick="openConversionModal()">Convert Lead</button>
+                <button class="btn btn-success" onclick="exportReport()">Export Report</button>
+                <a href="/crm/leads" class="btn btn-secondary">Back to Leads</a>
+            </div>
+        </div>
+
+        <!-- Dashboard Overview -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Conversion Rate</h3>
+                <div style="font-size: 24px; font-weight: bold; color: #28a745; margin: 20px 0;">
+                    23.5%
+                </div>
+                <p>This Month: <strong>+2.1%</strong></p>
+                <p>Last Month: <strong>21.4%</strong></p>
+            </div>
+            <div class="card">
+                <h3>Total Conversions</h3>
+                <div style="font-size: 24px; font-weight: bold; color: #007bff; margin: 20px 0;">
+                    156
+                </div>
+                <p>This Month: <strong>23</strong></p>
+                <p>Average per Week: <strong>5.2</strong></p>
+            </div>
+            <div class="card">
+                <h3>Conversion Value</h3>
+                <div style="font-size: 24px; font-weight: bold; color: #ffc107; margin: 20px 0;">
+                    $2.4M
+                </div>
+                <p>Average Deal: <strong>$15,400</strong></p>
+                <p>Pipeline Value: <strong>$8.7M</strong></p>
+            </div>
+            <div class="card">
+                <h3>Time to Convert</h3>
+                <div style="font-size: 24px; font-weight: bold; color: #6c757d; margin: 20px 0;">
+                    18 Days
+                </div>
+                <p>Average: <strong>18 days</strong></p>
+                <p>Best Source: <strong>Website</strong></p>
+            </div>
+        </div>
+
+        <!-- Time Filter -->
+        <div class="time-filter">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Time Period:</label>
+                    <select id="time-period">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="365">Last year</option>
+                        <option value="custom">Custom range</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="custom-date-range" style="display: none;">
+                    <label>From:</label>
+                    <input type="date" id="start-date">
+                    <label>To:</label>
+                    <input type="date" id="end-date">
+                </div>
+                <div class="filter-group">
+                    <label>Lead Source:</label>
+                    <select id="lead-source">
+                        <option value="">All Sources</option>
+                        <option value="website">Website</option>
+                        <option value="email">Email Campaign</option>
+                        <option value="social">Social Media</option>
+                        <option value="referral">Referral</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+
+        <!-- Conversion Funnel -->
+        <div class="conversion-funnel">
+            <h2>Conversion Funnel</h2>
+            <div class="funnel-stages">
+                <div class="funnel-stage">
+                    <div class="stage-info">
+                        <div class="stage-name">New Leads</div>
+                        <div class="stage-count">1,247</div>
+                        <div class="stage-rate">100% of total</div>
+                    </div>
+                    <div class="stage-arrow">↓</div>
+                </div>
+                <div class="funnel-stage">
+                    <div class="stage-info">
+                        <div class="stage-name">Qualified Leads</div>
+                        <div class="stage-count">892</div>
+                        <div class="stage-rate">71.5% conversion rate</div>
+                    </div>
+                    <div class="stage-arrow">↓</div>
+                </div>
+                <div class="funnel-stage">
+                    <div class="stage-info">
+                        <div class="stage-name">Opportunities</div>
+                        <div class="stage-count">456</div>
+                        <div class="stage-rate">51.1% conversion rate</div>
+                    </div>
+                    <div class="stage-arrow">↓</div>
+                </div>
+                <div class="funnel-stage">
+                    <div class="stage-info">
+                        <div class="stage-name">Closed Won</div>
+                        <div class="stage-count">156</div>
+                        <div class="stage-rate">34.2% conversion rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversion Metrics -->
+        <div class="conversion-metrics">
+            <h2>Detailed Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value">23.5%</div>
+                    <div class="metric-label">Overall Conversion Rate</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">18 Days</div>
+                    <div class="metric-label">Average Time to Convert</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">$15,400</div>
+                    <div class="metric-label">Average Deal Size</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">5.2</div>
+                    <div class="metric-label">Touches to Convert</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">34.2%</div>
+                    <div class="metric-label">Opportunity to Close Rate</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">$2.4M</div>
+                    <div class="metric-label">Total Revenue Generated</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversion Charts -->
+        <div class="chart-container">
+            <h2>Conversion Trends</h2>
+            <div class="chart-placeholder">
+                Chart: Conversion Rate Over Time
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Conversion by Lead Source</h2>
+            <div class="chart-placeholder">
+                Chart: Conversion Rate by Lead Source
+            </div>
+        </div>
+
+        <!-- Recent Conversions Table -->
+        <div class="conversion-table">
+            <div class="table-header">
+                <h3>Recent Conversions</h3>
+                <div>
+                    <select id="conversion-filter">
+                        <option value="">All Conversions</option>
+                        <option value="converted">Converted</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lead Name</th>
+                        <th>Company</th>
+                        <th>Lead Source</th>
+                        <th>Conversion Date</th>
+                        <th>Deal Value</th>
+                        <th>Time to Convert</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Smith</td>
+                        <td>TechCorp Inc</td>
+                        <td>Website</td>
+                        <td>2024-01-15</td>
+                        <td>$25,000</td>
+                        <td>12 days</td>
+                        <td><span class="conversion-status status-converted">Converted</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewOpportunity(1)">View</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sarah Johnson</td>
+                        <td>Innovate Solutions</td>
+                        <td>Email Campaign</td>
+                        <td>2024-01-14</td>
+                        <td>$18,500</td>
+                        <td>21 days</td>
+                        <td><span class="conversion-status status-converted">Converted</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewOpportunity(2)">View</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mike Davis</td>
+                        <td>StartupXYZ</td>
+                        <td>Social Media</td>
+                        <td>2024-01-13</td>
+                        <td>$12,000</td>
+                        <td>15 days</td>
+                        <td><span class="conversion-status status-in-progress">In Progress</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewOpportunity(3)">View</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Lisa Wilson</td>
+                        <td>Global Enterprises</td>
+                        <td>Referral</td>
+                        <td>2024-01-12</td>
+                        <td>$35,000</td>
+                        <td>8 days</td>
+                        <td><span class="conversion-status status-converted">Converted</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewOpportunity(4)">View</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Convert Lead Modal -->
+    <div id="conversionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Convert Lead to Opportunity</h2>
+            
+            <form id="conversionForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lead-name">Lead Name</label>
+                        <input type="text" id="lead-name" value="John Smith" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-name">Company</label>
+                        <input type="text" id="company-name" value="TechCorp Inc" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="opportunity-name">Opportunity Name</label>
+                        <input type="text" id="opportunity-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deal-value">Deal Value</label>
+                        <input type="number" id="deal-value" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="close-date">Expected Close Date</label>
+                        <input type="date" id="close-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="probability">Probability (%)</label>
+                        <select id="probability" required>
+                            <option value="">Select Probability</option>
+                            <option value="10">10% - Initial Contact</option>
+                            <option value="25">25% - Qualification</option>
+                            <option value="50">50% - Proposal</option>
+                            <option value="75">75% - Negotiation</option>
+                            <option value="90">90% - Contract</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="conversion-notes">Conversion Notes</label>
+                    <textarea id="conversion-notes" rows="4" placeholder="Add any notes about the conversion..."></textarea>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Convert Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openConversionModal() {
+            document.getElementById('conversionModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('conversionModal').style.display = 'none';
+        }
+
+        function viewOpportunity(opportunityId) {
+            window.location.href = `/crm/opportunities/${opportunityId}`;
+        }
+
+        function exportReport() {
+            alert('Exporting conversion report...');
+        }
+
+        function applyFilters() {
+            const timePeriod = document.getElementById('time-period').value;
+            const leadSource = document.getElementById('lead-source').value;
+            
+            if (timePeriod === 'custom') {
+                document.getElementById('custom-date-range').style.display = 'flex';
+            } else {
+                document.getElementById('custom-date-range').style.display = 'none';
+            }
+            
+            // Apply filter logic
+            console.log('Applying filters:', { timePeriod, leadSource });
+        }
+
+        // Time period change handler
+        document.getElementById('time-period').addEventListener('change', function() {
+            if (this.value === 'custom') {
+                document.getElementById('custom-date-range').style.display = 'flex';
+            } else {
+                document.getElementById('custom-date-range').style.display = 'none';
+            }
+        });
+
+        // Conversion form submission
+        document.getElementById('conversionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const opportunityName = document.getElementById('opportunity-name').value;
+            const dealValue = document.getElementById('deal-value').value;
+            const closeDate = document.getElementById('close-date').value;
+            const probability = document.getElementById('probability').value;
+            
+            // Convert lead logic
+            alert(`Lead converted successfully!\nOpportunity: ${opportunityName}\nDeal Value: $${dealValue}\nClose Date: ${closeDate}\nProbability: ${probability}%`);
+            
+            closeModal();
+            // Refresh the page or update the table
+            location.reload();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('conversionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Set default close date to 30 days from now
+        const today = new Date();
+        const closeDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+        document.getElementById('close-date').value = closeDate.toISOString().split('T')[0];
+    </script>
+</body>
+</html> 

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>API Documentation</h1>
+        
+        {% if docs %}
+        <div class="api-docs">
+            <div class="api-info">
+                <h2>{{ docs.info.title }}</h2>
+                <p><strong>Version:</strong> {{ docs.info.version }}</p>
+                <p><strong>Description:</strong> {{ docs.info.description }}</p>
+            </div>
+
+            <div class="api-endpoints">
+                <h3>Available Endpoints</h3>
+                {% if docs.paths %}
+                <div class="endpoints-list">
+                    {% for path, methods in docs.paths.items() %}
+                    <div class="endpoint-item">
+                        <h4>{{ path }}</h4>
+                        <div class="methods">
+                            {% for method, details in methods.items() %}
+                            <div class="method {{ method.lower() }}">
+                                <span class="method-name">{{ method.upper() }}</span>
+                                <span class="method-summary">{{ details.summary or 'No description' }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No endpoints documented yet.</p>
+                {% endif %}
+            </div>
+
+            <div class="api-actions">
+                <a href="{{ url_for('api_docs.swagger_ui') }}" class="btn btn-primary">Interactive Docs (Swagger)</a>
+                <a href="{{ url_for('api_docs.api_test') }}" class="btn btn-secondary">API Testing Tool</a>
+                <a href="{{ url_for('api_docs.list_endpoints') }}" class="btn btn-secondary">List All Endpoints</a>
+            </div>
+        </div>
+        {% else %}
+        <p>API documentation not available.</p>
+        {% endif %}
+
+        <div class="navigation">
+            <a href="{{ url_for('developer.developer_home') }}" class="btn btn-primary">Developer Portal</a>
+        </div>
+    </div>
+</body>
+</html> 

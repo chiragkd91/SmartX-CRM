@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoring Automation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/modern-crm.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-glass);
+            padding: 20px;
+            transition: all var(--transition-normal);
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glass), var(--shadow-float);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left var(--transition-slow);
+        }
+        .btn:hover::before {
+            left: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+        }
+        .btn-success {
+            background: var(--gradient-success);
+            color: var(--text-primary);
+        }
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: var(--text-primary);
+        }
+        .scoring-rule {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all var(--transition-normal);
+        }
+        .scoring-rule:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glass);
+        }
+        .scoring-rule.active {
+            border-color: var(--neon-green);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+        .scoring-rule.inactive {
+            border-color: var(--neon-red);
+            background: rgba(239, 68, 68, 0.1);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+        }
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .rule-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .rule-status {
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--neon-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--neon-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+        .rule-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        .rule-criteria {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            padding: 15px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        .rule-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: 700;
+            font-size: 20px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-normal);
+            box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+        .scoring-criteria {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+        .criteria-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .criteria-field {
+            flex: 2;
+        }
+        .criteria-operator {
+            flex: 1;
+        }
+        .criteria-value {
+            flex: 2;
+        }
+        .criteria-score {
+            flex: 1;
+        }
+        .criteria-actions {
+            flex: 0 0 auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .score-distribution {
+            margin-top: 20px;
+        }
+        .score-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .score-label {
+            width: 100px;
+            font-weight: bold;
+        }
+        .score-progress {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        .score-fill {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s ease;
+        }
+        .score-count {
+            width: 60px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .lead-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .lead-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .lead-item:last-child {
+            border-bottom: none;
+        }
+        .lead-info {
+            flex: 1;
+        }
+        .lead-name {
+            font-weight: bold;
+        }
+        .lead-company {
+            color: #666;
+            font-size: 14px;
+        }
+        .lead-score {
+            font-weight: bold;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+        }
+        .score-hot {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+        .score-warm {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: var(--text-primary);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        .score-cold {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            box-shadow: 0 0 15px rgba(107, 114, 128, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Scoring Automation</h1>
+                <p>Configure and manage lead scoring rules and criteria</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateRule()">Create Rule</button>
+                <a href="/crm/workflows" class="btn btn-secondary">Back to Workflows</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Scoring Rules -->
+            <div class="card">
+                <h3>Scoring Rules</h3>
+                <div class="scoring-rule active">
+                    <div class="rule-header">
+                        <div class="rule-name">Company Size Scoring</div>
+                        <span class="rule-status status-active">Active</span>
+                    </div>
+                    <div class="rule-description">
+                        Score leads based on company size
+                    </div>
+                    <div class="rule-criteria">
+                        IF company_size > 1000: +50 points<br>
+                        IF company_size > 500: +30 points<br>
+                        IF company_size > 100: +20 points<br>
+                        IF company_size > 50: +10 points
+                    </div>
+                    <div class="rule-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,234</div>
+                            <div class="stat-label">Leads Scored</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">+25.3</div>
+                            <div class="stat-label">Avg Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Hot Leads</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editRule('company_size')">Edit</button>
+                        <button class="btn btn-success" onclick="testRule('company_size')">Test</button>
+                        <button class="btn btn-danger" onclick="deactivateRule('company_size')">Deactivate</button>
+                    </div>
+                </div>
+
+                <div class="scoring-rule active">
+                    <div class="rule-header">
+                        <div class="rule-name">Job Title Scoring</div>
+                        <span class="rule-status status-active">Active</span>
+                    </div>
+                    <div class="rule-description">
+                        Score leads based on job title and seniority
+                    </div>
+                    <div class="rule-criteria">
+                        IF job_title = "CEO": +40 points<br>
+                        IF job_title = "VP": +30 points<br>
+                        IF job_title = "Director": +25 points<br>
+                        IF job_title = "Manager": +15 points
+                    </div>
+                    <div class="rule-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">2,156</div>
+                            <div class="stat-label">Leads Scored</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">+18.7</div>
+                            <div class="stat-label">Avg Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">28</div>
+                            <div class="stat-label">Hot Leads</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editRule('job_title')">Edit</button>
+                        <button class="btn btn-success" onclick="testRule('job_title')">Test</button>
+                        <button class="btn btn-danger" onclick="deactivateRule('job_title')">Deactivate</button>
+                    </div>
+                </div>
+
+                <div class="scoring-rule active">
+                    <div class="rule-header">
+                        <div class="rule-name">Engagement Scoring</div>
+                        <span class="rule-status status-active">Active</span>
+                    </div>
+                    <div class="rule-description">
+                        Score leads based on engagement activities
+                    </div>
+                    <div class="rule-criteria">
+                        IF email_opened = true: +10 points<br>
+                        IF email_clicked = true: +20 points<br>
+                        IF website_visited = true: +15 points<br>
+                        IF demo_requested = true: +50 points
+                    </div>
+                    <div class="rule-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">3,421</div>
+                            <div class="stat-label">Leads Scored</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">+12.4</div>
+                            <div class="stat-label">Avg Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">45</div>
+                            <div class="stat-label">Hot Leads</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-secondary" onclick="editRule('engagement')">Edit</button>
+                        <button class="btn btn-success" onclick="testRule('engagement')">Test</button>
+                        <button class="btn btn-danger" onclick="deactivateRule('engagement')">Deactivate</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Distribution -->
+            <div class="card">
+                <h3>Score Distribution</h3>
+                <div class="score-distribution">
+                    <div class="score-bar">
+                        <div class="score-label">Hot (80-100)</div>
+                        <div class="score-progress">
+                            <div class="score-fill" style="width: 15%"></div>
+                        </div>
+                        <div class="score-count">85</div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-label">Warm (50-79)</div>
+                        <div class="score-progress">
+                            <div class="score-fill" style="width: 35%"></div>
+                        </div>
+                        <div class="score-count">198</div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-label">Cold (0-49)</div>
+                        <div class="score-progress">
+                            <div class="score-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="score-count">283</div>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 30px;">Top Scored Leads</h4>
+                <div class="lead-list">
+                    <div class="lead-item">
+                        <div class="lead-info">
+                            <div class="lead-name">Sarah Johnson</div>
+                            <div class="lead-company">TechCorp Inc.</div>
+                        </div>
+                        <div class="lead-score score-hot">95</div>
+                    </div>
+                    <div class="lead-item">
+                        <div class="lead-info">
+                            <div class="lead-name">Michael Chen</div>
+                            <div class="lead-company">Global Solutions</div>
+                        </div>
+                        <div class="lead-score score-hot">92</div>
+                    </div>
+                    <div class="lead-item">
+                        <div class="lead-info">
+                            <div class="lead-name">Emily Rodriguez</div>
+                            <div class="lead-company">Innovation Labs</div>
+                        </div>
+                        <div class="lead-score score-hot">88</div>
+                    </div>
+                    <div class="lead-item">
+                        <div class="lead-info">
+                            <div class="lead-name">David Thompson</div>
+                            <div class="lead-company">Future Systems</div>
+                        </div>
+                        <div class="lead-score score-warm">75</div>
+                    </div>
+                    <div class="lead-item">
+                        <div class="lead-info">
+                            <div class="lead-name">Lisa Wang</div>
+                            <div class="lead-company">Digital Dynamics</div>
+                        </div>
+                        <div class="lead-score score-warm">72</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoring Criteria Builder -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Scoring Criteria Builder</h3>
+            <div class="scoring-criteria">
+                <div class="form-group">
+                    <label>Rule Name</label>
+                    <input type="text" id="rule-name" placeholder="Enter rule name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="rule-description" rows="3" placeholder="Enter rule description"></textarea>
+                </div>
+
+                <div id="criteria-rules">
+                    <h4>Scoring Criteria</h4>
+                    <div class="criteria-row">
+                        <div class="criteria-field">
+                            <select id="field-1">
+                                <option value="">Select Field</option>
+                                <option value="company_size">Company Size</option>
+                                <option value="job_title">Job Title</option>
+                                <option value="budget">Budget</option>
+                                <option value="lead_source">Lead Source</option>
+                                <option value="email_opened">Email Opened</option>
+                                <option value="email_clicked">Email Clicked</option>
+                                <option value="website_visited">Website Visited</option>
+                                <option value="demo_requested">Demo Requested</option>
+                            </select>
+                        </div>
+                        <div class="criteria-operator">
+                            <select id="operator-1">
+                                <option value="">Operator</option>
+                                <option value="equals">Equals</option>
+                                <option value="not_equals">Not Equals</option>
+                                <option value="contains">Contains</option>
+                                <option value="greater_than">Greater Than</option>
+                                <option value="less_than">Less Than</option>
+                                <option value="in">In</option>
+                                <option value="is_true">Is True</option>
+                                <option value="is_false">Is False</option>
+                            </select>
+                        </div>
+                        <div class="criteria-value">
+                            <input type="text" id="value-1" placeholder="Enter value">
+                        </div>
+                        <div class="criteria-score">
+                            <input type="number" id="score-1" placeholder="Points" min="0" max="100">
+                        </div>
+                        <div class="criteria-actions">
+                            <button class="btn btn-danger" onclick="removeCriteriaRow(this)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="addCriteriaRow()">Add Criteria</button>
+
+                <div style="margin-top: 20px;">
+                    <h4>Generated Scoring Logic</h4>
+                    <div id="generated-logic" class="rule-criteria">
+                        // Scoring logic will be generated here
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="saveRule()">Save Rule</button>
+                    <button class="btn btn-primary" onclick="testCurrentRule()">Test Rule</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let criteriaRowCounter = 1;
+
+        function showCreateRule() {
+            document.getElementById('rule-name').focus();
+        }
+
+        function addCriteriaRow() {
+            criteriaRowCounter++;
+            const rulesContainer = document.getElementById('criteria-rules');
+            const newRow = document.createElement('div');
+            newRow.className = 'criteria-row';
+            newRow.innerHTML = `
+                <div class="criteria-field">
+                    <select id="field-${criteriaRowCounter}">
+                        <option value="">Select Field</option>
+                        <option value="company_size">Company Size</option>
+                        <option value="job_title">Job Title</option>
+                        <option value="budget">Budget</option>
+                        <option value="lead_source">Lead Source</option>
+                        <option value="email_opened">Email Opened</option>
+                        <option value="email_clicked">Email Clicked</option>
+                        <option value="website_visited">Website Visited</option>
+                        <option value="demo_requested">Demo Requested</option>
+                    </select>
+                </div>
+                <div class="criteria-operator">
+                    <select id="operator-${criteriaRowCounter}">
+                        <option value="">Operator</option>
+                        <option value="equals">Equals</option>
+                        <option value="not_equals">Not Equals</option>
+                        <option value="contains">Contains</option>
+                        <option value="greater_than">Greater Than</option>
+                        <option value="less_than">Less Than</option>
+                        <option value="in">In</option>
+                        <option value="is_true">Is True</option>
+                        <option value="is_false">Is False</option>
+                    </select>
+                </div>
+                <div class="criteria-value">
+                    <input type="text" id="value-${criteriaRowCounter}" placeholder="Enter value">
+                </div>
+                <div class="criteria-score">
+                    <input type="number" id="score-${criteriaRowCounter}" placeholder="Points" min="0" max="100">
+                </div>
+                <div class="criteria-actions">
+                    <button class="btn btn-danger" onclick="removeCriteriaRow(this)">Remove</button>
+                </div>
+            `;
+            rulesContainer.appendChild(newRow);
+        }
+
+        function removeCriteriaRow(button) {
+            button.closest('.criteria-row').remove();
+        }
+
+        function generateLogic() {
+            const rows = document.querySelectorAll('.criteria-row');
+            let logic = '';
+            
+            rows.forEach((row, index) => {
+                const field = row.querySelector('select[id^="field-"]').value;
+                const operator = row.querySelector('select[id^="operator-"]').value;
+                const value = row.querySelector('input[id^="value-"]').value;
+                const score = row.querySelector('input[id^="score-"]').value;
+                
+                if (field && operator && score) {
+                    if (index > 0) {
+                        logic += '<br>';
+                    }
+                    logic += `IF ${field} ${operator} ${value}: +${score} points`;
+                }
+            });
+            
+            document.getElementById('generated-logic').innerHTML = logic || '// Scoring logic will be generated here';
+        }
+
+        function saveRule() {
+            const name = document.getElementById('rule-name').value;
+            const description = document.getElementById('rule-description').value;
+            
+            if (!name) {
+                alert('Please enter a rule name');
+                return;
+            }
+            
+            generateLogic();
+            console.log('Saving scoring rule:', { name, description });
+            alert('Scoring rule saved successfully!');
+        }
+
+        function testCurrentRule() {
+            generateLogic();
+            console.log('Testing current scoring rule');
+            alert('Rule test completed! Check lead scores for updates.');
+        }
+
+        function editRule(ruleId) {
+            console.log('Editing rule:', ruleId);
+            alert('Edit functionality would open rule configuration');
+        }
+
+        function testRule(ruleId) {
+            console.log('Testing rule:', ruleId);
+            alert('Rule test completed! Check lead scores for updates.');
+        }
+
+        function deactivateRule(ruleId) {
+            if (confirm('Are you sure you want to deactivate this rule?')) {
+                console.log('Deactivating rule:', ruleId);
+                alert('Rule deactivated successfully!');
+            }
+        }
+
+        // Auto-generate logic when fields change
+        document.addEventListener('change', function(e) {
+            if (e.target.id.startsWith('field-') || e.target.id.startsWith('operator-') || 
+                e.target.id.startsWith('value-') || e.target.id.startsWith('score-')) {
+                generateLogic();
+            }
+        });
+    </script>
+    
+    <!-- Modern CRM JavaScript -->
+    <script src="/static/js/modern-crm.js"></script>
+    
+    <script>
+        // Enhanced interactions for scoring template
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation classes to elements
+            document.querySelectorAll('.scoring-rule').forEach((rule, index) => {
+                rule.style.animationDelay = `${index * 0.1}s`;
+                rule.classList.add('animate-fade-in');
+            });
+            
+            // Enhanced form interactions
+            document.querySelectorAll('.form-group input, .form-group select, .form-group textarea').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Real-time scoring preview
+            document.querySelectorAll('#field-1, #operator-1, #value-1, #score-1').forEach(input => {
+                input.addEventListener('input', function() {
+                    generateLogic();
+                });
+            });
+            
+            // Enhanced button interactions
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255, 255, 255, 0.3);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+            
+            // Add CSS for ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html> 

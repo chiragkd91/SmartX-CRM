@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup Management Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/modern-crm.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/mobile-responsive.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-database me-2"></i>Backup Management
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="{{ url_for('main.dashboard') }}">Main Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('backup.create_backup') }}">Create Backup</a>
+                    <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container-fluid mt-4">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card bg-gradient-primary text-white">
+                        <div class="card-body">
+                            <h2><i class="fas fa-shield-alt me-2"></i>Backup & Recovery Dashboard</h2>
+                            <p class="mb-0">Monitor backup status, schedules, and manage data recovery</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup Status Overview -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Total Backups</h6>
+                                    <h3 class="mb-0">156</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-database text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success"><i class="fas fa-check-circle"></i> All Successful</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Last Backup</h6>
+                                    <h3 class="mb-0">2 hours ago</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock text-success"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success"><i class="fas fa-arrow-up"></i> On Schedule</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Storage Used</h6>
+                                    <h3 class="mb-0">45.2 GB</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-hdd text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-info">67% of 68 GB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-muted">Recovery Points</h6>
+                                    <h3 class="mb-0">30 days</h3>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-undo text-info"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-success">Available</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Sections -->
+            <div class="row">
+                <!-- Backup Schedule & Status -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-calendar-alt me-2"></i>Backup Schedule & Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Backup Type</th>
+                                            <th>Schedule</th>
+                                            <th>Last Run</th>
+                                            <th>Status</th>
+                                            <th>Size</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-database text-primary me-2"></i>
+                                                Full Database
+                                            </td>
+                                            <td>Daily at 2:00 AM</td>
+                                            <td>Today 2:00 AM</td>
+                                            <td><span class="badge bg-success">Completed</span></td>
+                                            <td>2.3 GB</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                <button class="btn btn-sm btn-outline-success">Restore</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-file-alt text-info me-2"></i>
+                                                File System
+                                            </td>
+                                            <td>Every 6 hours</td>
+                                            <td>2 hours ago</td>
+                                            <td><span class="badge bg-success">Completed</span></td>
+                                            <td>15.7 GB</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                <button class="btn btn-sm btn-outline-success">Restore</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-code text-warning me-2"></i>
+                                                Application Files
+                                            </td>
+                                            <td>Weekly</td>
+                                            <td>3 days ago</td>
+                                            <td><span class="badge bg-success">Completed</span></td>
+                                            <td>8.9 GB</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                <button class="btn btn-sm btn-outline-success">Restore</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-users text-danger me-2"></i>
+                                                User Data
+                                            </td>
+                                            <td>Every 12 hours</td>
+                                            <td>6 hours ago</td>
+                                            <td><span class="badge bg-success">Completed</span></td>
+                                            <td>18.3 GB</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">Download</button>
+                                                <button class="btn btn-sm btn-outline-success">Restore</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('backup.create_backup') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Create Manual Backup
+                                </a>
+                                <button class="btn btn-success">
+                                    <i class="fas fa-download me-2"></i>Download Latest Backup
+                                </button>
+                                <button class="btn btn-warning">
+                                    <i class="fas fa-undo me-2"></i>Restore from Backup
+                                </button>
+                                <button class="btn btn-info">
+                                    <i class="fas fa-cog me-2"></i>Configure Schedule
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-chart-line me-2"></i>Backup Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Storage Usage -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-hdd me-2"></i>Storage Usage</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="storage-item">
+                                <div class="d-flex justify-content-between">
+                                    <span>Database Backups</span>
+                                    <span>2.3 GB</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-primary" style="width: 15%"></div>
+                                </div>
+                            </div>
+                            <div class="storage-item mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>File System</span>
+                                    <span>15.7 GB</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-success" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="storage-item mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Application Files</span>
+                                    <span>8.9 GB</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-warning" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            <div class="storage-item mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>User Data</span>
+                                    <span>18.3 GB</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-danger" style="width: 55%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Backup Activity -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-history me-2"></i>Recent Backup Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-timeline">
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-success">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>Full Database Backup Completed</h6>
+                                        <p>Database backup completed successfully at 2:00 AM</p>
+                                        <small class="text-muted">2 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-info">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>File System Backup</h6>
+                                        <p>File system backup completed - 15.7 GB stored</p>
+                                        <small class="text-muted">6 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-warning">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>User Data Backup</h6>
+                                        <p>User data backup completed - 18.3 GB stored</p>
+                                        <small class="text-muted">12 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-primary">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>Backup Downloaded</h6>
+                                        <p>Latest database backup downloaded by admin</p>
+                                        <small class="text-muted">1 day ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/modern-crm.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/touch-interface.js') }}"></script>
+</body>
+</html> 

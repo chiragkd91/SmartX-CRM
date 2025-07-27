@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portal - CRM System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-crm.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Developer Portal</h1>
+        
+        <div class="portal-sections">
+            <div class="section-card">
+                <h2>Documentation</h2>
+                <p>Comprehensive API documentation and guides</p>
+                <a href="{{ url_for('developer.documentation') }}" class="btn btn-primary">View Docs</a>
+            </div>
+
+            <div class="section-card">
+                <h2>Code Examples</h2>
+                <p>Sample code and integration examples</p>
+                <a href="{{ url_for('developer.code_examples') }}" class="btn btn-primary">View Examples</a>
+            </div>
+
+            <div class="section-card">
+                <h2>API Reference</h2>
+                <p>Complete API endpoint reference</p>
+                <a href="{{ url_for('developer.api_reference') }}" class="btn btn-primary">API Reference</a>
+            </div>
+
+            <div class="section-card">
+                <h2>SDK</h2>
+                <p>Download and documentation for SDK</p>
+                <a href="{{ url_for('developer.sdk_documentation') }}" class="btn btn-primary">SDK Docs</a>
+            </div>
+
+            <div class="section-card">
+                <h2>Tutorials</h2>
+                <p>Step-by-step tutorials and guides</p>
+                <a href="{{ url_for('developer.tutorials') }}" class="btn btn-primary">View Tutorials</a>
+            </div>
+
+            <div class="section-card">
+                <h2>Resources</h2>
+                <p>Additional developer resources</p>
+                <a href="{{ url_for('developer.developer_resources') }}" class="btn btn-primary">Resources</a>
+            </div>
+        </div>
+
+        {% if portal_data %}
+        <div class="quick-stats">
+            <h3>Portal Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">{{ portal_data.documentation|length }}</span>
+                    <span class="stat-label">Documentation Pages</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ portal_data.tutorials|length }}</span>
+                    <span class="stat-label">Tutorials</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ portal_data.resources|length }}</span>
+                    <span class="stat-label">Resources</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="actions">
+            <a href="{{ url_for('developer.developer_dashboard') }}" class="btn btn-secondary">Developer Dashboard</a>
+        </div>
+    </div>
+</body>
+</html> 

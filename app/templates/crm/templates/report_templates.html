@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Templates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .report-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .report-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .report-item.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .report-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .report-category {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .report-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .report-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .report-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .section-builder {
+            margin-top: 20px;
+        }
+        .section-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+        }
+        .section-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .section-content {
+            color: #666;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .preview-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .preview-section {
+            margin-bottom: 25px;
+        }
+        .preview-section h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .preview-section p {
+            line-height: 1.6;
+            color: #333;
+        }
+        .chart-container {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+        .chart-placeholder {
+            color: #666;
+            text-align: center;
+        }
+        .data-source {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .data-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .data-field:last-child {
+            border-bottom: none;
+        }
+        .field-name {
+            font-weight: bold;
+        }
+        .field-type {
+            color: #666;
+            font-size: 12px;
+        }
+        .chart-library {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .chart-category {
+            margin-bottom: 15px;
+        }
+        .chart-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .chart-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .chart-option:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .chart-option-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .chart-option-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Report Templates</h1>
+                <p>Create and manage automated report templates</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateReport()">Create Template</button>
+                <a href="/crm/templates" class="btn btn-secondary">Back to Templates</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Report Library -->
+            <div class="card">
+                <h3>Report Library</h3>
+                <div class="report-item" onclick="selectReport('sales_dashboard')">
+                    <div class="report-header">
+                        <div class="report-name">Sales Dashboard</div>
+                        <span class="report-category">Sales</span>
+                    </div>
+                    <div class="report-description">
+                        Comprehensive sales performance dashboard with KPIs and trends
+                    </div>
+                    <div class="report-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">234</div>
+                            <div class="stat-label">Generated</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Charts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">Daily</div>
+                            <div class="stat-label">Schedule</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-item" onclick="selectReport('lead_analytics')">
+                    <div class="report-header">
+                        <div class="report-name">Lead Analytics</div>
+                        <span class="report-category">Marketing</span>
+                    </div>
+                    <div class="report-description">
+                        Lead generation and conversion analysis report
+                    </div>
+                    <div class="report-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Generated</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Charts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">Weekly</div>
+                            <div class="stat-label">Schedule</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-item" onclick="selectReport('financial_summary')">
+                    <div class="report-header">
+                        <div class="report-name">Financial Summary</div>
+                        <span class="report-category">Finance</span>
+                    </div>
+                    <div class="report-description">
+                        Monthly financial performance and revenue analysis
+                    </div>
+                    <div class="report-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Generated</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">10</div>
+                            <div class="stat-label">Charts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">Monthly</div>
+                            <div class="stat-label">Schedule</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-item" onclick="selectReport('customer_insights')">
+                    <div class="report-header">
+                        <div class="report-name">Customer Insights</div>
+                        <span class="report-category">Customer</span>
+                    </div>
+                    <div class="report-description">
+                        Customer behavior and satisfaction analysis report
+                    </div>
+                    <div class="report-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">123</div>
+                            <div class="stat-label">Generated</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">7</div>
+                            <div class="stat-label">Charts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">Bi-weekly</div>
+                            <div class="stat-label">Schedule</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Builder -->
+            <div class="card">
+                <h3>Report Builder</h3>
+                <div class="report-builder">
+                    <div class="form-group">
+                        <label>Report Name</label>
+                        <input type="text" id="report-name" placeholder="Enter report name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Report Type</label>
+                        <select id="report-type">
+                            <option value="">Select report type</option>
+                            <option value="sales">Sales Report</option>
+                            <option value="marketing">Marketing Report</option>
+                            <option value="finance">Financial Report</option>
+                            <option value="customer">Customer Report</option>
+                            <option value="operational">Operational Report</option>
+                            <option value="custom">Custom Report</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="report-description" rows="3" placeholder="Enter report description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Schedule</label>
+                        <select id="report-schedule">
+                            <option value="">Select schedule</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="section-builder">
+                        <h4>Report Sections</h4>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Executive Summary</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('executive_summary')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('executive_summary')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                High-level overview of key metrics and insights
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Key Performance Indicators</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('kpis')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('kpis')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Critical metrics and performance indicators
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Trend Analysis</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('trends')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('trends')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Historical trends and pattern analysis
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Recommendations</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('recommendations')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('recommendations')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Actionable insights and recommendations
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="addSection()">Add Section</button>
+                        <button class="btn btn-success" onclick="saveReport()">Save Report</button>
+                        <button class="btn btn-primary" onclick="previewReport()">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Library -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Chart Library</h3>
+            <div class="chart-library">
+                <div class="chart-category">
+                    <h4>Basic Charts</h4>
+                    <div class="chart-option" onclick="addChart('bar')">
+                        <div class="chart-option-title">Bar Chart</div>
+                        <div class="chart-option-desc">Compare values across categories</div>
+                    </div>
+                    <div class="chart-option" onclick="addChart('line')">
+                        <div class="chart-option-title">Line Chart</div>
+                        <div class="chart-option-desc">Show trends over time</div>
+                    </div>
+                    <div class="chart-option" onclick="addChart('pie')">
+                        <div class="chart-option-title">Pie Chart</div>
+                        <div class="chart-option-desc">Show proportions and percentages</div>
+                    </div>
+                </div>
+
+                <div class="chart-category">
+                    <h4>Advanced Charts</h4>
+                    <div class="chart-option" onclick="addChart('scatter')">
+                        <div class="chart-option-title">Scatter Plot</div>
+                        <div class="chart-option-desc">Show correlation between variables</div>
+                    </div>
+                    <div class="chart-option" onclick="addChart('heatmap')">
+                        <div class="chart-option-title">Heatmap</div>
+                        <div class="chart-option-desc">Visualize data density and patterns</div>
+                    </div>
+                    <div class="chart-option" onclick="addChart('funnel')">
+                        <div class="chart-option-title">Funnel Chart</div>
+                        <div class="chart-option-desc">Show conversion process</div>
+                    </div>
+                </div>
+
+                <div class="chart-category">
+                    <h4>Data Tables</h4>
+                    <div class="chart-option" onclick="addChart('table')">
+                        <div class="chart-option-title">Data Table</div>
+                        <div class="chart-option-desc">Display detailed data in tabular format</div>
+                    </div>
+                    <div class="chart-option" onclick="addChart('pivot')">
+                        <div class="chart-option-title">Pivot Table</div>
+                        <div class="chart-option-desc">Summarize and analyze data</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Data Sources</h3>
+            <div class="data-source">
+                <h4>Available Data Fields</h4>
+                <div class="data-field">
+                    <div>
+                        <div class="field-name">Lead Count</div>
+                        <div class="field-type">Number</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addDataSource('lead_count')">Add</button>
+                </div>
+                <div class="data-field">
+                    <div>
+                        <div class="field-name">Conversion Rate</div>
+                        <div class="field-type">Percentage</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addDataSource('conversion_rate')">Add</button>
+                </div>
+                <div class="data-field">
+                    <div>
+                        <div class="field-name">Revenue</div>
+                        <div class="field-type">Currency</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addDataSource('revenue')">Add</button>
+                </div>
+                <div class="data-field">
+                    <div>
+                        <div class="field-name">Sales Cycle</div>
+                        <div class="field-type">Duration</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addDataSource('sales_cycle')">Add</button>
+                </div>
+                <div class="data-field">
+                    <div>
+                        <div class="field-name">Customer Satisfaction</div>
+                        <div class="field-type">Score</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addDataSource('customer_satisfaction')">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Preview -->
+        <div id="report-preview" class="card hidden" style="margin-top: 20px;">
+            <h3>Report Preview</h3>
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h1>Sales Performance Report</h1>
+                    <p>Generated on: January 15, 2024</p>
+                    <p>Report Period: January 1 - January 15, 2024</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Executive Summary</h3>
+                    <p>This report provides a comprehensive overview of sales performance for the first half of January 2024. Key highlights include strong lead generation, improved conversion rates, and positive revenue growth compared to the previous period.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Key Performance Indicators</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">1,247</div>
+                            <div class="metric-label">Total Leads</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">23.5%</div>
+                            <div class="metric-label">Conversion Rate</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">$45,230</div>
+                            <div class="metric-label">Revenue</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">18.7</div>
+                            <div class="metric-label">Avg Deal Size</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Sales Trend Analysis</h3>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            <h4>Sales Trend Chart</h4>
+                            <p>Line chart showing daily sales performance over time</p>
+                            <p>📈 Interactive chart would be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Lead Source Distribution</h3>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            <h4>Lead Source Chart</h4>
+                            <p>Pie chart showing lead distribution by source</p>
+                            <p>🥧 Interactive chart would be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Recommendations</h3>
+                    <ul>
+                        <li>Focus on high-converting lead sources to maximize ROI</li>
+                        <li>Implement additional follow-up sequences for warm leads</li>
+                        <li>Consider expanding sales team to handle increased lead volume</li>
+                        <li>Optimize sales process to reduce average deal cycle time</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedReport = null;
+
+        function showCreateReport() {
+            document.getElementById('report-name').focus();
+        }
+
+        function selectReport(reportId) {
+            selectedReport = reportId;
+            
+            // Remove previous selection
+            document.querySelectorAll('.report-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('selected');
+            
+            console.log('Selected report:', reportId);
+        }
+
+        function addSection() {
+            const sectionName = prompt('Enter section name:');
+            if (sectionName) {
+                console.log('Adding section:', sectionName);
+                alert('Section added successfully!');
+            }
+        }
+
+        function addChart(chartType) {
+            console.log('Adding chart:', chartType);
+            alert('Chart added successfully!');
+        }
+
+        function addDataSource(dataField) {
+            console.log('Adding data source:', dataField);
+            alert('Data source added successfully!');
+        }
+
+        function editSection(sectionId) {
+            console.log('Editing section:', sectionId);
+            alert('Edit functionality would open section editor');
+        }
+
+        function removeSection(sectionId) {
+            if (confirm('Are you sure you want to remove this section?')) {
+                console.log('Removing section:', sectionId);
+                alert('Section removed successfully!');
+            }
+        }
+
+        function saveReport() {
+            const name = document.getElementById('report-name').value;
+            const type = document.getElementById('report-type').value;
+            const description = document.getElementById('report-description').value;
+            const schedule = document.getElementById('report-schedule').value;
+            
+            if (!name || !type) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Saving report:', { name, type, description, schedule });
+            alert('Report saved successfully!');
+        }
+
+        function previewReport() {
+            document.getElementById('report-preview').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html> 

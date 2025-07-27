@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting Integration - CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .integration-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-connected {
+            background: #28a745;
+        }
+        .status-disconnected {
+            background: #dc3545;
+        }
+        .sync-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .sync-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Accounting Integration</h1>
+                <p>Connect with your accounting software for seamless financial data sync</p>
+            </div>
+            <div>
+                <a href="/crm/integrations" class="btn btn-primary">Back to Integrations</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="integration-card">
+            <h2>Accounting Software Configuration</h2>
+            <form method="POST" action="/crm/integrations/accounting">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="accounting_provider">Accounting Software</label>
+                        <select id="accounting_provider" name="accounting_provider" required>
+                            <option value="">Select Software</option>
+                            <option value="quickbooks" {% if config.accounting_provider == 'quickbooks' %}selected{% endif %}>QuickBooks Online</option>
+                            <option value="xero" {% if config.accounting_provider == 'xero' %}selected{% endif %}>Xero</option>
+                            <option value="freshbooks" {% if config.accounting_provider == 'freshbooks' %}selected{% endif %}>FreshBooks</option>
+                            <option value="sage" {% if config.accounting_provider == 'sage' %}selected{% endif %}>Sage</option>
+                            <option value="wave" {% if config.accounting_provider == 'wave' %}selected{% endif %}>Wave</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="connection_status">Connection Status</label>
+                        <div>
+                            <span class="status-indicator {% if config.connected %}status-connected{% else %}status-disconnected{% endif %}"></span>
+                            {% if config.connected %}Connected{% else %}Disconnected{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="client_id">Client ID / App ID</label>
+                        <input type="text" id="client_id" name="client_id" value="{{ config.client_id or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="client_secret">Client Secret</label>
+                        <input type="password" id="client_secret" name="client_secret" value="{{ config.client_secret or '' }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company_id">Company ID</label>
+                        <input type="text" id="company_id" name="company_id" value="{{ config.company_id or '' }}" placeholder="Optional for some providers">
+                    </div>
+                    <div class="form-group">
+                        <label for="environment">Environment</label>
+                        <select id="environment" name="environment">
+                            <option value="sandbox" {% if config.environment == 'sandbox' %}selected{% endif %}>Sandbox/Test</option>
+                            <option value="production" {% if config.environment == 'production' %}selected{% endif %}>Production</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Configuration</button>
+                    <button type="button" class="btn btn-warning" onclick="testConnection()">Test Connection</button>
+                    <button type="button" class="btn btn-danger" onclick="disconnectAccounting()">Disconnect</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="integration-card">
+            <h2>Data Sync Settings</h2>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="sync_customers" {% if config.sync_customers %}checked{% endif %}>
+                    Sync customers/contacts from accounting to CRM
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="sync_invoices" {% if config.sync_invoices %}checked{% endif %}>
+                    Sync invoices and payments
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="sync_products" {% if config.sync_products %}checked{% endif %}>
+                    Sync products/services
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="create_opportunities" {% if config.create_opportunities %}checked{% endif %}>
+                    Create opportunities from unpaid invoices
+                </label>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sync_interval">Sync Interval</label>
+                    <select id="sync_interval" name="sync_interval">
+                        <option value="hourly" {% if config.sync_interval == 'hourly' %}selected{% endif %}>Hourly</option>
+                        <option value="daily" {% if config.sync_interval == 'daily' %}selected{% endif %}>Daily</option>
+                        <option value="weekly" {% if config.sync_interval == 'weekly' %}selected{% endif %}>Weekly</option>
+                        <option value="manual" {% if config.sync_interval == 'manual' %}selected{% endif %}>Manual Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sync_direction">Sync Direction</label>
+                    <select id="sync_direction" name="sync_direction">
+                        <option value="bidirectional" {% if config.sync_direction == 'bidirectional' %}selected{% endif %}>Bidirectional</option>
+                        <option value="accounting_to_crm" {% if config.sync_direction == 'accounting_to_crm' %}selected{% endif %}>Accounting → CRM</option>
+                        <option value="crm_to_accounting" {% if config.sync_direction == 'crm_to_accounting' %}selected{% endif %}>CRM → Accounting</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveSyncSettings()">Save Sync Settings</button>
+                <button type="button" class="btn btn-warning" onclick="manualSync()">Manual Sync Now</button>
+            </div>
+        </div>
+
+        <div class="integration-card">
+            <h2>Field Mapping</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customer_name_field">Customer Name Field</label>
+                    <select id="customer_name_field" name="customer_name_field">
+                        <option value="company_name" {% if config.customer_name_field == 'company_name' %}selected{% endif %}>Company Name</option>
+                        <option value="contact_name" {% if config.customer_name_field == 'contact_name' %}selected{% endif %}>Contact Name</option>
+                        <option value="display_name" {% if config.customer_name_field == 'display_name' %}selected{% endif %}>Display Name</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="email_field">Email Field</label>
+                    <select id="email_field" name="email_field">
+                        <option value="primary_email" {% if config.email_field == 'primary_email' %}selected{% endif %}>Primary Email</option>
+                        <option value="billing_email" {% if config.email_field == 'billing_email' %}selected{% endif %}>Billing Email</option>
+                        <option value="contact_email" {% if config.email_field == 'contact_email' %}selected{% endif %}>Contact Email</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-success" onclick="saveFieldMapping()">Save Field Mapping</button>
+            </div>
+        </div>
+
+        <div class="sync-summary">
+            <h3>Sync Summary</h3>
+            <div class="sync-stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ sync_stats.customers_synced or 0 }}</div>
+                    <div class="stat-label">Customers Synced</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ sync_stats.invoices_synced or 0 }}</div>
+                    <div class="stat-label">Invoices Synced</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ sync_stats.opportunities_created or 0 }}</div>
+                    <div class="stat-label">Opportunities Created</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ sync_stats.last_sync or 'Never' }}</div>
+                    <div class="stat-label">Last Sync</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-warning" onclick="viewSyncLog()">View Sync Log</button>
+                <button type="button" class="btn btn-primary" onclick="exportSyncData()">Export Sync Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testConnection() {
+            // Simulate connection test
+            alert('Testing accounting connection...');
+        }
+
+        function disconnectAccounting() {
+            if (confirm('Are you sure you want to disconnect the accounting integration?')) {
+                // Handle disconnect
+                alert('Accounting integration disconnected');
+            }
+        }
+
+        function saveSyncSettings() {
+            // Handle sync settings saving
+            alert('Sync settings saved successfully');
+        }
+
+        function saveFieldMapping() {
+            // Handle field mapping saving
+            alert('Field mapping saved successfully');
+        }
+
+        function manualSync() {
+            // Simulate manual sync
+            alert('Starting manual accounting sync...');
+            setTimeout(() => {
+                alert('Accounting sync completed successfully');
+            }, 2000);
+        }
+
+        function viewSyncLog() {
+            // Handle viewing sync log
+            alert('Opening sync log...');
+        }
+
+        function exportSyncData() {
+            // Handle exporting sync data
+            alert('Exporting sync data...');
+        }
+    </script>
+</body>
+</html> 

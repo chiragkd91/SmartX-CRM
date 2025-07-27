@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Analytics - CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1em;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .forecast-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .forecast-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .forecast-description {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .forecast-metrics {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .accuracy-score {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+        .predictions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .predictions-table th,
+        .predictions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .predictions-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .insight-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .insight-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .insight-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Predictive Analytics</h1>
+            <div>
+                <a href="/crm/ai/dashboard" class="btn btn-primary">AI Dashboard</a>
+                <a href="/crm/ai/predictive_analytics/export" class="btn btn-success">Export Report</a>
+                <a href="/crm/ai/predictive_analytics/refresh" class="btn btn-warning">Refresh Models</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_models }}</div>
+                <div class="metric-label">Active Models</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.avg_accuracy) }}%</div>
+                <div class="metric-label">Average Accuracy</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.predictions_made }}</div>
+                <div class="metric-label">Predictions Made</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.forecast_confidence) }}%</div>
+                <div class="metric-label">Forecast Confidence</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/crm/ai/predictive_analytics">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="model_type">Model Type:</label>
+                        <select id="model_type" name="model_type">
+                            <option value="">All Models</option>
+                            <option value="revenue" {% if request.args.get('model_type') == 'revenue' %}selected{% endif %}>Revenue Forecasting</option>
+                            <option value="demand" {% if request.args.get('model_type') == 'demand' %}selected{% endif %}>Demand Prediction</option>
+                            <option value="churn" {% if request.args.get('model_type') == 'churn' %}selected{% endif %}>Churn Prediction</option>
+                            <option value="conversion" {% if request.args.get('model_type') == 'conversion' %}selected{% endif %}>Conversion Prediction</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="timeframe">Forecast Timeframe:</label>
+                        <select id="timeframe" name="timeframe">
+                            <option value="">All Timeframes</option>
+                            <option value="1m" {% if request.args.get('timeframe') == '1m' %}selected{% endif %}>1 Month</option>
+                            <option value="3m" {% if request.args.get('timeframe') == '3m' %}selected{% endif %}>3 Months</option>
+                            <option value="6m" {% if request.args.get('timeframe') == '6m' %}selected{% endif %}>6 Months</option>
+                            <option value="1y" {% if request.args.get('timeframe') == '1y' %}selected{% endif %}>1 Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="confidence_level">Confidence Level:</label>
+                        <select id="confidence_level" name="confidence_level">
+                            <option value="">All Levels</option>
+                            <option value="high" {% if request.args.get('confidence_level') == 'high' %}selected{% endif %}>High (90%+)</option>
+                            <option value="medium" {% if request.args.get('confidence_level') == 'medium' %}selected{% endif %}>Medium (70-89%)</option>
+                            <option value="low" {% if request.args.get('confidence_level') == 'low' %}selected{% endif %}>Low (<70%)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/ai/predictive_analytics" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Revenue Forecast</h3>
+                <canvas id="revenueForecastChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Model Performance</h3>
+                <div style="margin-bottom: 20px;">
+                    <h4>Model Metrics</h4>
+                    <p><strong>Last Updated:</strong> {{ model_info.last_updated }}</p>
+                    <p><strong>Training Data:</strong> {{ model_info.training_samples }} samples</p>
+                    <p><strong>MAPE:</strong> {{ "%.2f"|format(model_info.mape) }}%</p>
+                    <p><strong>RMSE:</strong> {{ "%.2f"|format(model_info.rmse) }}</p>
+                    <p><strong>R² Score:</strong> {{ "%.2f"|format(model_info.r2_score) }}</p>
+                </div>
+                <div>
+                    <h4>Key Insights</h4>
+                    {% for insight in key_insights %}
+                    <div class="insight-item">
+                        <div class="insight-title">{{ insight.title }}</div>
+                        <div class="insight-description">{{ insight.description }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="card-title">Multi-Model Forecast Comparison</h3>
+            <canvas id="forecastComparisonChart" width="800" height="400"></canvas>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Active Forecasting Models</h3>
+                {% for model in active_models %}
+                <div class="forecast-item">
+                    <div class="forecast-title">
+                        <span>{{ model.name }}</span>
+                        <span class="accuracy-score">{{ "%.1f"|format(model.accuracy) }}% accuracy</span>
+                    </div>
+                    <div class="forecast-description">{{ model.description }}</div>
+                    <div class="forecast-metrics">
+                        <span>Type: {{ model.type }}</span>
+                        <span>Last Trained: {{ model.last_trained }}</span>
+                        <span>Predictions: {{ model.predictions_count }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Forecast Accuracy by Model</h3>
+                <canvas id="modelAccuracyChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Recent Predictions</h3>
+            <table class="predictions-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Prediction Type</th>
+                        <th>Target</th>
+                        <th>Predicted Value</th>
+                        <th>Confidence</th>
+                        <th>Actual Value</th>
+                        <th>Accuracy</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prediction in recent_predictions %}
+                    <tr>
+                        <td>{{ prediction.model_name }}</td>
+                        <td>{{ prediction.type }}</td>
+                        <td>{{ prediction.target }}</td>
+                        <td>{{ prediction.predicted_value }}</td>
+                        <td>{{ "%.1f"|format(prediction.confidence) }}%</td>
+                        <td>{{ prediction.actual_value or 'Pending' }}</td>
+                        <td>{{ "%.1f"|format(prediction.accuracy) }}%</td>
+                        <td>{{ prediction.date }}</td>
+                        <td>
+                            <a href="/crm/predictions/{{ prediction.id }}" class="btn btn-primary btn-sm">View</a>
+                            <a href="/crm/predictions/{{ prediction.id }}/update" class="btn btn-warning btn-sm">Update</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Revenue Forecast Chart
+        const revenueForecastCtx = document.getElementById('revenueForecastChart').getContext('2d');
+        new Chart(revenueForecastCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Historical Revenue',
+                    data: [150000, 160000, 155000, 170000, 165000, 180000, null, null, null, null, null, null],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                }, {
+                    label: 'Forecasted Revenue',
+                    data: [null, null, null, null, null, null, 185000, 190000, 195000, 200000, 205000, 210000],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Forecast Comparison Chart
+        const forecastComparisonCtx = document.getElementById('forecastComparisonChart').getContext('2d');
+        new Chart(forecastComparisonCtx, {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Revenue Model',
+                    data: [450000, 520000, 580000, 630000],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                }, {
+                    label: 'Demand Model',
+                    data: [120, 135, 150, 165],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    yAxisID: 'y1'
+                }, {
+                    label: 'Churn Model',
+                    data: [5.2, 4.8, 4.5, 4.2],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    yAxisID: 'y2'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000) + 'k';
+                            }
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' units';
+                            }
+                        }
+                    },
+                    y2: {
+                        beginAtZero: true,
+                        position: 'right',
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Model Accuracy Chart
+        const modelAccuracyCtx = document.getElementById('modelAccuracyChart').getContext('2d');
+        new Chart(modelAccuracyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Revenue', 'Demand', 'Churn', 'Conversion'],
+                datasets: [{
+                    label: 'Accuracy',
+                    data: [92.5, 88.3, 85.7, 90.1],
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#dc3545',
+                        '#ffc107'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

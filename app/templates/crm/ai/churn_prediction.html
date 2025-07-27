@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Churn Prediction - CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1em;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .risk-level {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        .customers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .customers-table th,
+        .customers-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .customers-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .retention-strategies {
+            margin-top: 20px;
+        }
+        .strategy-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .strategy-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .strategy-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Churn Prediction</h1>
+            <div>
+                <a href="/crm/ai/dashboard" class="btn btn-primary">AI Dashboard</a>
+                <a href="/crm/ai/churn_prediction/export" class="btn btn-success">Export Report</a>
+                <a href="/crm/ai/churn_prediction/retrain" class="btn btn-warning">Retrain Model</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_customers }}</div>
+                <div class="metric-label">Total Customers</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.high_risk_customers }}</div>
+                <div class="metric-label">High Risk Customers</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.churn_rate) }}%</div>
+                <div class="metric-label">Predicted Churn Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.model_accuracy) }}%</div>
+                <div class="metric-label">Model Accuracy</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/crm/ai/churn_prediction">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="risk_level">Risk Level:</label>
+                        <select id="risk_level" name="risk_level">
+                            <option value="">All Risk Levels</option>
+                            <option value="high" {% if request.args.get('risk_level') == 'high' %}selected{% endif %}>High Risk</option>
+                            <option value="medium" {% if request.args.get('risk_level') == 'medium' %}selected{% endif %}>Medium Risk</option>
+                            <option value="low" {% if request.args.get('risk_level') == 'low' %}selected{% endif %}>Low Risk</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="customer_type">Customer Type:</label>
+                        <select id="customer_type" name="customer_type">
+                            <option value="">All Types</option>
+                            {% for type in customer_types %}
+                            <option value="{{ type }}" {% if request.args.get('customer_type') == type %}selected{% endif %}>{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="region">Region:</label>
+                        <select id="region" name="region">
+                            <option value="">All Regions</option>
+                            {% for region in regions %}
+                            <option value="{{ region }}" {% if request.args.get('region') == region %}selected{% endif %}>{{ region }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/ai/churn_prediction" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Churn Risk Distribution</h3>
+                <canvas id="churnRiskChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Model Performance</h3>
+                <div style="margin-bottom: 20px;">
+                    <h4>Prediction Metrics</h4>
+                    <p><strong>Last Updated:</strong> {{ model_info.last_updated }}</p>
+                    <p><strong>Training Data:</strong> {{ model_info.training_samples }} samples</p>
+                    <p><strong>Precision:</strong> {{ "%.2f"|format(model_info.precision) }}</p>
+                    <p><strong>Recall:</strong> {{ "%.2f"|format(model_info.recall) }}</p>
+                    <p><strong>F1 Score:</strong> {{ "%.2f"|format(model_info.f1_score) }}</p>
+                </div>
+                <div class="retention-strategies">
+                    <h4>Retention Strategies</h4>
+                    {% for strategy in retention_strategies %}
+                    <div class="strategy-item">
+                        <div class="strategy-title">{{ strategy.title }}</div>
+                        <div class="strategy-description">{{ strategy.description }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="card-title">Churn Prediction Trends</h3>
+            <canvas id="churnTrendChart" width="800" height="400"></canvas>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">High Risk Customers</h3>
+            <table class="customers-table">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Account</th>
+                        <th>Risk Level</th>
+                        <th>Churn Probability</th>
+                        <th>Last Activity</th>
+                        <th>Revenue</th>
+                        <th>Key Risk Factors</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in high_risk_customers %}
+                    <tr>
+                        <td>{{ customer.name }}</td>
+                        <td>{{ customer.account_name }}</td>
+                        <td>
+                            {% if customer.risk_level == 'high' %}
+                                <span class="risk-level risk-high">High</span>
+                            {% elif customer.risk_level == 'medium' %}
+                                <span class="risk-level risk-medium">Medium</span>
+                            {% else %}
+                                <span class="risk-level risk-low">Low</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ "%.1f"|format(customer.churn_probability) }}%</td>
+                        <td>{{ customer.last_activity }}</td>
+                        <td>${{ "{:,.0f}".format(customer.revenue) }}</td>
+                        <td>{{ customer.risk_factors }}</td>
+                        <td>
+                            <a href="/crm/accounts/{{ customer.account_id }}" class="btn btn-primary">View</a>
+                            <a href="/crm/accounts/{{ customer.account_id }}/retention" class="btn btn-warning">Retention Plan</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Churn Risk Distribution Chart
+        const churnRiskCtx = document.getElementById('churnRiskChart').getContext('2d');
+        new Chart(churnRiskCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                datasets: [{
+                    data: [15, 25, 60],
+                    backgroundColor: [
+                        '#dc3545',
+                        '#ffc107',
+                        '#28a745'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Churn Trend Chart
+        const churnTrendCtx = document.getElementById('churnTrendChart').getContext('2d');
+        new Chart(churnTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Churn Rate',
+                    data: [5.2, 4.8, 4.5, 4.2, 3.9, 3.6],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Predicted Churn Rate',
+                    data: [5.0, 4.6, 4.3, 4.0, 3.7, 3.4],
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Performance Report - CRM</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 1em;
+        }
+        .metric-change {
+            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .performance-table th,
+        .performance-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .performance-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .rank-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .rank-1 {
+            background: #ffd700;
+            color: #000;
+        }
+        .rank-2 {
+            background: #c0c0c0;
+            color: #000;
+        }
+        .rank-3 {
+            background: #cd7f32;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sales Performance Report</h1>
+            <div>
+                <a href="/crm/reports" class="btn btn-primary">Reports Dashboard</a>
+                <a href="/crm/reports/sales_performance/export" class="btn btn-success">Export Report</a>
+                <a href="/crm/reports/sales_performance/print" class="btn btn-warning">Print Report</a>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">${{ "{:,.0f}".format(metrics.total_revenue) }}</div>
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-change {% if metrics.revenue_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.revenue_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.revenue_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ metrics.total_deals }}</div>
+                <div class="metric-label">Total Deals</div>
+                <div class="metric-change {% if metrics.deals_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.deals_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.deals_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.avg_deal_size) }}</div>
+                <div class="metric-label">Average Deal Size</div>
+                <div class="metric-change {% if metrics.deal_size_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.deal_size_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.deal_size_growth) }}% vs last period
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">{{ "%.1f"|format(metrics.win_rate) }}%</div>
+                <div class="metric-label">Win Rate</div>
+                <div class="metric-change {% if metrics.win_rate_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if metrics.win_rate_growth >= 0 %}+{% endif %}{{ "%.1f"|format(metrics.win_rate_growth) }}% vs last period
+                </div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/crm/reports/sales_performance">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="date_from">Date From:</label>
+                        <input type="date" id="date_from" name="date_from" value="{{ request.args.get('date_from', '') }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="date_to">Date To:</label>
+                        <input type="date" id="date_to" name="date_to" value="{{ request.args.get('date_to', '') }}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="sales_rep">Sales Representative:</label>
+                        <select id="sales_rep" name="sales_rep">
+                            <option value="">All Representatives</option>
+                            {% for rep in sales_reps %}
+                            <option value="{{ rep.id }}" {% if request.args.get('sales_rep')|int == rep.id %}selected{% endif %}>{{ rep.first_name }} {{ rep.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="region">Region:</label>
+                        <select id="region" name="region">
+                            <option value="">All Regions</option>
+                            {% for region in regions %}
+                            <option value="{{ region }}" {% if request.args.get('region') == region %}selected{% endif %}>{{ region }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="/crm/reports/sales_performance" class="btn btn-warning">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Revenue Trend</h3>
+                <canvas id="revenueTrendChart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Sales by Region</h3>
+                <canvas id="salesByRegionChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="card-title">Sales Performance by Representative</h3>
+            <canvas id="salesRepPerformanceChart" width="800" height="400"></canvas>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3 class="card-title">Top Performing Representatives</h3>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Representative</th>
+                            <th>Revenue</th>
+                            <th>Deals</th>
+                            <th>Win Rate</th>
+                            <th>Avg Deal Size</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rep in top_performers %}
+                        <tr>
+                            <td>
+                                {% if loop.index == 1 %}
+                                    <span class="rank-badge rank-1">1st</span>
+                                {% elif loop.index == 2 %}
+                                    <span class="rank-badge rank-2">2nd</span>
+                                {% elif loop.index == 3 %}
+                                    <span class="rank-badge rank-3">3rd</span>
+                                {% else %}
+                                    {{ loop.index }}
+                                {% endif %}
+                            </td>
+                            <td>{{ rep.name }}</td>
+                            <td>${{ "{:,.0f}".format(rep.revenue) }}</td>
+                            <td>{{ rep.deals }}</td>
+                            <td>{{ "%.1f"|format(rep.win_rate) }}%</td>
+                            <td>${{ "{:,.0f}".format(rep.avg_deal_size) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Sales Pipeline Analysis</h3>
+                <canvas id="pipelineAnalysisChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Detailed Sales Performance</h3>
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th>Representative</th>
+                        <th>Region</th>
+                        <th>Total Revenue</th>
+                        <th>Won Deals</th>
+                        <th>Lost Deals</th>
+                        <th>Win Rate</th>
+                        <th>Avg Deal Size</th>
+                        <th>Sales Cycle (Days)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for performance in detailed_performance %}
+                    <tr>
+                        <td>{{ performance.representative }}</td>
+                        <td>{{ performance.region }}</td>
+                        <td>${{ "{:,.0f}".format(performance.total_revenue) }}</td>
+                        <td>{{ performance.won_deals }}</td>
+                        <td>{{ performance.lost_deals }}</td>
+                        <td>{{ "%.1f"|format(performance.win_rate) }}%</td>
+                        <td>${{ "{:,.0f}".format(performance.avg_deal_size) }}</td>
+                        <td>{{ performance.avg_sales_cycle }}</td>
+                        <td>
+                            <a href="/crm/reports/sales_performance/{{ performance.rep_id }}" class="btn btn-primary btn-sm">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Revenue Trend Chart
+        const revenueTrendCtx = document.getElementById('revenueTrendChart').getContext('2d');
+        new Chart(revenueTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [150000, 160000, 155000, 170000, 165000, 180000],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Sales by Region Chart
+        const salesByRegionCtx = document.getElementById('salesByRegionChart').getContext('2d');
+        new Chart(salesByRegionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['North', 'South', 'East', 'West', 'Central'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Sales Rep Performance Chart
+        const salesRepPerformanceCtx = document.getElementById('salesRepPerformanceChart').getContext('2d');
+        new Chart(salesRepPerformanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['John Smith', 'Sarah Johnson', 'Mike Davis', 'Lisa Wilson', 'Tom Brown'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [250000, 220000, 200000, 180000, 160000],
+                    backgroundColor: '#007bff'
+                }, {
+                    label: 'Deals Won',
+                    data: [25, 22, 20, 18, 16],
+                    backgroundColor: '#28a745',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value / 1000) + 'k';
+                            }
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' deals';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pipeline Analysis Chart
+        const pipelineAnalysisCtx = document.getElementById('pipelineAnalysisChart').getContext('2d');
+        new Chart(pipelineAnalysisCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Prospecting', 'Qualification', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'],
+                datasets: [{
+                    label: 'Deal Count',
+                    data: [150, 120, 90, 60, 45, 15],
+                    backgroundColor: [
+                        '#6c757d',
+                        '#007bff',
+                        '#ffc107',
+                        '#fd7e14',
+                        '#28a745',
+                        '#dc3545'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

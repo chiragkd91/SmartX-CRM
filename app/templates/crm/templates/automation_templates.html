@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Templates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .automation-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .automation-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .automation-item.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .automation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .automation-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .automation-category {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .automation-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .automation-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .automation-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .workflow-builder {
+            margin-top: 20px;
+        }
+        .workflow-step {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .step-title {
+            font-weight: bold;
+        }
+        .step-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .step-content {
+            color: #666;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .preview-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+        }
+        .workflow-preview {
+            margin-top: 20px;
+        }
+        .workflow-node {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .workflow-arrow {
+            display: inline-block;
+            margin: 0 10px;
+            font-size: 20px;
+            color: #007bff;
+        }
+        .trigger-library {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .trigger-category {
+            margin-bottom: 15px;
+        }
+        .trigger-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .trigger-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .trigger-option:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .trigger-option-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .trigger-option-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .action-library {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .action-category {
+            margin-bottom: 15px;
+        }
+        .action-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .action-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .action-option:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .action-option-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .action-option-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .condition-builder {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .condition-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .condition-field {
+            flex: 2;
+        }
+        .condition-operator {
+            flex: 1;
+        }
+        .condition-value {
+            flex: 2;
+        }
+        .condition-actions {
+            flex: 0 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Automation Templates</h1>
+                <p>Create and manage workflow automation templates</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateAutomation()">Create Template</button>
+                <a href="/crm/templates" class="btn btn-secondary">Back to Templates</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Automation Library -->
+            <div class="card">
+                <h3>Automation Library</h3>
+                <div class="automation-item" onclick="selectAutomation('lead_nurturing')">
+                    <div class="automation-header">
+                        <div class="automation-name">Lead Nurturing Campaign</div>
+                        <span class="automation-category">Marketing</span>
+                    </div>
+                    <div class="automation-description">
+                        Automated email sequence for nurturing new leads through the sales funnel
+                    </div>
+                    <div class="automation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">78.5%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="automation-item" onclick="selectAutomation('deal_followup')">
+                    <div class="automation-header">
+                        <div class="automation-name">Deal Follow-up</div>
+                        <span class="automation-category">Sales</span>
+                    </div>
+                    <div class="automation-description">
+                        Automated follow-up reminders and task creation for active deals
+                    </div>
+                    <div class="automation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">456</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">82.3%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="automation-item" onclick="selectAutomation('customer_onboarding')">
+                    <div class="automation-header">
+                        <div class="automation-name">Customer Onboarding</div>
+                        <span class="automation-category">Customer</span>
+                    </div>
+                    <div class="automation-description">
+                        Welcome series and onboarding process for new customers
+                    </div>
+                    <div class="automation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">892</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">91.2%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="automation-item" onclick="selectAutomation('re_engagement')">
+                    <div class="automation-header">
+                        <div class="automation-name">Re-engagement Campaign</div>
+                        <span class="automation-category">Marketing</span>
+                    </div>
+                    <div class="automation-description">
+                        Automated campaign to re-engage inactive leads and customers
+                    </div>
+                    <div class="automation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">234</div>
+                            <div class="stat-label">Executions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Steps</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">42.1%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automation Builder -->
+            <div class="card">
+                <h3>Automation Builder</h3>
+                <div class="automation-builder">
+                    <div class="form-group">
+                        <label>Automation Name</label>
+                        <input type="text" id="automation-name" placeholder="Enter automation name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Automation Type</label>
+                        <select id="automation-type">
+                            <option value="">Select automation type</option>
+                            <option value="marketing">Marketing Automation</option>
+                            <option value="sales">Sales Automation</option>
+                            <option value="customer">Customer Automation</option>
+                            <option value="operational">Operational Automation</option>
+                            <option value="custom">Custom Automation</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="automation-description" rows="3" placeholder="Enter automation description"></textarea>
+                    </div>
+
+                    <div class="workflow-builder">
+                        <h4>Workflow Steps</h4>
+                        <div class="workflow-step">
+                            <div class="step-header">
+                                <div class="step-title">Trigger: Lead Created</div>
+                                <div class="step-actions">
+                                    <button class="btn btn-secondary" onclick="editStep('trigger')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeStep('trigger')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                When a new lead is created in the system
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-header">
+                                <div class="step-title">Action: Send Welcome Email</div>
+                                <div class="step-actions">
+                                    <button class="btn btn-secondary" onclick="editStep('action1')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeStep('action1')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                Send welcome email with company introduction
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-header">
+                                <div class="step-title">Delay: Wait 2 Days</div>
+                                <div class="step-actions">
+                                    <button class="btn btn-secondary" onclick="editStep('delay')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeStep('delay')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                Wait for 2 days before next action
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-header">
+                                <div class="step-title">Action: Create Follow-up Task</div>
+                                <div class="step-actions">
+                                    <button class="btn btn-secondary" onclick="editStep('action2')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeStep('action2')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                Create a follow-up task for the sales team
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="addStep()">Add Step</button>
+                        <button class="btn btn-success" onclick="saveAutomation()">Save Automation</button>
+                        <button class="btn btn-primary" onclick="previewAutomation()">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trigger Library -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Trigger Library</h3>
+            <div class="trigger-library">
+                <div class="trigger-category">
+                    <h4>Lead Triggers</h4>
+                    <div class="trigger-option" onclick="addTrigger('lead_created')">
+                        <div class="trigger-option-title">Lead Created</div>
+                        <div class="trigger-option-desc">Trigger when a new lead is created</div>
+                    </div>
+                    <div class="trigger-option" onclick="addTrigger('lead_updated')">
+                        <div class="trigger-option-title">Lead Updated</div>
+                        <div class="trigger-option-desc">Trigger when lead information is updated</div>
+                    </div>
+                    <div class="trigger-option" onclick="addTrigger('lead_qualified')">
+                        <div class="trigger-option-title">Lead Qualified</div>
+                        <div class="trigger-option-desc">Trigger when lead is marked as qualified</div>
+                    </div>
+                </div>
+
+                <div class="trigger-category">
+                    <h4>Deal Triggers</h4>
+                    <div class="trigger-option" onclick="addTrigger('deal_created')">
+                        <div class="trigger-option-title">Deal Created</div>
+                        <div class="trigger-option-desc">Trigger when a new deal is created</div>
+                    </div>
+                    <div class="trigger-option" onclick="addTrigger('deal_stage_changed')">
+                        <div class="trigger-option-title">Deal Stage Changed</div>
+                        <div class="trigger-option-desc">Trigger when deal moves to different stage</div>
+                    </div>
+                    <div class="trigger-option" onclick="addTrigger('deal_won')">
+                        <div class="trigger-option-title">Deal Won</div>
+                        <div class="trigger-option-desc">Trigger when deal is marked as won</div>
+                    </div>
+                </div>
+
+                <div class="trigger-category">
+                    <h4>Email Triggers</h4>
+                    <div class="trigger-option" onclick="addTrigger('email_opened')">
+                        <div class="trigger-option-title">Email Opened</div>
+                        <div class="trigger-option-desc">Trigger when email is opened</div>
+                    </div>
+                    <div class="trigger-option" onclick="addTrigger('email_clicked')">
+                        <div class="trigger-option-title">Email Clicked</div>
+                        <div class="trigger-option-desc">Trigger when email link is clicked</div>
+                    </div>
+                    <div class="trigger-option" onclick="addTrigger('email_bounced')">
+                        <div class="trigger-option-title">Email Bounced</div>
+                        <div class="trigger-option-desc">Trigger when email bounces</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Library -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Action Library</h3>
+            <div class="action-library">
+                <div class="action-category">
+                    <h4>Email Actions</h4>
+                    <div class="action-option" onclick="addAction('send_email')">
+                        <div class="action-option-title">Send Email</div>
+                        <div class="action-option-desc">Send automated email to contact</div>
+                    </div>
+                    <div class="action-option" onclick="addAction('send_notification')">
+                        <div class="action-option-title">Send Notification</div>
+                        <div class="action-option-desc">Send internal notification</div>
+                    </div>
+                </div>
+
+                <div class="action-category">
+                    <h4>Task Actions</h4>
+                    <div class="action-option" onclick="addAction('create_task')">
+                        <div class="action-option-title">Create Task</div>
+                        <div class="action-option-desc">Create a new task for follow-up</div>
+                    </div>
+                    <div class="action-option" onclick="addAction('assign_owner')">
+                        <div class="action-option-title">Assign Owner</div>
+                        <div class="action-option-desc">Assign record to team member</div>
+                    </div>
+                </div>
+
+                <div class="action-category">
+                    <h4>Data Actions</h4>
+                    <div class="action-option" onclick="addAction('update_record')">
+                        <div class="action-option-title">Update Record</div>
+                        <div class="action-option-desc">Update lead or contact information</div>
+                    </div>
+                    <div class="action-option" onclick="addAction('add_tag')">
+                        <div class="action-option-title">Add Tag</div>
+                        <div class="action-option-desc">Add tag to record</div>
+                    </div>
+                </div>
+
+                <div class="action-category">
+                    <h4>Integration Actions</h4>
+                    <div class="action-option" onclick="addAction('webhook')">
+                        <div class="action-option-title">Webhook</div>
+                        <div class="action-option-desc">Call external API endpoint</div>
+                    </div>
+                    <div class="action-option" onclick="addAction('create_calendar_event')">
+                        <div class="action-option-title">Create Calendar Event</div>
+                        <div class="action-option-desc">Schedule calendar appointment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Automation Preview -->
+        <div id="automation-preview" class="card hidden" style="margin-top: 20px;">
+            <h3>Automation Preview</h3>
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h1>Lead Nurturing Campaign</h1>
+                    <p>Automated workflow for nurturing new leads</p>
+                </div>
+
+                <div class="workflow-preview">
+                    <h3>Workflow Flow</h3>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div class="workflow-node">Lead Created</div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-node">Send Welcome Email</div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-node">Wait 2 Days</div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-node">Create Follow-up Task</div>
+                    </div>
+                </div>
+
+                <div class="condition-builder">
+                    <h3>Conditions</h3>
+                    <div class="condition-row">
+                        <div class="condition-field">
+                            <select>
+                                <option>Lead Source</option>
+                                <option>Company Size</option>
+                                <option>Job Title</option>
+                            </select>
+                        </div>
+                        <div class="condition-operator">
+                            <select>
+                                <option>Equals</option>
+                                <option>Not Equals</option>
+                                <option>Contains</option>
+                            </select>
+                        </div>
+                        <div class="condition-value">
+                            <input type="text" placeholder="Enter value">
+                        </div>
+                        <div class="condition-actions">
+                            <button class="btn btn-danger">Remove</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary">Add Condition</button>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>Execution Statistics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #007bff;">1,247</div>
+                            <div style="color: #666;">Total Executions</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #28a745;">78.5%</div>
+                            <div style="color: #666;">Success Rate</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ffc107;">2.3s</div>
+                            <div style="color: #666;">Avg Response Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedAutomation = null;
+
+        function showCreateAutomation() {
+            document.getElementById('automation-name').focus();
+        }
+
+        function selectAutomation(automationId) {
+            selectedAutomation = automationId;
+            
+            // Remove previous selection
+            document.querySelectorAll('.automation-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('selected');
+            
+            console.log('Selected automation:', automationId);
+        }
+
+        function addStep() {
+            const stepName = prompt('Enter step name:');
+            if (stepName) {
+                console.log('Adding step:', stepName);
+                alert('Step added successfully!');
+            }
+        }
+
+        function addTrigger(triggerType) {
+            console.log('Adding trigger:', triggerType);
+            alert('Trigger added successfully!');
+        }
+
+        function addAction(actionType) {
+            console.log('Adding action:', actionType);
+            alert('Action added successfully!');
+        }
+
+        function editStep(stepId) {
+            console.log('Editing step:', stepId);
+            alert('Edit functionality would open step editor');
+        }
+
+        function removeStep(stepId) {
+            if (confirm('Are you sure you want to remove this step?')) {
+                console.log('Removing step:', stepId);
+                alert('Step removed successfully!');
+            }
+        }
+
+        function saveAutomation() {
+            const name = document.getElementById('automation-name').value;
+            const type = document.getElementById('automation-type').value;
+            const description = document.getElementById('automation-description').value;
+            
+            if (!name || !type) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Saving automation:', { name, type, description });
+            alert('Automation saved successfully!');
+        }
+
+        function previewAutomation() {
+            document.getElementById('automation-preview').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html> 

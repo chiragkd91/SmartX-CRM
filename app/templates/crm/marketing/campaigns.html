@@ -1,0 +1,548 @@
+{% extends "base.html" %}
+
+{% block title %}Marketing Campaigns{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Marketing Campaigns</h1>
+                <div>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#createCampaignModal">
+                        <i class="fas fa-plus"></i> Create Campaign
+                    </button>
+                    <button class="btn btn-outline-secondary ml-2">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Overview -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Active Campaigns</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">12</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Leads Generated</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1,250</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Conversion Rate</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">8.5%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Budget</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$45,000</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-control">
+                                <option>All Status</option>
+                                <option>Active</option>
+                                <option>Paused</option>
+                                <option>Completed</option>
+                                <option>Draft</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-control">
+                                <option>All Types</option>
+                                <option>Email</option>
+                                <option>Social Media</option>
+                                <option>Content Marketing</option>
+                                <option>Paid Advertising</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Channel</label>
+                            <select class="form-control">
+                                <option>All Channels</option>
+                                <option>Email</option>
+                                <option>LinkedIn</option>
+                                <option>Facebook</option>
+                                <option>Google Ads</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-control">
+                                <option>Last 30 Days</option>
+                                <option>Last 90 Days</option>
+                                <option>Last 6 Months</option>
+                                <option>Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button class="btn btn-primary">Apply Filters</button>
+                                <button class="btn btn-outline-secondary ml-2">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign Performance</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Leads</th>
+                                    <th>Conversion</th>
+                                    <th>Budget</th>
+                                    <th>ROI</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Q1 Enterprise Email Campaign</strong>
+                                        <br><small class="text-muted">Targeting enterprise decision makers</small>
+                                    </td>
+                                    <td>Email Marketing</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>245</td>
+                                    <td>12.5%</td>
+                                    <td>$8,000</td>
+                                    <td><span class="text-success">+180%</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>LinkedIn Lead Generation</strong>
+                                        <br><small class="text-muted">Sponsored content for tech professionals</small>
+                                    </td>
+                                    <td>Social Media</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>180</td>
+                                    <td>8.2%</td>
+                                    <td>$12,000</td>
+                                    <td><span class="text-success">+145%</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Content Marketing Series</strong>
+                                        <br><small class="text-muted">Whitepaper and webinar promotion</small>
+                                    </td>
+                                    <td>Content Marketing</td>
+                                    <td><span class="badge badge-warning">Paused</span></td>
+                                    <td>320</td>
+                                    <td>15.8%</td>
+                                    <td>$5,000</td>
+                                    <td><span class="text-success">+220%</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Google Ads Search Campaign</strong>
+                                        <br><small class="text-muted">Targeting specific keywords</small>
+                                    </td>
+                                    <td>Paid Advertising</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>156</td>
+                                    <td>6.5%</td>
+                                    <td>$15,000</td>
+                                    <td><span class="text-warning">+85%</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Facebook Retargeting</strong>
+                                        <br><small class="text-muted">Retargeting website visitors</small>
+                                    </td>
+                                    <td>Paid Advertising</td>
+                                    <td><span class="badge badge-info">Completed</span></td>
+                                    <td>89</td>
+                                    <td>4.2%</td>
+                                    <td>$5,000</td>
+                                    <td><span class="text-danger">+45%</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Performance Charts -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign Performance Over Time</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                            <a class="dropdown-item" href="#">Last 7 Days</a>
+                            <a class="dropdown-item" href="#">Last 30 Days</a>
+                            <a class="dropdown-item" href="#">Last 90 Days</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="campaignPerformanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign ROI by Channel</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="campaignROIChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Email
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Social
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Content
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Insights -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Top Performing Campaigns</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Q1 Enterprise Email Campaign</h6>
+                                <small class="text-muted">245 leads • 12.5% conversion</small>
+                            </div>
+                            <span class="badge badge-success badge-pill">+180% ROI</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Content Marketing Series</h6>
+                                <small class="text-muted">320 leads • 15.8% conversion</small>
+                            </div>
+                            <span class="badge badge-success badge-pill">+220% ROI</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">LinkedIn Lead Generation</h6>
+                                <small class="text-muted">180 leads • 8.2% conversion</small>
+                            </div>
+                            <span class="badge badge-success badge-pill">+145% ROI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Campaign Insights</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <h6 class="mb-1">Email Campaigns</h6>
+                            <p class="mb-1 text-success">Email campaigns show 25% higher conversion rates when sent on Tuesdays and Thursdays.</p>
+                            <small class="text-muted">Recommendation: Optimize send times</small>
+                        </div>
+                        <div class="list-group-item">
+                            <h6 class="mb-1">Content Marketing</h6>
+                            <p class="mb-1 text-info">Whitepapers generate 3x more leads than blog posts but require 5x more resources.</p>
+                            <small class="text-muted">Recommendation: Balance content types</small>
+                        </div>
+                        <div class="list-group-item">
+                            <h6 class="mb-1">Social Media</h6>
+                            <p class="mb-1 text-warning">LinkedIn campaigns perform 40% better than Facebook for B2B lead generation.</p>
+                            <small class="text-muted">Recommendation: Increase LinkedIn budget</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Campaign Modal -->
+<div class="modal fade" id="createCampaignModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Campaign</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Campaign Name</label>
+                                <input type="text" class="form-control" placeholder="Enter campaign name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Campaign Type</label>
+                                <select class="form-control">
+                                    <option>Email Marketing</option>
+                                    <option>Social Media</option>
+                                    <option>Content Marketing</option>
+                                    <option>Paid Advertising</option>
+                                    <option>Event Marketing</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Channel</label>
+                                <select class="form-control">
+                                    <option>Email</option>
+                                    <option>LinkedIn</option>
+                                    <option>Facebook</option>
+                                    <option>Google Ads</option>
+                                    <option>Twitter</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control">
+                                    <option>Draft</option>
+                                    <option>Active</option>
+                                    <option>Paused</option>
+                                    <option>Scheduled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Budget</label>
+                                <input type="number" class="form-control" placeholder="Enter budget amount">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Target Audience</label>
+                                <select class="form-control">
+                                    <option>Enterprise</option>
+                                    <option>Mid-Market</option>
+                                    <option>SMB</option>
+                                    <option>All Segments</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Campaign Description</label>
+                        <textarea class="form-control" rows="3" placeholder="Enter campaign description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Goals</label>
+                        <textarea class="form-control" rows="2" placeholder="Enter campaign goals"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Create Campaign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Campaign Performance Chart
+    const performanceCtx = document.getElementById('campaignPerformanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Leads Generated',
+                data: [120, 180, 220, 280, 320, 350, 380, 420, 450, 480, 520, 550],
+                borderColor: 'rgba(78, 115, 223, 1)',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true
+            }, {
+                label: 'Conversions',
+                data: [12, 18, 22, 28, 32, 35, 38, 42, 45, 48, 52, 55],
+                borderColor: 'rgba(28, 200, 138, 1)',
+                backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Campaign ROI Chart
+    const roiCtx = document.getElementById('campaignROIChart').getContext('2d');
+    new Chart(roiCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Email', 'Social', 'Content', 'Paid Ads'],
+            datasets: [{
+                data: [35, 25, 20, 20],
+                backgroundColor: [
+                    'rgba(78, 115, 223, 0.8)',
+                    'rgba(28, 200, 138, 0.8)',
+                    'rgba(54, 185, 204, 0.8)',
+                    'rgba(246, 194, 62, 0.8)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Builder - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .workflow-builder {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+            height: 80vh;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .canvas-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-canvas {
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            position: relative;
+            overflow: auto;
+        }
+
+        .workflow-canvas.dragover {
+            border-color: #007bff;
+            background: rgba(0,123,255,0.1);
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .trigger-item, .action-item, .condition-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .trigger-item:hover, .action-item:hover, .condition-item:hover {
+            border-color: #007bff;
+            background: rgba(0,123,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .trigger-item:active, .action-item:active, .condition-item:active {
+            cursor: grabbing;
+        }
+
+        .item-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .trigger-item .item-icon {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+        }
+
+        .action-item .item-icon {
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+        }
+
+        .condition-item .item-icon {
+            background: #ffc107;
+            color: #212529;
+            border-radius: 50%;
+        }
+
+        .workflow-node {
+            position: absolute;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: move;
+            user-select: none;
+        }
+
+        .workflow-node.trigger {
+            border-color: #dc3545;
+        }
+
+        .workflow-node.action {
+            border-color: #28a745;
+        }
+
+        .workflow-node.condition {
+            border-color: #ffc107;
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .node-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .node-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .node-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .node-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .node-content {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #007bff;
+            height: 2px;
+            transform-origin: left center;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #007bff;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .workflow-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .workflow-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .workflow-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .workflow-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            min-width: 400px;
+            max-width: 600px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .close-btn:hover {
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .workflow-builder {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .canvas-container {
+                order: 1;
+                height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Workflow Builder</h1>
+            <p>Create complex automation rules with drag-and-drop interface</p>
+        </div>
+
+        <!-- Workflow Information -->
+        <div class="workflow-info">
+            <div class="workflow-form">
+                <div class="form-group">
+                    <label for="workflow-name">Workflow Name</label>
+                    <input type="text" id="workflow-name" value="Lead Qualification Automation" placeholder="Enter workflow name">
+                </div>
+                <div class="form-group">
+                    <label for="workflow-description">Description</label>
+                    <textarea id="workflow-description" rows="2" placeholder="Describe what this workflow does">Automatically qualifies leads based on score and assigns them to appropriate sales representatives.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="workflow-status">Status</label>
+                    <select id="workflow-status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="workflow-priority">Priority</label>
+                    <select id="workflow-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="workflow-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-nodes">0</div>
+                    <div class="stat-label">Total Nodes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-connections">0</div>
+                    <div class="stat-label">Connections</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="execution-count">1,247</div>
+                    <div class="stat-label">Executions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="success-rate">98.5%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Builder -->
+        <div class="workflow-builder">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Triggers -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">🎯 Triggers</div>
+                    <div class="trigger-item" draggable="true" data-type="trigger" data-trigger="lead-created">
+                        <span class="item-icon">T</span>
+                        Lead Created
+                    </div>
+                    <div class="trigger-item" draggable="true" data-type="trigger" data-trigger="lead-updated">
+                        <span class="item-icon">T</span>
+                        Lead Updated
+                    </div>
+                    <div class="trigger-item" draggable="true" data-type="trigger" data-trigger="email-received">
+                        <span class="item-icon">T</span>
+                        Email Received
+                    </div>
+                    <div class="trigger-item" draggable="true" data-type="trigger" data-trigger="form-submitted">
+                        <span class="item-icon">T</span>
+                        Form Submitted
+                    </div>
+                    <div class="trigger-item" draggable="true" data-type="trigger" data-trigger="scheduled">
+                        <span class="item-icon">T</span>
+                        Scheduled Event
+                    </div>
+                </div>
+
+                <!-- Conditions -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">🔍 Conditions</div>
+                    <div class="condition-item" draggable="true" data-type="condition" data-condition="score-check">
+                        <span class="item-icon">C</span>
+                        Score Check
+                    </div>
+                    <div class="condition-item" draggable="true" data-type="condition" data-condition="source-check">
+                        <span class="item-icon">C</span>
+                        Source Check
+                    </div>
+                    <div class="condition-item" draggable="true" data-type="condition" data-condition="status-check">
+                        <span class="item-icon">C</span>
+                        Status Check
+                    </div>
+                    <div class="condition-item" draggable="true" data-type="condition" data-condition="time-check">
+                        <span class="item-icon">C</span>
+                        Time Check
+                    </div>
+                    <div class="condition-item" draggable="true" data-type="condition" data-condition="field-check">
+                        <span class="item-icon">C</span>
+                        Field Check
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">⚡ Actions</div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="send-email">
+                        <span class="item-icon">A</span>
+                        Send Email
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="assign-lead">
+                        <span class="item-icon">A</span>
+                        Assign Lead
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="update-status">
+                        <span class="item-icon">A</span>
+                        Update Status
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="create-task">
+                        <span class="item-icon">A</span>
+                        Create Task
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="send-notification">
+                        <span class="item-icon">A</span>
+                        Send Notification
+                    </div>
+                    <div class="action-item" draggable="true" data-type="action" data-action="webhook">
+                        <span class="item-icon">A</span>
+                        Webhook Call
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas -->
+            <div class="canvas-container">
+                <div class="workflow-controls">
+                    <button class="btn btn-primary" onclick="saveWorkflow()">Save Workflow</button>
+                    <button class="btn btn-success" onclick="testWorkflow()">Test Workflow</button>
+                    <button class="btn btn-warning" onclick="exportWorkflow()">Export</button>
+                    <button class="btn btn-danger" onclick="clearCanvas()">Clear All</button>
+                </div>
+                
+                <div class="workflow-canvas" id="workflow-canvas">
+                    <!-- Workflow nodes will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Node Configuration Modal -->
+    <div class="modal" id="node-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Configure Node</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let nodes = [];
+        let connections = [];
+        let selectedNode = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+
+        // Initialize workflow builder
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDragAndDrop();
+            initializeCanvas();
+            updateStats();
+        });
+
+        function initializeDragAndDrop() {
+            // Make draggable items
+            const draggableItems = document.querySelectorAll('[draggable="true"]');
+            
+            draggableItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Canvas drop zone
+            const canvas = document.getElementById('workflow-canvas');
+            canvas.addEventListener('dragover', handleDragOver);
+            canvas.addEventListener('drop', handleDrop);
+            canvas.addEventListener('dragenter', handleDragEnter);
+            canvas.addEventListener('dragleave', handleDragLeave);
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                type: e.target.dataset.type,
+                trigger: e.target.dataset.trigger,
+                condition: e.target.dataset.condition,
+                action: e.target.dataset.action
+            }));
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '1';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            createNode(data, x, y);
+        }
+
+        function createNode(data, x, y) {
+            const node = {
+                id: 'node-' + Date.now(),
+                type: data.type,
+                x: x,
+                y: y,
+                data: data
+            };
+            
+            nodes.push(node);
+            renderNode(node);
+            updateStats();
+        }
+
+        function renderNode(node) {
+            const canvas = document.getElementById('workflow-canvas');
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `workflow-node ${node.type}`;
+            nodeElement.id = node.id;
+            nodeElement.style.left = node.x + 'px';
+            nodeElement.style.top = node.y + 'px';
+            
+            let title = '';
+            let content = '';
+            
+            switch(node.type) {
+                case 'trigger':
+                    title = getTriggerTitle(node.data.trigger);
+                    content = 'Triggers when ' + getTriggerDescription(node.data.trigger);
+                    break;
+                case 'condition':
+                    title = getConditionTitle(node.data.condition);
+                    content = 'Checks if ' + getConditionDescription(node.data.condition);
+                    break;
+                case 'action':
+                    title = getActionTitle(node.data.action);
+                    content = 'Performs ' + getActionDescription(node.data.action);
+                    break;
+            }
+            
+            nodeElement.innerHTML = `
+                <div class="node-header">
+                    <div class="node-title">${title}</div>
+                    <div class="node-actions">
+                        <button class="node-btn" onclick="configureNode('${node.id}')" title="Configure">⚙️</button>
+                        <button class="node-btn" onclick="deleteNode('${node.id}')" title="Delete">🗑️</button>
+                    </div>
+                </div>
+                <div class="node-content">${content}</div>
+            `;
+            
+            // Make node draggable
+            nodeElement.addEventListener('mousedown', startNodeDrag);
+            
+            canvas.appendChild(nodeElement);
+        }
+
+        function getTriggerTitle(trigger) {
+            const titles = {
+                'lead-created': 'Lead Created',
+                'lead-updated': 'Lead Updated',
+                'email-received': 'Email Received',
+                'form-submitted': 'Form Submitted',
+                'scheduled': 'Scheduled Event'
+            };
+            return titles[trigger] || trigger;
+        }
+
+        function getTriggerDescription(trigger) {
+            const descriptions = {
+                'lead-created': 'a new lead is created in the system',
+                'lead-updated': 'an existing lead is updated',
+                'email-received': 'an email is received from a lead',
+                'form-submitted': 'a form is submitted on the website',
+                'scheduled': 'a scheduled time is reached'
+            };
+            return descriptions[trigger] || trigger;
+        }
+
+        function getConditionTitle(condition) {
+            const titles = {
+                'score-check': 'Score Check',
+                'source-check': 'Source Check',
+                'status-check': 'Status Check',
+                'time-check': 'Time Check',
+                'field-check': 'Field Check'
+            };
+            return titles[condition] || condition;
+        }
+
+        function getConditionDescription(condition) {
+            const descriptions = {
+                'score-check': 'lead score meets criteria',
+                'source-check': 'lead source matches',
+                'status-check': 'lead status is specific value',
+                'time-check': 'time conditions are met',
+                'field-check': 'specific field has value'
+            };
+            return descriptions[condition] || condition;
+        }
+
+        function getActionTitle(action) {
+            const titles = {
+                'send-email': 'Send Email',
+                'assign-lead': 'Assign Lead',
+                'update-status': 'Update Status',
+                'create-task': 'Create Task',
+                'send-notification': 'Send Notification',
+                'webhook': 'Webhook Call'
+            };
+            return titles[action] || action;
+        }
+
+        function getActionDescription(action) {
+            const descriptions = {
+                'send-email': 'sends an email to the lead',
+                'assign-lead': 'assigns lead to sales rep',
+                'update-status': 'updates lead status',
+                'create-task': 'creates a follow-up task',
+                'send-notification': 'sends notification to team',
+                'webhook': 'calls external webhook'
+            };
+            return descriptions[action] || action;
+        }
+
+        function startNodeDrag(e) {
+            if (e.target.classList.contains('node-btn')) return;
+            
+            isDragging = true;
+            selectedNode = e.currentTarget;
+            const rect = selectedNode.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', handleNodeDrag);
+            document.addEventListener('mouseup', stopNodeDrag);
+        }
+
+        function handleNodeDrag(e) {
+            if (!isDragging || !selectedNode) return;
+            
+            const canvas = document.getElementById('workflow-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - dragOffset.x;
+            const y = e.clientY - rect.top - dragOffset.y;
+            
+            selectedNode.style.left = x + 'px';
+            selectedNode.style.top = y + 'px';
+            
+            // Update node data
+            const nodeId = selectedNode.id;
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                node.x = x;
+                node.y = y;
+            }
+        }
+
+        function stopNodeDrag() {
+            isDragging = false;
+            selectedNode = null;
+            document.removeEventListener('mousemove', handleNodeDrag);
+            document.removeEventListener('mouseup', stopNodeDrag);
+        }
+
+        function configureNode(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            const modal = document.getElementById('node-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            
+            modalTitle.textContent = `Configure ${getNodeTitle(node)}`;
+            modalBody.innerHTML = getNodeConfigurationHTML(node);
+            
+            modal.style.display = 'block';
+        }
+
+        function getNodeTitle(node) {
+            switch(node.type) {
+                case 'trigger': return getTriggerTitle(node.data.trigger);
+                case 'condition': return getConditionTitle(node.data.condition);
+                case 'action': return getActionTitle(node.data.action);
+                default: return 'Node';
+            }
+        }
+
+        function getNodeConfigurationHTML(node) {
+            switch(node.type) {
+                case 'trigger':
+                    return getTriggerConfigurationHTML(node);
+                case 'condition':
+                    return getConditionConfigurationHTML(node);
+                case 'action':
+                    return getActionConfigurationHTML(node);
+                default:
+                    return '<p>No configuration available for this node type.</p>';
+            }
+        }
+
+        function getTriggerConfigurationHTML(node) {
+            return `
+                <div class="form-group">
+                    <label>Trigger Type</label>
+                    <select id="trigger-type">
+                        <option value="lead-created" ${node.data.trigger === 'lead-created' ? 'selected' : ''}>Lead Created</option>
+                        <option value="lead-updated" ${node.data.trigger === 'lead-updated' ? 'selected' : ''}>Lead Updated</option>
+                        <option value="email-received" ${node.data.trigger === 'email-received' ? 'selected' : ''}>Email Received</option>
+                        <option value="form-submitted" ${node.data.trigger === 'form-submitted' ? 'selected' : ''}>Form Submitted</option>
+                        <option value="scheduled" ${node.data.trigger === 'scheduled' ? 'selected' : ''}>Scheduled Event</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="trigger-description" rows="3" placeholder="Describe when this trigger should fire">${getTriggerDescription(node.data.trigger)}</textarea>
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="saveNodeConfiguration('${node.id}')">Save Configuration</button>
+                </div>
+            `;
+        }
+
+        function getConditionConfigurationHTML(node) {
+            return `
+                <div class="form-group">
+                    <label>Condition Type</label>
+                    <select id="condition-type">
+                        <option value="score-check" ${node.data.condition === 'score-check' ? 'selected' : ''}>Score Check</option>
+                        <option value="source-check" ${node.data.condition === 'source-check' ? 'selected' : ''}>Source Check</option>
+                        <option value="status-check" ${node.data.condition === 'status-check' ? 'selected' : ''}>Status Check</option>
+                        <option value="time-check" ${node.data.condition === 'time-check' ? 'selected' : ''}>Time Check</option>
+                        <option value="field-check" ${node.data.condition === 'field-check' ? 'selected' : ''}>Field Check</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Condition Logic</label>
+                    <select id="condition-operator">
+                        <option value="equals">Equals</option>
+                        <option value="not-equals">Not Equals</option>
+                        <option value="greater-than">Greater Than</option>
+                        <option value="less-than">Less Than</option>
+                        <option value="contains">Contains</option>
+                        <option value="not-contains">Not Contains</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Value</label>
+                    <input type="text" id="condition-value" placeholder="Enter condition value">
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="saveNodeConfiguration('${node.id}')">Save Configuration</button>
+                </div>
+            `;
+        }
+
+        function getActionConfigurationHTML(node) {
+            return `
+                <div class="form-group">
+                    <label>Action Type</label>
+                    <select id="action-type">
+                        <option value="send-email" ${node.data.action === 'send-email' ? 'selected' : ''}>Send Email</option>
+                        <option value="assign-lead" ${node.data.action === 'assign-lead' ? 'selected' : ''}>Assign Lead</option>
+                        <option value="update-status" ${node.data.action === 'update-status' ? 'selected' : ''}>Update Status</option>
+                        <option value="create-task" ${node.data.action === 'create-task' ? 'selected' : ''}>Create Task</option>
+                        <option value="send-notification" ${node.data.action === 'send-notification' ? 'selected' : ''}>Send Notification</option>
+                        <option value="webhook" ${node.data.action === 'webhook' ? 'selected' : ''}>Webhook Call</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Action Parameters</label>
+                    <textarea id="action-parameters" rows="4" placeholder="Enter action parameters (JSON format)"></textarea>
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="saveNodeConfiguration('${node.id}')">Save Configuration</button>
+                </div>
+            `;
+        }
+
+        function saveNodeConfiguration(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            // Save configuration based on node type
+            switch(node.type) {
+                case 'trigger':
+                    node.data.trigger = document.getElementById('trigger-type').value;
+                    break;
+                case 'condition':
+                    node.data.condition = document.getElementById('condition-type').value;
+                    node.data.operator = document.getElementById('condition-operator').value;
+                    node.data.value = document.getElementById('condition-value').value;
+                    break;
+                case 'action':
+                    node.data.action = document.getElementById('action-type').value;
+                    node.data.parameters = document.getElementById('action-parameters').value;
+                    break;
+            }
+            
+            // Re-render node
+            const nodeElement = document.getElementById(nodeId);
+            if (nodeElement) {
+                nodeElement.remove();
+                renderNode(node);
+            }
+            
+            closeModal();
+            showNotification('Node configuration saved successfully!', 'success');
+        }
+
+        function deleteNode(nodeId) {
+            if (confirm('Are you sure you want to delete this node?')) {
+                const nodeElement = document.getElementById(nodeId);
+                if (nodeElement) {
+                    nodeElement.remove();
+                }
+                
+                nodes = nodes.filter(n => n.id !== nodeId);
+                updateStats();
+                showNotification('Node deleted successfully!', 'success');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('node-modal').style.display = 'none';
+        }
+
+        function saveWorkflow() {
+            const workflowData = {
+                name: document.getElementById('workflow-name').value,
+                description: document.getElementById('workflow-description').value,
+                status: document.getElementById('workflow-status').value,
+                priority: document.getElementById('workflow-priority').value,
+                nodes: nodes,
+                connections: connections
+            };
+            
+            console.log('Saving workflow:', workflowData);
+            showNotification('Workflow saved successfully!', 'success');
+        }
+
+        function testWorkflow() {
+            showNotification('Testing workflow...', 'info');
+            setTimeout(() => {
+                showNotification('Workflow test completed successfully!', 'success');
+            }, 2000);
+        }
+
+        function exportWorkflow() {
+            const workflowData = {
+                name: document.getElementById('workflow-name').value,
+                nodes: nodes,
+                connections: connections
+            };
+            
+            const dataStr = JSON.stringify(workflowData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'workflow.json';
+            link.click();
+            
+            showNotification('Workflow exported successfully!', 'success');
+        }
+
+        function clearCanvas() {
+            if (confirm('Are you sure you want to clear the entire workflow?')) {
+                document.getElementById('workflow-canvas').innerHTML = '';
+                nodes = [];
+                connections = [];
+                updateStats();
+                showNotification('Canvas cleared successfully!', 'success');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('total-nodes').textContent = nodes.length;
+            document.getElementById('total-connections').textContent = connections.length;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 6px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = '#28a745';
+            } else if (type === 'info') {
+                notification.style.background = '#17a2b8';
+            } else if (type === 'warning') {
+                notification.style.background = '#ffc107';
+                notification.style.color = '#212529';
+            } else {
+                notification.style.background = '#dc3545';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('node-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Templates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .template-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .template-item:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .template-item.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .template-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .template-category {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e9ecef;
+            color: #495057;
+        }
+        .template-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .template-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .template-builder {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .section-builder {
+            margin-top: 20px;
+        }
+        .section-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+        }
+        .section-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .section-content {
+            color: #666;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .preview-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .preview-section {
+            margin-bottom: 25px;
+        }
+        .preview-section h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .preview-section p {
+            line-height: 1.6;
+            color: #333;
+        }
+        .variable-list {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .variable-item {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .variable-item:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Proposal Templates</h1>
+                <p>Create and manage professional proposal templates</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="showCreateTemplate()">Create Template</button>
+                <a href="/crm/templates" class="btn btn-secondary">Back to Templates</a>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Template Library -->
+            <div class="card">
+                <h3>Template Library</h3>
+                <div class="template-item" onclick="selectTemplate('enterprise')">
+                    <div class="template-header">
+                        <div class="template-name">Enterprise Solution Proposal</div>
+                        <span class="template-category">Enterprise</span>
+                    </div>
+                    <div class="template-description">
+                        Comprehensive proposal template for enterprise software solutions
+                    </div>
+                    <div class="template-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">78.5%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$2.3M</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template-item" onclick="selectTemplate('sme')">
+                    <div class="template-header">
+                        <div class="template-name">SME Business Proposal</div>
+                        <span class="template-category">SME</span>
+                    </div>
+                    <div class="template-description">
+                        Streamlined proposal template for small and medium businesses
+                    </div>
+                    <div class="template-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">234</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">65.2%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$890K</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template-item" onclick="selectTemplate('consulting')">
+                    <div class="template-header">
+                        <div class="template-name">Consulting Services</div>
+                        <span class="template-category">Consulting</span>
+                    </div>
+                    <div class="template-description">
+                        Professional consulting services proposal template
+                    </div>
+                    <div class="template-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">82.1%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$450K</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template-item" onclick="selectTemplate('custom')">
+                    <div class="template-header">
+                        <div class="template-name">Custom Development</div>
+                        <span class="template-category">Custom</span>
+                    </div>
+                    <div class="template-description">
+                        Template for custom software development projects
+                    </div>
+                    <div class="template-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">67</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">71.6%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$1.2M</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Builder -->
+            <div class="card">
+                <h3>Template Builder</h3>
+                <div class="template-builder">
+                    <div class="form-group">
+                        <label>Template Name</label>
+                        <input type="text" id="template-name" placeholder="Enter template name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="template-category">
+                            <option value="">Select category</option>
+                            <option value="enterprise">Enterprise</option>
+                            <option value="sme">SME</option>
+                            <option value="consulting">Consulting</option>
+                            <option value="custom">Custom Development</option>
+                            <option value="saas">SaaS</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="template-description" rows="3" placeholder="Enter template description"></textarea>
+                    </div>
+
+                    <div class="section-builder">
+                        <h4>Template Sections</h4>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Executive Summary</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('executive_summary')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('executive_summary')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Brief overview of the proposed solution and its benefits...
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Problem Statement</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('problem_statement')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('problem_statement')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Detailed analysis of the client's current challenges...
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Proposed Solution</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('proposed_solution')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('proposed_solution')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Comprehensive description of the proposed solution...
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Implementation Plan</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('implementation_plan')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('implementation_plan')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Step-by-step implementation timeline and milestones...
+                            </div>
+                        </div>
+                        <div class="section-item">
+                            <div class="section-header">
+                                <div class="section-title">Pricing</div>
+                                <div class="section-actions">
+                                    <button class="btn btn-secondary" onclick="editSection('pricing')">Edit</button>
+                                    <button class="btn btn-danger" onclick="removeSection('pricing')">Remove</button>
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                Detailed pricing breakdown and payment terms...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="addSection()">Add Section</button>
+                        <button class="btn btn-success" onclick="saveTemplate()">Save Template</button>
+                        <button class="btn btn-primary" onclick="previewTemplate()">Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template Preview -->
+        <div id="template-preview" class="card hidden" style="margin-top: 20px;">
+            <h3>Template Preview</h3>
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h1>Proposal for {{client_name}}</h1>
+                    <p>Prepared by {{company_name}}</p>
+                    <p>{{proposal_date}}</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Executive Summary</h3>
+                    <p>This proposal outlines a comprehensive solution to address {{client_name}}'s current challenges and deliver measurable business value. Our approach leverages industry best practices and proven methodologies to ensure successful implementation and long-term success.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Problem Statement</h3>
+                    <p>{{client_name}} is currently facing several challenges including {{problem_1}}, {{problem_2}}, and {{problem_3}}. These issues are impacting {{business_impact}} and require immediate attention to maintain competitive advantage.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Proposed Solution</h3>
+                    <p>Our proposed solution addresses these challenges through {{solution_approach}}. This comprehensive approach includes {{key_features}} and will deliver {{expected_benefits}}.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Implementation Plan</h3>
+                    <p>The implementation will be executed in {{number_of_phases}} phases over {{timeline}} months. Key milestones include {{milestone_1}}, {{milestone_2}}, and {{milestone_3}}.</p>
+                </div>
+
+                <div class="preview-section">
+                    <h3>Pricing</h3>
+                    <p>Total project cost: {{total_cost}}<br>
+                    Payment terms: {{payment_terms}}<br>
+                    Project timeline: {{project_timeline}}</p>
+                </div>
+            </div>
+
+            <div class="variable-list">
+                <h4>Available Variables</h4>
+                <div class="variable-item" onclick="insertVariable('client_name')">{{client_name}}</div>
+                <div class="variable-item" onclick="insertVariable('company_name')">{{company_name}}</div>
+                <div class="variable-item" onclick="insertVariable('proposal_date')">{{proposal_date}}</div>
+                <div class="variable-item" onclick="insertVariable('problem_1')">{{problem_1}}</div>
+                <div class="variable-item" onclick="insertVariable('problem_2')">{{problem_2}}</div>
+                <div class="variable-item" onclick="insertVariable('problem_3')">{{problem_3}}</div>
+                <div class="variable-item" onclick="insertVariable('business_impact')">{{business_impact}}</div>
+                <div class="variable-item" onclick="insertVariable('solution_approach')">{{solution_approach}}</div>
+                <div class="variable-item" onclick="insertVariable('key_features')">{{key_features}}</div>
+                <div class="variable-item" onclick="insertVariable('expected_benefits')">{{expected_benefits}}</div>
+                <div class="variable-item" onclick="insertVariable('number_of_phases')">{{number_of_phases}}</div>
+                <div class="variable-item" onclick="insertVariable('timeline')">{{timeline}}</div>
+                <div class="variable-item" onclick="insertVariable('milestone_1')">{{milestone_1}}</div>
+                <div class="variable-item" onclick="insertVariable('milestone_2')">{{milestone_2}}</div>
+                <div class="variable-item" onclick="insertVariable('milestone_3')">{{milestone_3}}</div>
+                <div class="variable-item" onclick="insertVariable('total_cost')">{{total_cost}}</div>
+                <div class="variable-item" onclick="insertVariable('payment_terms')">{{payment_terms}}</div>
+                <div class="variable-item" onclick="insertVariable('project_timeline')">{{project_timeline}}</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTemplate = null;
+
+        function showCreateTemplate() {
+            document.getElementById('template-name').focus();
+        }
+
+        function selectTemplate(templateId) {
+            selectedTemplate = templateId;
+            
+            // Remove previous selection
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('selected');
+            
+            console.log('Selected template:', templateId);
+        }
+
+        function addSection() {
+            const sectionName = prompt('Enter section name:');
+            if (sectionName) {
+                console.log('Adding section:', sectionName);
+                alert('Section added successfully!');
+            }
+        }
+
+        function editSection(sectionId) {
+            console.log('Editing section:', sectionId);
+            alert('Edit functionality would open section editor');
+        }
+
+        function removeSection(sectionId) {
+            if (confirm('Are you sure you want to remove this section?')) {
+                console.log('Removing section:', sectionId);
+                alert('Section removed successfully!');
+            }
+        }
+
+        function saveTemplate() {
+            const name = document.getElementById('template-name').value;
+            const category = document.getElementById('template-category').value;
+            const description = document.getElementById('template-description').value;
+            
+            if (!name || !category) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Saving template:', { name, category, description });
+            alert('Template saved successfully!');
+        }
+
+        function previewTemplate() {
+            document.getElementById('template-preview').classList.remove('hidden');
+        }
+
+        function insertVariable(variableName) {
+            console.log('Inserting variable:', variableName);
+            alert(`Variable {{${variableName}}} would be inserted into the template`);
+        }
+    </script>
+</body>
+</html> 
